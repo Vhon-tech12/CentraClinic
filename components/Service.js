@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+
 const services = [
   {
     title: "General Consultations",
@@ -60,6 +61,8 @@ function Service() {
                   (service.active
                     ? "bg-purple-600 text-white border-purple-600"
                     : "bg-white hover:shadow-lg")
+
+
                 }
               >
                 <div
@@ -105,6 +108,8 @@ function Service() {
         <button className="inline-flex items-center gap-3 bg-purple-600 text-white px-8 py-4 rounded-full shadow hover:bg-purple-700 transition">
           Book Appointment
           <span className="bg-white text-purple-600 w-8 h-8 rounded-full flex items-center justify-center">
+             →
+
           </span>
         </button>
 
