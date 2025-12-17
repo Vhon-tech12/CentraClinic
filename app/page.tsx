@@ -1,6 +1,14 @@
-import LoginForm from "@/components/LoginForm";
+import NavBar from "@/components/NavBar";
+import Hero from "@/components/Hero";
+import Service from "@/components/Service";
 
 export default function Home() {
-  return <LoginForm />;
+  return (
+    <div>
+      <NavBar />
+      <Hero />
+      <Service />
+    </div>
+  );
 }
   
