@@ -22,7 +22,7 @@ const Hero = () => {
             </p>
 
             <button className="flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-full">
-              📘 Book Appointment
+              📘 Consult Now
             </button>
           </div>
 
