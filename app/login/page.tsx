@@ -20,12 +20,12 @@ export default function ContactPage() {
 
             <div>
               <p className="font-semibold text-gray-800">Phone</p>
-              <p className="text-gray-600">+1 (555) 000-0000</p>
+              <p className="text-gray-600">09999562468</p>
             </div>
 
             <div>
               <p className="font-semibold text-gray-800">Email</p>
-              <p className="text-gray-600">hi@agency.com</p>
+              <p className="text-gray-600">centraclinicph@gmail.com</p>
             </div>
 
             <div>
