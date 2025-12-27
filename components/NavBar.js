@@ -20,8 +20,8 @@ const Navbar = () => {
 
       {/* Actions */}
       <div className="flex items-center gap-4">
-        <Link href="login" className="text-gray-700 font-medium">
-          Login
+        <Link href="login" className="text-gray-700 font-medium rounded-full px-6 py-2 hover:bg-blue-200 transition-colors">
+         Book Appointment
         </Link>
       </div>
     </nav>
