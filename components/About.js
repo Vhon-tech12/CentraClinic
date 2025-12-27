@@ -63,13 +63,20 @@ const About = () => {
                 Choose what works for you – visit our modern, welcoming physical clinic.
               </Feature>
 
-              {/* CTA */}
-              <button className="mt-6 inline-flex items-center gap-4 bg-white text-purple-600 px-8 py-4 rounded-full font-semibold shadow hover:bg-gray-100 transition">
-                Book Appointment
-                <span className="bg-purple-600 text-white w-9 h-9 rounded-full flex items-center justify-center">
-                  →
-                </span>
-              </button>
+                {/* CTA */}
+                <Link
+                href="/login"
+                className="mt-6 inline-flex items-center gap-4 bg-white text-purple-600
+                px-8 py-4 rounded-full font-semibold shadow
+               hover:bg-gray-100 transition"
+              >
+               Book Appointment
+                 <span className="bg-purple-600 text-white w-9 h-9 rounded-full
+                   flex items-center justify-center">
+    →
+  </span>
+</Link>
+
             </div>
           </div>
         </div>

@@ -115,14 +115,15 @@ function Service() {
           ))}
         </div>
 
-        {/* CTA BUTTON */}
-        <button className="inline-flex items-center gap-3 bg-linear-to-r from-indigo-600 to-blue-600 text-white px-10 py-5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-semibold text-lg">
-          Book Your Appointment
-          <span className="bg-white text-indigo-600 w-10 h-10 rounded-full flex items-center justify-center transition-transform hover:rotate-12">
-            →
-          </span>
-        </button>
-
+        <Link
+              href="/login"
+              className="inline-flex items-center gap-3 bg-linear-to-r from-indigo-600 to-blue-600 text-white px-12 py-5 rounded-full shadow-lg hover:shadow-xl transition-transform hover:scale-105 font-semibold text-lg"
+            >
+              Book an Appointment
+              <span className="bg-white text-indigo-600 w-10 h-10 rounded-full flex items-center justify-center">
+                →
+              </span>
+                    </Link>
       </div>
     </section>
   );

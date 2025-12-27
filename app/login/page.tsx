@@ -165,11 +165,11 @@ export default function AppointmentPage() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Additional Notes
+                    Message (Optional)
                   </label>
                   <textarea
                     rows={4}
-                    placeholder="Please share any specific concerns or questions..."
+                    placeholder="Preferred date, concerns, or special requests"
                     className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 hover:border-indigo-400 resize-none"
                   />
                 </div>

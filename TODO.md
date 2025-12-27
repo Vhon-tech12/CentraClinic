@@ -9,3 +9,8 @@
 
 - [x] Update app/layout.tsx to include NavBar globally
 - [x] Remove NavBar from app/page.tsx to prevent duplication
+
+# TODO: Update login page textarea to match contact page
+
+- [x] Change label from "Additional Notes" to "Message (Optional)"
+- [x] Update placeholder to "Preferred date, concerns, or special requests"
