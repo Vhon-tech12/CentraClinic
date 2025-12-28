@@ -73,9 +73,9 @@ const About = () => {
                Book Appointment
                  <span className="bg-purple-600 text-white w-9 h-9 rounded-full
                    flex items-center justify-center">
-    →
-  </span>
-</Link>
+                      →
+                  </span>
+                  </Link>
 
             </div>
           </div>

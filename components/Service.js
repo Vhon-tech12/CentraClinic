@@ -123,7 +123,7 @@ function Service() {
               <span className="bg-white text-indigo-600 w-10 h-10 rounded-full flex items-center justify-center">
                 →
               </span>
-                    </Link>
+                    </Link>         
       </div>
     </section>
   );
