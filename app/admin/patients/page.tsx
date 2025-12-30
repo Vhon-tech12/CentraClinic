@@ -120,7 +120,7 @@ export default function AdminPatientPage() {
             <div className="flex gap-6 border-b border-[#2a2d33] mb-6">
               {[
                 { key: "info", label: "Patient Information" },
-                { key: "appointments", label: "Appointment History" },
+                { key: "notes", label: "Notes" },
                 { key: "treatment", label: "Next Treatment" },
                 { key: "medical", label: "Medical History" },
               ].map((tab) => (
@@ -150,9 +150,9 @@ export default function AdminPatientPage() {
                 </div>
               )}
 
-              {activeTab === "appointments" && (
+              {activeTab === "notes" && (
                 <p className="text-gray-400">
-                  Appointment history will appear here.
+                  Notes history will appear here.
                 </p>
               )}
 
