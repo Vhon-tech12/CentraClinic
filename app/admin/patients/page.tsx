@@ -1,195 +1,330 @@
 "use client";
+
 import { useState } from "react";
 
 type Patient = {
+  id: number;
   name: string;
-  phone: string;
   email: string;
-  age: number;
-  lastVisit: string;
-  treatment: string;
+  age: string;
+  gender: string;
+  phone: string;
+  address: string;
 };
 
-export default function AdminPatientPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("info");
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-
-  const patient: Patient = {
+// Mock data
+const patientList: Patient[] = [
+  {
+    id: 1,
     name: "Jessica Ong",
-    phone: "0960946444",
     email: "JessicaOng@gmail.com",
-    age: 22,
-    lastVisit: "2025-03-15",
-    treatment: "General Checkup",
+    age: "22 years old",
+    gender: "Female",
+    phone: "09609464444",
+    address: "Polintan",
+  },
+];
+
+export default function PatientsPage() {
+  const [selected, setSelected] = useState<Patient | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+  const [showSoap, setShowSoap] = useState(false);
+  const [tab, setTab] = useState("info");
+
+  const openDetails = (p: Patient) => {
+    setSelected(p);
+    setTab("info");
+    setShowDetails(true);   // 👁 Patient Details View
+  };
+
+  const openSoap = (p: Patient) => {
+    setSelected(p);
+    setShowSoap(true);     // 🖊 SOAP Note
   };
 
   return (
-    <section className="flex-1 bg-[#0f1115] text-white p-6 space-y-6">
-      {/* HEADER */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Patients</h1>
-        <input
-          type="text"
-          placeholder="Search..."
-          className="bg-[#181b20] px-4 py-2 rounded-lg text-sm outline-none border border-[#2a2d33]"
-        />
-      </div>
+    <section className="p-6 bg-[#0f1115] text-white space-y-6">
+
+      <h1 className="text-2xl font-semibold">Patients</h1>
 
       {/* TABLE */}
-      <div className="bg-[#181b20] rounded-xl p-6 h-[600] overflow-y-auto">
-        <h2 className="font-medium mb-4">Patient List</h2>
+      <table className="w-full border border-gray-700 rounded-xl overflow-hidden">
+        <thead className="bg-[#13161d]">
+          <tr>
+            <Th>Name</Th>
+            <Th>Email</Th>
+            <Th className="text-right pr-6">Action</Th>
+          </tr>
+        </thead>
 
-        <table className="w-full text-sm">
-          <thead className="bg-[#1f2228] text-gray-300 sticky top-0">
-            <tr>
-              <th className="px-4 py-3 text-left">Patient Name</th>
-              <th className="px-4 py-3 text-left">Phone</th>
-              <th className="px-4 py-3 text-left">Email</th>
-              <th className="px-4 py-3 text-left">Age</th>
-              <th className="px-4 py-3 text-left">Last Visit</th>
-              <th className="px-4 py-3 text-right">Treatment</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
+        <tbody>
+          {patientList.map((p) => (
+            <tr key={p.id} className="border-t border-gray-700">
+              <Td>{p.name}</Td>
+              <Td>{p.email}</Td>
 
-          <tbody>
-            <tr className="border-b border-[#2a2d33] hover:bg-[#1a1d22]">
-              <td className="px-4 py-3 font-medium">{patient.name}</td>
-              <td className="px-4 py-3">{patient.phone}</td>
-              <td className="px-4 py-3 text-gray-300">{patient.email}</td>
-              <td className="px-4 py-3">{patient.age}</td>
-              <td className="px-4 py-3">{patient.lastVisit}</td>
-              <td className="px-4 py-3 text-right">{patient.treatment}</td>
-
-              <td className="px-4 py-3">
-                <div className="flex justify-end gap-2">
-                  {/* VIEW */}
+              <Td>
+                <div className="flex justify-end gap-3 pr-4">
+                  {/* 👁 VIEW */}
                   <button
-                    onClick={() => {
-                      setSelectedPatient(patient);
-                      setActiveTab("info");
-                      setIsModalOpen(true);
-                    }}
-                    className="p-2 rounded-lg bg-[#1f2228] hover:bg-[#2a2d33]"
+                    onClick={() => openDetails(p)}
+                    className="px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700"
                   >
-                    👁️
+                    👁
                   </button>
 
-                  <button className="p-2 rounded-lg bg-[#1f2228] hover:bg-[#2a2d33]">
-                    ✏️
+                  {/* 🖊 SOAP NOTE */}
+                  <button
+                    onClick={() => openSoap(p)}
+                    className="px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700"
+                  >
+                    🖊
                   </button>
-                  <button className="p-2 rounded-lg bg-[#1f2228] hover:bg-[#2a2d33]">
-                    🗑️
+
+                  {/* 🗑 DELETE */}
+                  <button
+                    className="px-3 py-2 rounded-lg bg-red-700/70 hover:bg-red-700"
+                    onClick={() => alert("Delete record")}
+                  >
+                    🗑
                   </button>
                 </div>
-              </td>
+              </Td>
             </tr>
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
 
-      {/* MODAL */}
-      {isModalOpen && selectedPatient && (
-        <div
-          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center"
-          onClick={() => setIsModalOpen(false)}
-        >
-          <div
-            className="bg-[#181b20] w-[900] h-[600] rounded-2xl p-6 relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* HEADER */}
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-gray-500" />
-                <div>
-                  <h2 className="text-xl font-semibold">
-                    {selectedPatient.name}
-                  </h2>
-                  <p className="text-sm text-gray-400">Patient Details</p>
-                </div>
-              </div>
+      {/* VIEW DETAILS MODAL */}
+      <PatientDetailsModal
+        open={showDetails}
+        onClose={() => setShowDetails(false)}
+        patient={selected}
+        tab={tab}
+        setTab={setTab}
+      />
 
-              <button className="bg-purple-600 hover:bg-purple-700 px-5 py-2 rounded-lg text-sm">
-                Confirm
-              </button>
-            </div>
-
-            {/* TABS */}
-            <div className="flex gap-6 border-b border-[#2a2d33] mb-6">
-              {[
-                { key: "info", label: "Patient Information" },
-                { key: "notes", label: "Notes" },
-                { key: "treatment", label: "Next Treatment" },
-                { key: "medical", label: "Medical History" },
-              ].map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`pb-3 text-sm ${
-                    activeTab === tab.key
-                      ? "text-purple-500 border-b-2 border-purple-500"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            {/* CONTENT */}
-            <div className="h-[400] overflow-y-auto text-sm">
-              {activeTab === "info" && (
-                <div className="grid grid-cols-3 gap-6">
-                  <InfoItem label="Age" value={`${selectedPatient.age} years old`} />
-                  <InfoItem label="Gender" value="Female" />
-                  <InfoItem label="Email Address" value={selectedPatient.email} />
-                  <InfoItem label="Mobile Number" value={selectedPatient.phone} />
-                  <InfoItem label="Address" value="Polintan" />
-                </div>
-              )}
-
-              {activeTab === "notes" && (
-                <p className="text-gray-400">
-                  Notes history will appear here.
-                </p>
-              )}
-
-              {activeTab === "treatment" && (
-                <p className="text-gray-400">
-                  Next scheduled treatment details.
-                </p>
-              )}
-
-              {activeTab === "medical" && (
-                <div className="grid grid-cols-2 gap-6">
-                  <InfoItem label="Allergies" value="None" />
-                  <InfoItem label="Particular Sickness" value="N/A" />
-                </div>
-              )}
-            </div>
-
-            {/* CLOSE */}
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
+      {/* SOAP NOTE MODAL */}
+      <SoapNoteModal
+        open={showSoap}
+        onClose={() => setShowSoap(false)}
+        patient={selected}
+      />
     </section>
   );
 }
 
-/* REUSABLE INFO ITEM */
-function InfoItem({ label, value }: { label: string; value: string }) {
+/* ----------------------- PATIENT DETAILS VIEW ----------------------- */
+
+const PatientDetailsModal = ({
+  open,
+  onClose,
+  patient,
+  tab,
+  setTab,
+}: any) => {
+  if (!open || !patient) return null;
+
   return (
-    <div>
-      <p className="text-gray-400 mb-1">{label}</p>
-      <p className="font-medium">{value}</p>
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+      <div className="w-[950] bg-[#111318] rounded-2xl p-6">
+
+        {/* Header */}
+        <div className="flex justify-between mb-4">
+          <h2 className="text-xl font-semibold">Patient Details</h2>
+          <button onClick={onClose} className="opacity-70 hover:opacity-100">
+            ✕
+          </button>
+        </div>
+
+        {/* Patient Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-16 h-16 rounded-full bg-gray-600" />
+          <div>
+            <h3 className="text-lg font-semibold">{patient.name}</h3>
+            <p className="text-sm opacity-70">{patient.email}</p>
+          </div>
+        </div>
+
+        {/* TABS */}
+        <div className="flex gap-8 border-b border-gray-700 mb-6">
+          {[
+            { id: "info", label: "Patient Information" },
+            { id: "history", label: "Appointment History" },
+            { id: "treatment", label: "Next Treatment" },
+            { id: "medical", label: "Medical History" },
+          ].map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`pb-2 ${
+                tab === t.id
+                  ? "text-purple-400 border-b-2 border-purple-400"
+                  : "opacity-60 hover:opacity-100"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* TAB CONTENT */}
+        {tab === "info" && (
+          <div className="grid grid-cols-2 gap-6">
+            <Field label="Age" value={patient.age} />
+            <Field label="Gender" value={patient.gender} />
+            <Field label="Mobile Number" value={patient.phone} />
+            <Field label="Address" value={patient.address} />
+            <Field label="Email Address" value={patient.email} />
+          </div>
+        )}
+
+        {tab === "history" && <Placeholder text="Appointment history..." />}
+        {tab === "treatment" && <Placeholder text="Next treatment..." />}
+        {tab === "medical" && <Placeholder text="Medical history..." />}
+      </div>
     </div>
   );
-}
+};
+
+/* ---------------------------- SOAP NOTE ---------------------------- */
+
+const SoapNoteModal = ({
+  open,
+  onClose,
+  patient,
+}: {
+  open: boolean;
+  onClose: () => void;
+  patient: any;
+}) => {
+  if (!open || !patient) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="w-[820] max-h-[92vh] bg-[#111318] text-gray-200 rounded-2xl border border-gray-700 shadow-2xl overflow-y-auto">
+
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-gray-700 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-white">SOAP Note</h2>
+            <p className="text-sm text-gray-400">{patient.name}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-[#1b1f27] text-gray-400 hover:text-gray-200 transition"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-6 space-y-8">
+
+          <SectionLabel title="SUBJECTIVE" />
+          <FieldBlock label="Chief Complaint" placeholder="Enter patient's chief complaint" />
+          <FieldBlock label="History of Present Illness" placeholder="Describe symptoms, duration, onset..." />
+
+          <SectionLabel title="OBJECTIVE" subtitle="(Select templates or attach Labs, Results, Vitals, Notes, etc.)" />
+          <FieldBlock label="Remarks" placeholder="Physical exam findings, observations..." />
+          <ActionChips options={["Add Remarks"]} />
+
+          <SectionLabel title="ASSESSMENT" />
+          <FieldBlock label="Diagnosis" placeholder="Enter diagnosis / impression" />
+          <ActionChips options={["Add Diagnosis", "Add ICD-10", "Add Remarks"]} />
+
+          <SectionLabel title="PLAN" />
+          <FieldBlock label="Plan" placeholder="Treatment plan, medications, follow-up..." />
+          <ActionChips options={["Add Plan", "Add Procedure", "Add PhilHealth", "Add Remarks"]} />
+          <FieldBlock label="Follow-up Check-up" placeholder="Clinic and Date" />
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-gray-700 bg-[#0f1115] flex justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-[#1b1f27] transition"
+          >
+            Cancel
+          </button>
+          <button className="px-4 py-2 rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition">
+            Save Note
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* -------------------------- UI HELPERS -------------------------- */
+
+const Field = ({ label, value }: any) => (
+  <div>
+    <p className="text-xs opacity-60 mb-1">{label}</p>
+    <p className="font-medium">{value}</p>
+  </div>
+);
+
+const Placeholder = ({ text }: any) => (
+  <p className="opacity-70">{text}</p>
+);
+
+const Textarea = ({ label }: any) => (
+  <div>
+    <p className="mb-1 opacity-80">{label}</p>
+    <textarea className="w-full h-24 bg-gray-900 border border-gray-700 rounded-xl p-3 outline-none" />
+  </div>
+);
+
+const Th = ({ children, className = "" }: any) => (
+  <th className={`px-4 py-3 text-left ${className}`}>{children}</th>
+);
+
+const Td = ({ children }: any) => (
+  <td className="px-4 py-3">{children}</td>
+);
+const SectionLabel = ({ title, subtitle }: { title: string; subtitle?: string }) => (
+  <div className="mb-1">
+    <p className="text-xs font-semibold tracking-widest text-gray-400">{title}</p>
+    {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
+  </div>
+);
+
+
+const FieldBlock = ({
+  label,
+  placeholder,
+}: {
+  label: string;
+  placeholder?: string;
+}) => (
+  <div className="space-y-1">
+    <p className="text-sm font-medium text-gray-300">{label}</p>
+
+    <textarea
+      rows={2}
+      placeholder={placeholder}
+      className="w-full rounded-xl px-3 py-2 text-sm
+                 bg-[#0f1115] text-gray-200
+                 border border-gray-700
+                 placeholder-gray-500
+                 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+    />
+  </div>
+);
+const ActionChips = ({ options }: { options: string[] }) => (
+  <div className="flex flex-wrap gap-2 mt-1">
+    {options.map(o => (
+      <button
+        key={o}
+        className="px-3 py-1.5 rounded-full text-xs
+                   border border-gray-600
+                   bg-[#13161d] text-gray-300
+                   hover:bg-[#1b1f27] hover:border-gray-500 transition"
+      >
+        + {o}
+      </button>
+    ))}
+  </div>
+);
+
