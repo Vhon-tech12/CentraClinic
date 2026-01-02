@@ -11,7 +11,7 @@ export default function AppointmentsPage() {
         />
       </div>
 
-      <div className="bg-[#181b20] rounded-xl p-6 h-[600px] overflow-y-auto">
+      <div className="bg-[#181b20] rounded-xl p-6 h-[600] overflow-y-auto">
         <h2 className="font-medium mb-4">Appointment List</h2>
 
         {/* TABLE */}
