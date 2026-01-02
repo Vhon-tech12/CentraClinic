@@ -97,12 +97,6 @@ const LoginForm = () => {
               href="/"
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             >
-              <FontAwesomeIcon icon={faFacebookF} className="w-3" />
-            </Link>
-            <Link
-              href="/"
-              className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            >
               <FontAwesomeIcon icon={faGoogle} className="w-3" />
             </Link>
           </div>

@@ -1,13 +1,42 @@
-import React from "react";
+
+"use client";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 const Hero = () => {
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, staggerChildren: 0.2 } },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+    hover: { scale: 1.05, boxShadow: "0px 15px 25px rgba(0,0,0,0.2)", transition: { duration: 0.3 } },
+  };
+
+  const imageVariants = {
+    hidden: { opacity: 0, x: 50 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.8 } },
+    hover: { scale: 1.05, transition: { duration: 0.5 } },
+  };
+
   return (
     <section className="px-6 md:px-10 py-14 bg-linear-to-br from-blue-50 to-indigo-100">
-      <div className="grid md:grid-cols-2 gap-10 items-center max-w-7xl mx-auto">
+      <motion.div
+        className="grid md:grid-cols-2 gap-10 items-center max-w-7xl mx-auto"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
 
         {/* LEFT CARD */}
-        <div className="h-[500] rounded-3xl p-10 bg-linear-to-br from-blue-100 to-indigo-200 flex flex-col justify-between shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <motion.div
+          className="h-[500] rounded-3xl p-10 bg-linear-to-br from-blue-100 to-indigo-200 flex flex-col justify-between shadow-lg"
+          variants={cardVariants}
+          whileHover="hover"
+        >
           <div>
             <h2 className="text-lg font-semibold text-indigo-600 mb-2">
               Expert Care for Your Health & Beauty
@@ -38,20 +67,24 @@ const Hero = () => {
               Dedicated to your care at Centra Clinic PH
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* RIGHT IMAGE */}
-        <div className="relative h-[500] rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <motion.div
+          className="relative h-[500] rounded-3xl overflow-hidden shadow-lg"
+          variants={imageVariants}
+          whileHover="hover"
+        >
           <Image
             src="/Centra-Doctor.jpg"
             alt="Professional doctor at Centra Clinic providing expert ENT and aesthetic care"
             fill
             priority
-            className="object-cover hover:scale-105 transition-transform duration-500"
+            className="object-cover"
           />
-        </div>
+        </motion.div>
 
-      </div>
+      </motion.div>
     </section>
   );
 };
