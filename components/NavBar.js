@@ -33,11 +33,17 @@ const Navbar = () => {
           <li><Link href="/contact">Contact</Link></li>
         </ul>
 
-        {/* Desktop Button */}
-        <div className="hidden md:block">
+        {/* Desktop Buttons */}
+        <div className="hidden md:flex items-center gap-4">
           <Link
             href="/login"
-            className="bg-blue-600 text-white rounded-full px-6 py-2 hover:bg-blue-700 transition"
+            className="bg-gray-800 text-white rounded-full px-6 py-2 hover:bg-gray-900 transition font-medium"
+          >
+            Login
+          </Link>
+          <Link
+            href="/appointment"
+            className="bg-blue-600 text-white rounded-full px-6 py-2 hover:bg-blue-700 transition font-medium"
           >
             Book Appointment
           </Link>
@@ -71,7 +77,15 @@ const Navbar = () => {
           <Link
             href="/login"
             onClick={() => setIsOpen(false)}
-            className="block text-center bg-blue-600 text-white rounded-full px-6 py-2"
+            className="block text-center bg-gray-800 text-white rounded-full px-6 py-2 font-medium"
+          >
+            Login
+          </Link>
+
+          <Link
+            href="/appointment"
+            onClick={() => setIsOpen(false)}
+            className="block text-center bg-blue-600 text-white rounded-full px-6 py-2 font-medium"
           >
             Book Appointment
           </Link>

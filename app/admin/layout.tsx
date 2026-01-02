@@ -1,3 +1,4 @@
+import React from "react";
 import type { Metadata } from "next";
 import { Geist, Montserrat } from "next/font/google";
 import "@/app/globals.css";
@@ -18,28 +19,13 @@ export const metadata: Metadata = {
   description: "Admin dashboard for Centra Clinic",
 };
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {/* ADMIN WRAPPER */}
-        <div className="flex min-h-screen bg-[#111418] text-gray-200">
-          
-          {/* SIDEBAR */}
-          <Sidebar />
+type AdminLayoutProps = React.PropsWithChildren<{}>;
 
-          {/* MAIN CONTENT */}
-          <main className="flex-1 p-8">
-            {children}
-          </main>
-        </div>
-      </body>
-    </html>
+export default function AdminLayout({ children }: AdminLayoutProps) {
+  return (
+    <div className="flex min-h-screen bg-[#111418] text-gray-200">
+      <Sidebar />
+      <main className="flex-1 p-8">{children}</main>
+    </div>
   );
 }
