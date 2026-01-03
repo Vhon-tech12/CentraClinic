@@ -16,11 +16,10 @@ const Navbar = () => {
     { name: "Contact", href: "/contact" },
   ];
 
-  /* ===== Scroll effect ===== */
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
-      setIsOpen(false); // Close mobile menu on scroll
+      setIsOpen(false); // close mobile menu on scroll
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -29,12 +28,11 @@ const Navbar = () => {
   return (
     <nav
       role="navigation"
-      className={`sticky top-0 z-50 transition-all duration-500
-        ${
-          scrolled
-            ? "bg-white/90 backdrop-blur-xl shadow-[0_4px_6px_-1px_rgba(99,102,241,0.1),0_2px_4px_-1px_rgba(99,102,241,0.06)] border-b border-gray-200 translate-y-0"
-            : "bg-linear-to-br from-indigo-50 via-white to-white shadow-sm -translate-y-1"
-        }`}
+      className={`sticky top-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? "bg-white/90 backdrop-blur-xl shadow-md border-b border-gray-200"
+          : "bg-linear-to-br from-indigo-50 via-white to-white shadow-sm"
+      }`}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-10 py-4 flex items-center justify-between">
         {/* Logo */}
@@ -57,7 +55,7 @@ const Navbar = () => {
           </div>
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Nav */}
         <ul className="hidden md:flex items-center gap-10 text-gray-700 font-medium">
           {navLinks.map((link) => (
             <li key={link.name}>
@@ -107,18 +105,17 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden mx-4 mb-4 rounded-2xl bg-white shadow-xl
-          transform transition-transform ease-out duration-300 origin-top-left
-          ${isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}`}
+        className={`md:hidden overflow-hidden transition-max-height duration-300 ${
+          isOpen ? "max-h-96" : "max-h-0"
+        }`}
       >
-        <div className="p-6 space-y-5">
+        <div className="px-6 pb-6 pt-2 space-y-5 bg-white shadow-lg rounded-b-2xl">
           {navLinks.map((link) => (
             <Link
               key={link.name}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className="block text-lg font-medium text-gray-800
-              hover:text-indigo-600 transition"
+              className="block text-lg font-medium text-gray-800 hover:text-indigo-600 transition"
             >
               {link.name}
             </Link>
