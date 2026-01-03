@@ -20,14 +20,9 @@ const menuItems = [
     icon: LayoutDashboard,
   },
   {
-    label: "Patient Chart",
+    label: "Patient",
     href: "/admin/patients",
     icon: Users,
-  },
-  {
-    label: "Services",
-    href: "/admin/services",
-    icon: Stethoscope,
   },
   {
     label: "Appointment",
@@ -35,13 +30,8 @@ const menuItems = [
     icon: Calendar,
   },
   {
-    label: "AI Prescription",
-    href: "/admin/ai",
-    icon: Bot,
-  },
-  {
-    label: "Export",
-    href: "/admin/export",
+    label: "Report",
+    href: "/admin/report",
     icon: Download,
   },
 ];

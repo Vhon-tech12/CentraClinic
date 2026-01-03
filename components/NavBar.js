@@ -19,7 +19,7 @@ const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
-      setIsOpen(false); // close mobile menu on scroll
+      setIsOpen(false); // Close mobile menu on scroll
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -27,10 +27,9 @@ const Navbar = () => {
 
   return (
     <nav
-      role="navigation"
       className={`sticky top-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-white/90 backdrop-blur-xl shadow-md border-b border-gray-200"
+          ? "bg-white/95 backdrop-blur-md shadow-md border-b border-gray-200"
           : "bg-linear-to-br from-indigo-50 via-white to-white shadow-sm"
       }`}
     >
@@ -62,9 +61,9 @@ const Navbar = () => {
               <Link
                 href={link.href}
                 className="relative hover:text-indigo-600 transition-colors
-                after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-0
-                after:bg-indigo-600 after:transition-all after:duration-300
-                hover:after:w-full"
+                  after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-0
+                  after:bg-indigo-600 after:transition-all after:duration-300
+                  hover:after:w-full"
               >
                 {link.name}
               </Link>
@@ -81,12 +80,10 @@ const Navbar = () => {
           >
             Login
           </Link>
-
           <Link
             href="/appointment"
             className="px-6 py-2 rounded-full bg-black
-            text-white font-semibold shadow-md
-            hover:bg-gray-900 hover:shadow-lg transition"
+            text-white font-semibold shadow-md hover:bg-gray-900 hover:shadow-lg transition"
           >
             Book Appointment
           </Link>
@@ -105,9 +102,10 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden overflow-hidden transition-max-height duration-300 ${
-          isOpen ? "max-h-96" : "max-h-0"
+        className={`md:hidden origin-top-right transform transition-transform duration-300 ${
+          isOpen ? "scale-y-100" : "scale-y-0"
         }`}
+        style={{ transformOrigin: "top" }}
       >
         <div className="px-6 pb-6 pt-2 space-y-5 bg-white shadow-lg rounded-b-2xl">
           {navLinks.map((link) => (
@@ -131,7 +129,6 @@ const Navbar = () => {
             >
               Login
             </Link>
-
             <Link
               href="/appointment"
               onClick={() => setIsOpen(false)}

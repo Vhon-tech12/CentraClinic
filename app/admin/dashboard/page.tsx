@@ -2,7 +2,6 @@
 
 import StatCard from "@/components/StatCard";
 import Activity from "@/components/Activity";
-
 import {
   LineChart,
   Line,
@@ -60,21 +59,21 @@ export default function DashboardPage() {
   const COLORS = ["#6c63ff", "#4fd1c5", "#a78bfa", "#f6ad55"];
 
   return (
-    <section className="flex bg-[#0f1115] text-white h-screen">
-      <div className="flex-1 p-6 space-y-6 overflow-y-auto">
+    <section className="flex flex-col bg-[#0f1115] text-white min-h-screen">
+      <div className="flex-1 p-6 sm:p-8 space-y-6 overflow-y-auto">
 
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <h1 className="text-3xl font-semibold">Dashboard</h1>
           <input
             type="text"
             placeholder="Search..."
-            className="bg-[#181b20] px-4 py-2 rounded-lg text-sm outline-none"
+            className="bg-[#181b20] px-5 py-3 rounded-lg text-sm outline-none w-full sm:w-64"
           />
         </div>
 
         {/* Stat Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
           <StatCard title="Customers" value="721K" change="+11.01%" positive />
           <StatCard title="Visits" value="367K" change="-0.03%" />
           <StatCard title="New Appointment" value="1,156" change="+3.55%" positive />
@@ -85,37 +84,29 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
           {/* Line Chart */}
-          <div className="xl:col-span-2 bg-[#181b20] rounded-xl p-8 h-[320]">
+          <div className="xl:col-span-2 bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
             <h2 className="font-medium mb-4">Total Users (Jan — Dec)</h2>
-
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="90%">
               <LineChart data={totalUsersData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#2c2f36" />
                 <XAxis dataKey="month" stroke="#ccc" />
                 <YAxis stroke="#ccc" />
                 <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="users"
-                  stroke="#6c63ff"
-                  strokeWidth={3}
-                  dot={false}
-                />
+                <Line type="monotone" dataKey="users" stroke="#6c63ff" strokeWidth={3} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
 
           {/* Pie Chart */}
-          <div className="bg-[#181b20] rounded-xl p-8 h-[400]">
+          <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
             <h2 className="font-medium mb-4">Consultations In Progress</h2>
-
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="90%">
               <PieChart>
                 <Pie
                   data={consultationData}
                   cx="50%"
                   cy="50%"
-                  outerRadius={90}
+                  outerRadius={80}
                   dataKey="value"
                   label
                 >
@@ -123,7 +114,7 @@ export default function DashboardPage() {
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
-                <Legend />
+                <Legend verticalAlign="bottom" />
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
@@ -134,10 +125,9 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
           {/* Bar Chart */}
-          <div className="bg-[#181b20] rounded-xl p-8 h-[320]">
+          <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
             <h2 className="font-medium mb-4">AI Prescriptions Generated</h2>
-
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="90%">
               <BarChart data={prescriptionsData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#2c2f36" />
                 <XAxis dataKey="month" stroke="#ccc" />
@@ -149,17 +139,16 @@ export default function DashboardPage() {
           </div>
 
           {/* Donut Chart */}
-          <div className="bg-[#181b20] rounded-xl p-8 h-[320]">
+          <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
             <h2 className="font-medium mb-4">Consultations</h2>
-
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="90%">
               <PieChart>
                 <Pie
                   data={consultationsBreakdown}
                   cx="50%"
                   cy="50%"
-                  innerRadius={55}
-                  outerRadius={90}
+                  innerRadius={50}
+                  outerRadius={80}
                   paddingAngle={4}
                   dataKey="value"
                 >
@@ -167,7 +156,7 @@ export default function DashboardPage() {
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
-                <Legend />
+                <Legend verticalAlign="bottom" />
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
