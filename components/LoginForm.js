@@ -12,23 +12,20 @@ const LoginForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Replace this with your login logic
     console.log("Login attempt:", { username, password });
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+    <div className="flex items-center justify-center min-h-screen bg-linear-to-r from-indigo-100 to-purple-100">
+      <div className="w-full max-w-md p-10 bg-white rounded-2xl shadow-xl border border-gray-200">
+        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Welcome Back</h2>
+        <p className="text-center text-gray-500 mb-8">Sign in to continue to your account</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email */}
           <div>
-            <label
-              htmlFor="username"
-              className="block text-sm font-medium text-gray-700"
-            >
-              <FontAwesomeIcon icon={faEnvelope} className="inline-block mr-2" />
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              <FontAwesomeIcon icon={faEnvelope} className="inline-block mr-2 text-gray-400" />
               Email
             </label>
             <input
@@ -37,19 +34,16 @@ const LoginForm = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              placeholder="Enter your email"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-                         focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="you@example.com"
+              className="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm
+                         focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
           </div>
 
           {/* Password */}
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              <FontAwesomeIcon icon={faLock} className="inline-block mr-2" />
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <FontAwesomeIcon icon={faLock} className="inline-block mr-2 text-gray-400" />
               Password
             </label>
             <input
@@ -59,14 +53,14 @@ const LoginForm = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="Enter your password"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-                         focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm
+                         focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
           </div>
 
           {/* Forgot Password */}
           <div className="text-right">
-            <Link href="/" className="text-blue-600 hover:underline">
+            <Link href="/" className="text-indigo-600 hover:underline text-sm font-medium">
               Forgot Password?
             </Link>
           </div>
@@ -74,33 +68,39 @@ const LoginForm = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md 
-                       hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg 
+                       shadow-md hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
-            Login
+            Sign In
           </button>
         </form>
 
+        {/* Divider */}
+        <div className="flex items-center my-6">
+          <hr className="flex-1 border-gray-300" />
+          <span className="mx-2 text-gray-400">or</span>
+          <hr className="flex-1 border-gray-300" />
+        </div>
+
+        {/* Social Login */}
+        <div className="flex justify-center gap-4">
+          <Link
+            href="/"
+            className="flex items-center justify-center gap-2 w-1/2 py-2 px-4 border border-gray-300 rounded-lg
+                       hover:bg-gray-100 transition-colors"
+          >
+            <FontAwesomeIcon icon={faGoogle} className="text-red-500" />
+            Google
+          </Link>
+        </div>
+
         {/* Sign Up */}
-        <p className="text-center mt-6 text-gray-600">
+        <p className="text-center mt-6 text-gray-500">
           Don’t have an account?{" "}
-          <Link href="/" className="text-blue-600">
+          <Link href="/" className="text-indigo-600 font-medium hover:underline">
             Sign Up
           </Link>
         </p>
-
-        {/* Social Login */}
-        <div className="mt-4">
-          <p className="text-center text-gray-600 mb-2">Or login with:</p>
-          <div className="flex justify-center space-x-4">
-            <Link
-              href="/"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              <FontAwesomeIcon icon={faGoogle} className="w-3" />
-            </Link>
-          </div>
-        </div>
       </div>
     </div>
   );

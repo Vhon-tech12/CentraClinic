@@ -1,65 +1,105 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { HiOutlineMenu, HiOutlineX } from "react-icons/hi"; // modern icons
+import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
-    { name: "Service", href: "/service" },
+    { name: "Services", href: "/service" },
     { name: "Contact", href: "/contact" },
   ];
 
+  /* ===== Scroll effect ===== */
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+      setIsOpen(false); // Close mobile menu on scroll
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <nav className="w-full bg-white shadow-md sticky top-0 z-50 transition-all">
+    <nav
+      role="navigation"
+      className={`sticky top-0 z-50 transition-all duration-500
+        ${
+          scrolled
+            ? "bg-white/90 backdrop-blur-xl shadow-[0_4px_6px_-1px_rgba(99,102,241,0.1),0_2px_4px_-1px_rgba(99,102,241,0.06)] border-b border-gray-200 translate-y-0"
+            : "bg-linear-to-br from-indigo-50 via-white to-white shadow-sm -translate-y-1"
+        }`}
+    >
       <div className="max-w-7xl mx-auto px-6 md:px-10 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3">
           <Image
             src="/centraLogo.jpg"
-            alt="Centra Clinic PH Logo"
-            width={40}
-            height={40}
+            alt="Centra Clinic PH"
+            width={42}
+            height={42}
             priority
+            className="rounded-full"
           />
-          <span className="text-2xl font-bold text-gray-800">Centra</span>
+          <div className="leading-tight">
+            <span className="block text-xl font-extrabold text-gray-900">
+              Centra
+            </span>
+            <span className="block text-xs text-gray-500 tracking-wide">
+              Clinic PH
+            </span>
+          </div>
         </Link>
 
-        {/* Desktop Links */}
-        <ul className="hidden md:flex items-center gap-8 text-gray-700 font-medium">
+        {/* Desktop Navigation */}
+        <ul className="hidden md:flex items-center gap-10 text-gray-700 font-medium">
           {navLinks.map((link) => (
-            <li key={link.name} className="hover:text-blue-600 transition-colors">
-              <Link href={link.href}>{link.name}</Link>
+            <li key={link.name}>
+              <Link
+                href={link.href}
+                className="relative hover:text-indigo-600 transition-colors
+                after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-0
+                after:bg-indigo-600 after:transition-all after:duration-300
+                hover:after:w-full"
+              >
+                {link.name}
+              </Link>
             </li>
           ))}
         </ul>
 
-        {/* Desktop Buttons */}
-        <div className="hidden md:flex items-center gap-4">
+        {/* Desktop CTA */}
+        <div className="hidden md:flex items-center gap-3">
           <Link
             href="/login"
-            className="px-5 py-2 rounded-full border border-gray-800 text-gray-800 hover:bg-gray-100 transition font-medium"
+            className="px-5 py-2 rounded-full border border-gray-300
+            text-gray-700 hover:bg-gray-100 transition font-medium"
           >
             Login
           </Link>
+
           <Link
             href="/appointment"
-            className="px-5 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition font-medium"
+            className="px-6 py-2 rounded-full bg-black
+            text-white font-semibold shadow-md
+            hover:bg-gray-900 hover:shadow-lg transition"
           >
             Book Appointment
           </Link>
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Toggle */}
         <button
-          className="md:hidden text-gray-800 text-3xl focus:outline-none"
           onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle Menu"
+          className="md:hidden text-gray-900 text-3xl focus:outline-none"
+          aria-label="Toggle menu"
+          aria-expanded={isOpen}
         >
           {isOpen ? <HiOutlineX /> : <HiOutlineMenu />}
         </button>
@@ -67,35 +107,45 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden bg-white shadow-lg rounded-xl mx-4 my-2 p-5 space-y-4 transform transition-transform duration-300 ${
-          isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"
-        }`}
+        className={`md:hidden mx-4 mb-4 rounded-2xl bg-white shadow-xl
+          transform transition-transform ease-out duration-300 origin-top-left
+          ${isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}`}
       >
-        {navLinks.map((link) => (
-          <Link
-            key={link.name}
-            href={link.href}
-            onClick={() => setIsOpen(false)}
-            className="block text-gray-700 font-medium text-lg hover:text-blue-600 transition-colors"
-          >
-            {link.name}
-          </Link>
-        ))}
+        <div className="p-6 space-y-5">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+              className="block text-lg font-medium text-gray-800
+              hover:text-indigo-600 transition"
+            >
+              {link.name}
+            </Link>
+          ))}
 
-        <Link
-          href="/login"
-          onClick={() => setIsOpen(false)}
-          className="block text-center px-6 py-2 rounded-full border border-gray-800 text-gray-800 hover:bg-gray-100 transition font-medium"
-        >
-          Login
-        </Link>
-        <Link
-          href="/appointment"
-          onClick={() => setIsOpen(false)}
-          className="block text-center px-6 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition font-medium"
-        >
-          Book Appointment
-        </Link>
+          <div className="pt-4 border-t space-y-3">
+            <Link
+              href="/login"
+              onClick={() => setIsOpen(false)}
+              className="block text-center px-6 py-2 rounded-full
+              border border-gray-300 text-gray-700 font-medium
+              hover:bg-gray-100 transition"
+            >
+              Login
+            </Link>
+
+            <Link
+              href="/appointment"
+              onClick={() => setIsOpen(false)}
+              className="block text-center px-6 py-2 rounded-full
+              bg-black text-white font-semibold
+              hover:bg-gray-900 transition"
+            >
+              Book Appointment
+            </Link>
+          </div>
+        </div>
       </div>
     </nav>
   );
