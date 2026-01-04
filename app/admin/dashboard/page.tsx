@@ -1,25 +1,31 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import StatCard from "@/components/StatCard";
-import Activity from "@/components/Activity";
 
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-  BarChart,
-  Bar,
-} from "recharts";
+import dynamic from "next/dynamic";
+
+// Dynamically import Recharts components so they render only on client
+const LineChart = dynamic(() => import("recharts").then((mod) => mod.LineChart), { ssr: false });
+const Line = dynamic(() => import("recharts").then((mod) => mod.Line), { ssr: false });
+const XAxis = dynamic(() => import("recharts").then((mod) => mod.XAxis), { ssr: false });
+const YAxis = dynamic(() => import("recharts").then((mod) => mod.YAxis), { ssr: false });
+const CartesianGrid = dynamic(() => import("recharts").then((mod) => mod.CartesianGrid), { ssr: false });
+const Tooltip = dynamic(() => import("recharts").then((mod) => mod.Tooltip), { ssr: false });
+const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => mod.ResponsiveContainer), { ssr: false });
+const PieChart = dynamic(() => import("recharts").then((mod) => mod.PieChart), { ssr: false });
+const Pie = dynamic(() => import("recharts").then((mod) => mod.Pie), { ssr: false });
+const Cell = dynamic(() => import("recharts").then((mod) => mod.Cell), { ssr: false });
+const Legend = dynamic(() => import("recharts").then((mod) => mod.Legend), { ssr: false });
+const BarChart = dynamic(() => import("recharts").then((mod) => mod.BarChart), { ssr: false });
+const Bar = dynamic(() => import("recharts").then((mod) => mod.Bar), { ssr: false });
 
 export default function DashboardPage() {
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure charts only render after client mounts
+  useEffect(() => setMounted(true), []);
+
   const totalUsersData = [
     { month: "Jan", users: 400 },
     { month: "Feb", users: 600 },
@@ -82,87 +88,92 @@ export default function DashboardPage() {
         </div>
 
         {/* Charts Row */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {mounted && (
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-          {/* Line Chart */}
-          <div className="xl:col-span-2 bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
-            <h2 className="font-medium mb-4">Total Users (Jan — Dec)</h2>
-            <ResponsiveContainer width="100%" height="90%">
-              <LineChart data={totalUsersData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2c2f36" />
-                <XAxis dataKey="month" stroke="#ccc" />
-                <YAxis stroke="#ccc" />
-                <Tooltip />
-                <Line type="monotone" dataKey="users" stroke="#6c63ff" strokeWidth={3} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+            {/* Line Chart */}
+            <div className="xl:col-span-2 bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
+              <h2 className="font-medium mb-4">Total Users (Jan — Dec)</h2>
+              <ResponsiveContainer width="100%" height="90%">
+                <LineChart data={totalUsersData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2c2f36" />
+                  <XAxis dataKey="month" stroke="#ccc" />
+                  <YAxis stroke="#ccc" />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="users" stroke="#6c63ff" strokeWidth={3} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
 
-          {/* Pie Chart */}
-          <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
-            <h2 className="font-medium mb-4">Consultations In Progress</h2>
-            <ResponsiveContainer width="100%" height="90%">
-              <PieChart>
-                <Pie
-                  data={consultationData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  dataKey="value"
-                  label
-                >
-                  {consultationData.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Legend verticalAlign="bottom" />
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            {/* Pie Chart */}
+            <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
+              <h2 className="font-medium mb-4">Consultations In Progress</h2>
+              <ResponsiveContainer width="100%" height="90%">
+                <PieChart>
+                  <Pie
+                    data={consultationData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    dataKey="value"
+                    label
+                  >
+                    {consultationData.map((_, i) => (
+                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Legend verticalAlign="bottom" />
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Bottom Charts */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {mounted && (
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
-          {/* Bar Chart */}
-          <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
-            <h2 className="font-medium mb-4">AI Prescriptions Generated</h2>
-            <ResponsiveContainer width="100%" height="90%">
-              <BarChart data={prescriptionsData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2c2f36" />
-                <XAxis dataKey="month" stroke="#ccc" />
-                <YAxis stroke="#ccc" />
-                <Tooltip />
-                <Bar dataKey="count" fill="#6c63ff" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+            {/* Bar Chart */}
+            <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
+              <h2 className="font-medium mb-4">AI Prescriptions Generated</h2>
+              <ResponsiveContainer width="100%" height="90%">
+                <BarChart data={prescriptionsData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2c2f36" />
+                  <XAxis dataKey="month" stroke="#ccc" />
+                  <YAxis stroke="#ccc" />
+                  <Tooltip />
+                  <Bar dataKey="count" fill="#6c63ff" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
 
-          {/* Donut Chart */}
-          <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
-            <h2 className="font-medium mb-4">Consultations</h2>
-            <ResponsiveContainer width="100%" height="90%">
-              <PieChart>
-                <Pie
-                  data={consultationsBreakdown}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={80}
-                  paddingAngle={4}
-                  dataKey="value"
-                >
-                  {consultationsBreakdown.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Legend verticalAlign="bottom" />
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            {/* Donut Chart */}
+            <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
+              <h2 className="font-medium mb-4">Consultations</h2>
+              <ResponsiveContainer width="100%" height="90%">
+                <PieChart>
+                  <Pie
+                    data={consultationsBreakdown}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={80}
+                    paddingAngle={4}
+                    dataKey="value"
+                  >
+                    {consultationsBreakdown.map((_, i) => (
+                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Legend verticalAlign="bottom" />
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-        </div>
+        )}
+
       </div>
     </section>
   );
