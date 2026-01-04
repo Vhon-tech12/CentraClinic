@@ -1,97 +1,168 @@
 "use client";
 
-import { useState } from "react";
-import AppointmentCalendar from "@/components/AppointmentCalendar";
-import AppointmentRequestsModal from "@/components/AppointmentRequestModal";
-import EditAppointmentModal from "@/components/EditAppoinmentModal";
-import { Bell } from "lucide-react";
+import StatCard from "@/components/StatCard";
+import Activity from "@/components/Activity";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  BarChart,
+  Bar,
+} from "recharts";
 
-export default function AppointmentsPage() {
-  const [events, setEvents] = useState<any[]>([
-    { id: 1, title: "Juan Dela Cruz — Consultation", start: new Date(2026, 0, 4, 10, 0), end: new Date(2026, 0, 4, 11, 0) },
-    { id: 2, title: "Maria Santos — Follow-up", start: new Date(2026, 0, 5, 14, 0), end: new Date(2026, 0, 5, 14, 30) },
-  ]);
+export default function DashboardPage() {
+  const totalUsersData = [
+    { month: "Jan", users: 400 },
+    { month: "Feb", users: 600 },
+    { month: "Mar", users: 800 },
+    { month: "Apr", users: 1200 },
+    { month: "May", users: 1500 },
+    { month: "Jun", users: 1800 },
+    { month: "Jul", users: 2000 },
+    { month: "Aug", users: 2200 },
+    { month: "Sep", users: 2400 },
+    { month: "Oct", users: 2600 },
+    { month: "Nov", users: 2800 },
+    { month: "Dec", users: 3000 },
+  ];
 
-  const [newBookings, setNewBookings] = useState<any[]>([
-    { id: 3, name: "Pedro Reyes", avatar: "/avatar.png", type: "Virtual Consult", label: "Follow-up", start: new Date(2026, 0, 6, 15, 0), end: new Date(2026, 0, 6, 15, 30), location: "Centra Virtual Clinic" },
-    { id: 4, name: "Ana Cruz", avatar: "/avatar.png", type: "Clinic Visit", label: "New Patient", start: new Date(2026, 0, 6, 16, 0), end: new Date(2026, 0, 6, 16, 30), location: "Centra Health Manila" },
-  ]);
+  const consultationData = [
+    { name: "Ear", value: 38.6 },
+    { name: "Nose", value: 22.5 },
+    { name: "Throat", value: 30.8 },
+    { name: "Aesthetics", value: 8.1 },
+  ];
 
-  const [openModal, setOpenModal] = useState(false);
-  const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  const prescriptionsData = [
+    { month: "Jan", count: 120 },
+    { month: "Feb", count: 180 },
+    { month: "Mar", count: 150 },
+    { month: "Apr", count: 210 },
+    { month: "May", count: 260 },
+    { month: "Jun", count: 300 },
+  ];
 
-  const handleEdit = (appointment: any) => {
-    setSelectedAppointment({ ...appointment });
-    setEditModalOpen(true);
-    setMenuOpenId(null);
-  };
+  const consultationsBreakdown = [
+    { name: "Online", value: 65 },
+    { name: "In-Clinic", value: 25 },
+    { name: "Follow-up", value: 10 },
+  ];
 
-  const saveEdit = () => {
-    if (selectedAppointment) {
-      const isExisting = events.some((e) => e.id === selectedAppointment.id);
-      if (isExisting) {
-        setEvents((prev) =>
-          prev.map((e) =>
-            e.id === selectedAppointment.id
-              ? { ...e, start: selectedAppointment.start, end: selectedAppointment.end }
-              : e
-          )
-        );
-      } else {
-        setEvents((prev) => [
-          ...prev,
-          { id: selectedAppointment.id, title: `${selectedAppointment.name} — ${selectedAppointment.label}`, start: selectedAppointment.start, end: selectedAppointment.end },
-        ]);
-        setNewBookings((prev) => prev.filter((b) => b.id !== selectedAppointment.id));
-      }
-    }
-    setEditModalOpen(false);
-  };
+  const COLORS = ["#6c63ff", "#4fd1c5", "#a78bfa", "#f6ad55"];
 
   return (
-    <section className="flex-1 bg-[#0e1014] min-h-screen text-white p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Appointments</h1>
-          <p className="text-gray-400 text-sm">Calendar schedule & patient queue</p>
+    <section className="flex flex-col bg-[#0f1115] text-white min-h-screen">
+      <div className="flex-1 p-6 sm:p-8 space-y-6 overflow-y-auto">
+
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <h1 className="text-3xl font-semibold">Dashboard</h1>
+          <input
+            type="text"
+            placeholder="Search..."
+            className="bg-[#181b20] px-5 py-3 rounded-lg text-sm outline-none w-full sm:w-64"
+          />
         </div>
 
-        <button
-          onClick={() => setOpenModal(true)}
-          className="relative flex items-center gap-2 bg-[#1b1f29] px-3 py-2 rounded-xl border border-white/10 hover:bg-[#222736] transition"
-        >
-          <Bell size={18} />
-          <span className="text-sm">Appointment Requests</span>
-          {newBookings.length > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-xs px-1.5 py-0.5 rounded-full shadow">
-              {newBookings.length}
-            </span>
-          )}
-        </button>
+        {/* Stat Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+          <StatCard title="Customers" value="721K" change="+11.01%" positive />
+          <StatCard title="Visits" value="367K" change="-0.03%" />
+          <StatCard title="New Appointment" value="1,156" change="+3.55%" positive />
+          <StatCard title="Active Users" value="239K" change="+6.08%" positive />
+        </div>
+
+        {/* Charts Row */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+          {/* Line Chart */}
+          <div className="xl:col-span-2 bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
+            <h2 className="font-medium mb-4">Total Users (Jan — Dec)</h2>
+            <ResponsiveContainer width="100%" height="90%">
+              <LineChart data={totalUsersData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#2c2f36" />
+                <XAxis dataKey="month" stroke="#ccc" />
+                <YAxis stroke="#ccc" />
+                <Tooltip />
+                <Line type="monotone" dataKey="users" stroke="#6c63ff" strokeWidth={3} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Pie Chart */}
+          <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
+            <h2 className="font-medium mb-4">Consultations In Progress</h2>
+            <ResponsiveContainer width="100%" height="90%">
+              <PieChart>
+                <Pie
+                  data={consultationData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                  label
+                >
+                  {consultationData.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Legend verticalAlign="bottom" />
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Bottom Charts */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+          {/* Bar Chart */}
+          <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
+            <h2 className="font-medium mb-4">AI Prescriptions Generated</h2>
+            <ResponsiveContainer width="100%" height="90%">
+              <BarChart data={prescriptionsData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#2c2f36" />
+                <XAxis dataKey="month" stroke="#ccc" />
+                <YAxis stroke="#ccc" />
+                <Tooltip />
+                <Bar dataKey="count" fill="#6c63ff" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Donut Chart */}
+          <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
+            <h2 className="font-medium mb-4">Consultations</h2>
+            <ResponsiveContainer width="100%" height="90%">
+              <PieChart>
+                <Pie
+                  data={consultationsBreakdown}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={80}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  {consultationsBreakdown.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Legend verticalAlign="bottom" />
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </div>
-
-      <AppointmentCalendar events={events} />
-
-      {openModal && (
-        <AppointmentRequestsModal
-          newBookings={newBookings}
-          menuOpenId={menuOpenId}
-          setMenuOpenId={setMenuOpenId}
-          handleEdit={handleEdit}
-          setOpenModal={setOpenModal}
-        />
-      )}
-
-      {editModalOpen && selectedAppointment && (
-        <EditAppointmentModal
-          selectedAppointment={selectedAppointment}
-          setSelectedAppointment={setSelectedAppointment}
-          setEditModalOpen={setEditModalOpen}
-          saveEdit={saveEdit}
-        />
-      )}
     </section>
   );
 }
