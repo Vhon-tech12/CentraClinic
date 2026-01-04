@@ -8,6 +8,7 @@ import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -16,14 +17,35 @@ const Navbar = () => {
     { name: "Contact", href: "/contact" },
   ];
 
+  // 🔐 CHECK LOGIN STATUS (NO REFRESH NEEDED)
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
-      setIsOpen(false); // Close mobile menu on scroll
+      setIsOpen(false);
     };
+
+    const checkLoginStatus = () => {
+      setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
+    };
+
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("auth-change", checkLoginStatus);
+
+    // initial check
+    checkLoginStatus();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("auth-change", checkLoginStatus);
+    };
   }, []);
+
+  // 🚪 LOGOUT
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    window.dispatchEvent(new Event("auth-change"));
+    setIsOpen(false);
+  };
 
   return (
     <nav
@@ -61,9 +83,9 @@ const Navbar = () => {
               <Link
                 href={link.href}
                 className="relative hover:text-indigo-600 transition-colors
-                  after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-0
-                  after:bg-indigo-600 after:transition-all after:duration-300
-                  hover:after:w-full"
+                after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-0
+                after:bg-indigo-600 after:transition-all after:duration-300
+                hover:after:w-full"
               >
                 {link.name}
               </Link>
@@ -73,28 +95,41 @@ const Navbar = () => {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <Link
-            href="/login"
-            className="px-5 py-2 rounded-full border border-gray-300
-            text-gray-700 hover:bg-gray-100 transition font-medium"
-          >
-            Login
-          </Link>
-          <Link
-            href="/appointment"
-            className="px-6 py-2 rounded-full bg-black
-            text-white font-semibold shadow-md hover:bg-gray-900 hover:shadow-lg transition"
-          >
-            Book Appointment
-          </Link>
+          {!isLoggedIn && (
+            <Link
+              href="/login"
+              className="px-5 py-2 rounded-full border border-gray-300
+              text-gray-700 hover:bg-gray-100 transition font-medium"
+            >
+              Login
+            </Link>
+          )}
+
+          {isLoggedIn && (
+            <>
+              <Link
+                href="/appointment"
+                className="px-6 py-2 rounded-full bg-black
+                text-white font-semibold shadow-md hover:bg-gray-900 hover:shadow-lg transition"
+              >
+                Book Appointment
+              </Link>
+
+              <button
+                onClick={handleLogout}
+                className="px-5 py-2 rounded-full border border-gray-300
+                text-gray-700 hover:bg-gray-100 transition font-medium"
+              >
+                Logout
+              </button>
+            </>
+          )}
         </div>
 
         {/* Mobile Toggle */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden text-gray-900 text-3xl focus:outline-none"
-          aria-label="Toggle menu"
-          aria-expanded={isOpen}
+          className="md:hidden text-gray-900 text-3xl"
         >
           {isOpen ? <HiOutlineX /> : <HiOutlineMenu />}
         </button>
@@ -102,7 +137,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden origin-top-right transform transition-transform duration-300 ${
+        className={`md:hidden transition-transform duration-300 ${
           isOpen ? "scale-y-100" : "scale-y-0"
         }`}
         style={{ transformOrigin: "top" }}
@@ -113,31 +148,44 @@ const Navbar = () => {
               key={link.name}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className="block text-lg font-medium text-gray-800 hover:text-indigo-600 transition"
+              className="block text-lg font-medium text-gray-800 hover:text-indigo-600"
             >
               {link.name}
             </Link>
           ))}
 
           <div className="pt-4 border-t space-y-3">
-            <Link
-              href="/login"
-              onClick={() => setIsOpen(false)}
-              className="block text-center px-6 py-2 rounded-full
-              border border-gray-300 text-gray-700 font-medium
-              hover:bg-gray-100 transition"
-            >
-              Login
-            </Link>
-            <Link
-              href="/appointment"
-              onClick={() => setIsOpen(false)}
-              className="block text-center px-6 py-2 rounded-full
-              bg-black text-white font-semibold
-              hover:bg-gray-900 transition"
-            >
-              Book Appointment
-            </Link>
+            {!isLoggedIn && (
+              <Link
+                href="/login"
+                onClick={() => setIsOpen(false)}
+                className="block text-center px-6 py-2 rounded-full
+                border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
+              >
+                Login
+              </Link>
+            )}
+
+            {isLoggedIn && (
+              <>
+                <Link
+                  href="/appointment"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-center px-6 py-2 rounded-full
+                  bg-black text-white font-semibold hover:bg-gray-900"
+                >
+                  Book Appointment
+                </Link>
+
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-center px-6 py-2 rounded-full
+                  border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
+                >
+                  Logout
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
