@@ -19,8 +19,6 @@ function BookingModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
       <div className="bg-white w-full max-w-md rounded-2xl p-6 relative">
-
-        {/* Close */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
@@ -28,7 +26,6 @@ function BookingModal({ onClose }: { onClose: () => void }) {
           ✕
         </button>
 
-        {/* Progress */}
         <div className="flex justify-center gap-2 mb-6">
           {[1, 2, 3].map((n) => (
             <span
@@ -43,21 +40,18 @@ function BookingModal({ onClose }: { onClose: () => void }) {
         {step === 1 && (
           <>
             <h2 className="text-xl font-semibold mb-2">Hi!</h2>
-            <p className="text-gray-500 mb-6">
-              Please select patient type
-            </p>
+            <p className="text-gray-500 mb-6">Please select patient type</p>
 
             <div className="space-y-3">
               <button
                 onClick={() => setStep(2)}
-                className="w-full border rounded-full py-3 hover:bg-gray-50"
+                className="w-full border rounded-full py-3"
               >
                 I'm an Existing Patient
               </button>
-
               <button
                 onClick={() => setStep(2)}
-                className="w-full border rounded-full py-3 hover:bg-gray-50"
+                className="w-full border rounded-full py-3"
               >
                 I'm a New Patient
               </button>
@@ -78,10 +72,7 @@ function BookingModal({ onClose }: { onClose: () => void }) {
               </button>
             </div>
 
-            <input
-              type="date"
-              className="w-full border rounded-lg p-3 mb-4"
-            />
+            <input type="date" className="w-full border rounded-lg p-3 mb-4" />
 
             <button
               onClick={() => setStep(3)}
@@ -116,19 +107,18 @@ function BookingModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-/* ================= MAIN PAGE ================= */
-export default function AppointmentPage() {
+/* ================= MAIN CLIENT PAGE ================= */
+
+export default function AppointmentClient() {
   const searchParams = useSearchParams();
   const [openModal, setOpenModal] = useState(false);
 
-  // ✅ AUTO-OPEN MODAL WHEN FROM NAVBAR
   useEffect(() => {
     if (searchParams.get("book") === "true") {
       setOpenModal(true);
     }
   }, [searchParams]);
 
-  // ✅ CLOSE MODAL + CLEAN URL
   const handleCloseModal = () => {
     setOpenModal(false);
     window.history.replaceState({}, "", "/appointment");
@@ -138,73 +128,23 @@ export default function AppointmentPage() {
     <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-7xl mx-auto">
 
-        {/* HEADER */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            Book Your Appointment
-          </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-            Schedule a consultation with our expert team at Centra Clinic PH.
+          <h1 className="text-4xl font-bold mb-4">Book Your Appointment</h1>
+          <p className="text-gray-600">
+            Schedule a consultation with our expert team.
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-          <div className="grid md:grid-cols-2">
+        <button
+          onClick={() => setOpenModal(true)}
+          className="w-full bg-indigo-600 text-white py-4 rounded-xl"
+        >
+          <FontAwesomeIcon icon={faCalendarAlt} className="mr-2" />
+          Book Appointment
+        </button>
 
-            {/* LEFT */}
-            <div className="bg-linear-to-br from-indigo-600 to-blue-700 text-white p-10">
-              <h2 className="text-2xl font-bold mb-4">
-                Why Choose Centra Clinic PH?
-              </h2>
-
-              <div className="space-y-6 mt-8">
-                <Info icon={faClock} title="Flexible Hours" text="Mon–Sat: 8am to 6pm" />
-                <Info icon={faPhone} title="Phone" text="09999562468" />
-                <Info icon={faEnvelope} title="Email" text="centraclinicph@gmail.com" />
-                <Info icon={faMapMarkerAlt} title="Location" text="Makati City" />
-              </div>
-            </div>
-
-            {/* RIGHT */}
-            <div className="p-10">
-              <button
-                type="button"
-                onClick={() => setOpenModal(true)}
-                className="w-full bg-linear-to-r from-indigo-600 to-blue-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:scale-105 transition"
-              >
-                <FontAwesomeIcon icon={faCalendarAlt} className="mr-2" />
-                Book Appointment
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ✅ MODAL */}
-      {openModal && <BookingModal onClose={handleCloseModal} />}
-    </div>
-  );
-}
-
-function Info({
-  icon,
-  title,
-  text,
-}: {
-  icon: any;
-  title: string;
-  text: string;
-}) {
-  return (
-    <div className="flex items-center gap-4">
-      <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-        <FontAwesomeIcon icon={icon} />
-      </div>
-      <div>
-        <p className="font-semibold">{title}</p>
-        <p className="text-indigo-100 text-sm">{text}</p>
+        {openModal && <BookingModal onClose={handleCloseModal} />}
       </div>
     </div>
   );
 }
-

@@ -1,4 +1,11 @@
-import Hero from "@/components/Hero";
+"use client";
+
+import dynamic from "next/dynamic";
+
+const Hero = dynamic(() => import("@/components/Hero"), {
+  ssr: false,
+});
+
 import Service from "@/components/Service";
 import About from "@/components/About";
 import Sentiments from "@/components/Sentiments";
@@ -15,4 +22,3 @@ export default function Home() {
     </div>
   );
 }
-  
