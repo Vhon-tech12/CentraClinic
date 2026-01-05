@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
+import { HiOutlineBars3, HiOutlineXMark } from "react-icons/hi2";
+
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -131,7 +132,7 @@ const Navbar = () => {
           onClick={() => setIsOpen(!isOpen)}
           className="md:hidden text-gray-900 text-3xl"
         >
-          {isOpen ? <HiOutlineX /> : <HiOutlineMenu />}
+          {isOpen ? <HiOutlineXMark /> : <HiOutlineBars3 />}
         </button>
       </div>
 
