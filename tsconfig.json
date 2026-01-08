@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "components/AppointmentOverview.jsx", "components/AdminLogin.JS"  ],
+, "components/AppointmentOverview.jsx", "components/AdminLogin.JS", "components/AppointmentClient.js"  ],
   "exclude": ["node_modules"]
 }
