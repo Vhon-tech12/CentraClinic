@@ -151,7 +151,7 @@ export default function AppointmentPage() {
 
         <div className="flex-1">
           <img
-            src="centra-Doctor.jpg"
+            src="Centra-Doctor.jpg"
             alt="Clinic Appointment"
             className="w-full rounded-2xl shadow-lg"
           />
