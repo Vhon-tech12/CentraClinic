@@ -28,8 +28,8 @@ const services = [
     icon: faFaceSmile,
   },
   {
-    title: "Lip Enhancement",
-    description: "Precision treatments to sculpt and volumize your lips, boosting confidence with natural-looking results tailored to your unique features.",
+    title: "Ear, Nose & Throat Care",
+    description: "Medical and procedural care for ear, nose, and throat conditions.",
     icon: faList,
   },
   {
@@ -101,7 +101,7 @@ function Service() {
 
               {/* LINK */}
               <Link
-                href="#"
+                href="service"
                 className={
                   "text-base font-semibold inline-flex items-center gap-2 transition-all duration-300 " +
                   (service.active
