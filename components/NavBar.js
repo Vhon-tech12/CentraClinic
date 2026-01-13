@@ -1,18 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { HiOutlineBars3, HiOutlineXMark } from "react-icons/hi2";
-
+import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
+import { useSession, signOut } from "next-auth/react";
 
 const Navbar = () => {
+  const { data: session, status } = useSession();
   const [isOpen, setIsOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const profileRef = useRef(null);
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -21,42 +18,24 @@ const Navbar = () => {
     { name: "Contact", href: "/contact" },
   ];
 
-  // Handle scroll, login state, and clicking outside
+  // Handle scroll
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
       setIsOpen(false);
-      setProfileOpen(false);
-    };
-
-    const checkLoginStatus = () => {
-      setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
-    };
-
-    const handleClickOutside = (e) => {
-      if (profileRef.current && e.target && !profileRef.current.contains(e.target)) {
-        setProfileOpen(false);
-      }
     };
 
     window.addEventListener("scroll", handleScroll);
-    window.addEventListener("auth-change", checkLoginStatus);
-    document.addEventListener("mousedown", handleClickOutside);
-
-    checkLoginStatus();
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("auth-change", checkLoginStatus);
-      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    setIsLoggedIn(false);
-    setProfileOpen(false);
-    window.dispatchEvent(new Event("auth-change"));
+  // 🚪 LOGOUT
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/" });
+    setIsOpen(false);
   };
 
   return (
@@ -79,8 +58,12 @@ const Navbar = () => {
             className="rounded-full"
           />
           <div className="leading-tight">
-            <span className="block text-xl font-extrabold text-gray-900">Centra</span>
-            <span className="block text-xs text-gray-500 tracking-wide">Clinic PH</span>
+            <span className="block text-xl font-extrabold text-gray-900">
+              Centra
+            </span>
+            <span className="block text-xs text-gray-500 tracking-wide">
+              Clinic PH
+            </span>
           </div>
         </Link>
 
@@ -101,73 +84,35 @@ const Navbar = () => {
           ))}
         </ul>
 
-        {/* Desktop Actions */}
-        <div className="hidden md:flex items-center gap-3 relative">
-          {isLoggedIn ? (
+        {/* Desktop CTA */}
+        <div className="hidden md:flex items-center gap-3">
+          {!session && (
+            <Link
+              href="/login"
+              className="px-5 py-2 rounded-full border border-gray-300
+              text-gray-700 hover:bg-gray-100 transition font-medium"
+            >
+              Login
+            </Link>
+          )}
+
+          {session && (
             <>
               <Link
                 href="/appointment"
-                className="px-6 py-2 rounded-full bg-black text-white
-                font-semibold shadow-md hover:bg-gray-900 transition"
+                className="px-6 py-2 rounded-full bg-black
+                text-white font-semibold shadow-md hover:bg-gray-900 hover:shadow-lg transition"
               >
                 Book Appointment
               </Link>
 
-              {/* Profile Dropdown */}
-              <div className="relative" ref={profileRef}>
-                <button
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-full
-                  border border-gray-300 hover:bg-gray-100 transition"
-                >
-                  <div className="h-9 w-9 rounded-full bg-gray-300 flex items-center justify-center font-semibold">
-                    J
-                  </div>
-                </button>
-
-                {profileOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border z-50 overflow-hidden">
-                    <div className="px-4 py-3 border-b">
-                      <p className="font-semibold text-sm">Juan Dela Cruz</p>
-                      <p className="text-xs text-gray-500 truncate">juandelacruz@gmail.com</p>
-                    </div>
-
-                    <Link
-                      href="/dashboard"
-                      className="block px-4 py-2 text-sm hover:bg-gray-100"
-                      onClick={() => setProfileOpen(false)}
-                    >
-                      My Account
-                    </Link>
-
-                    <Link
-                      href="/appointments"
-                      className="block px-4 py-2 text-sm hover:bg-gray-100"
-                      onClick={() => setProfileOpen(false)}
-                    >
-                      My Appointments
-                    </Link>
-
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm
-                      text-red-600 hover:bg-gray-100 border-t"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="px-6 py-2 rounded-full bg-indigo-600 text-white
-                font-semibold shadow-md hover:bg-indigo-700 transition"
+              <button
+                onClick={handleLogout}
+                className="px-5 py-2 rounded-full border border-gray-300
+                text-gray-700 hover:bg-gray-100 transition font-medium"
               >
-                Login
-              </Link>
+                Logout
+              </button>
             </>
           )}
         </div>
@@ -177,78 +122,64 @@ const Navbar = () => {
           onClick={() => setIsOpen(!isOpen)}
           className="md:hidden text-gray-900 text-3xl"
         >
-          {isOpen ? <HiOutlineXMark /> : <HiOutlineBars3 />}
+          {isOpen ? <HiOutlineX /> : <HiOutlineMenu />}
         </button>
       </div>
 
       {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden bg-white shadow-md border-t border-gray-200">
-          <ul className="flex flex-col px-6 py-4 gap-4">
-            {navLinks.map((link) => (
-              <li key={link.name}>
-                <Link
-                  href={link.href}
-                  className="block text-gray-700 font-medium hover:text-indigo-600"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {link.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+      <div
+        className={`md:hidden transition-transform duration-300 ${
+          isOpen ? "scale-y-100" : "scale-y-0"
+        }`}
+        style={{ transformOrigin: "top" }}
+      >
+        <div className="px-6 pb-6 pt-2 space-y-5 bg-white shadow-lg rounded-b-2xl">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+              className="block text-lg font-medium text-gray-800 hover:text-indigo-600"
+            >
+              {link.name}
+            </Link>
+          ))}
 
-          <div className="flex flex-col px-6 py-4 gap-3">
-            {isLoggedIn ? (
+          <div className="pt-4 border-t space-y-3">
+            {!session && (
+              <Link
+                href="/login"
+                onClick={() => setIsOpen(false)}
+                className="block text-center px-6 py-2 rounded-full
+                border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
+              >
+                Login
+              </Link>
+            )}
+
+            {session && (
               <>
                 <Link
                   href="/appointment"
-                  className="px-6 py-2 rounded-full bg-black text-white font-semibold text-center"
                   onClick={() => setIsOpen(false)}
+                  className="block text-center px-6 py-2 rounded-full
+                  bg-black text-white font-semibold hover:bg-gray-900"
                 >
                   Book Appointment
                 </Link>
 
-                <Link
-                  href="/dashboard"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
-                  onClick={() => setIsOpen(false)}
-                >
-                  My Account
-                </Link>
-
-                <Link
-                  href="/appointments"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded"
-                  onClick={() => setIsOpen(false)}
-                >
-                  My Appointments
-                </Link>
-
                 <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 rounded"
+                  onClick={handleLogout}
+                  className="block w-full text-center px-6 py-2 rounded-full
+                  border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
                 >
                   Logout
                 </button>
               </>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="px-6 py-2 rounded-full bg-indigo-600 text-white font-semibold text-center"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Login
-                </Link>
-              </>
             )}
           </div>
         </div>
-      )}
+      </div>
     </nav>
   );
 };

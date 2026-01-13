@@ -41,15 +41,15 @@ const LoginForm = () => {
   };
 
   const handleGoogleSignIn = async () => {
-    setLoading(true);
-    try {
-      await signIn("google", { callbackUrl: "/" });
-    } catch (err) {
-      console.error(err);
-      setError("Google sign in failed");
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    await signIn("google", { callbackUrl: "/" });
+  } catch (err) {
+    console.error(err);
+    setError("Google sign in failed");
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-linear-to-r from-indigo-100 to-purple-100">
@@ -100,6 +100,13 @@ const LoginForm = () => {
             />
           </div>
 
+          {/* CAPTCHA PLACEHOLDER */}
+          <div className="flex items-center gap-3 border border-gray-300 rounded-lg px-4 py-3 w-fit bg-white">
+            <input type="checkbox" className="w-5 h-5" />
+            <span className="text-sm text-gray-700">I’m not a robot</span>
+            <span className="ml-auto text-xs text-gray-400">reCAPTCHA</span>
+          </div>
+
           {/* Submit */}
           <button
             type="submit"
@@ -121,7 +128,6 @@ const LoginForm = () => {
         <div className="flex justify-center gap-4">
           <button
             onClick={handleGoogleSignIn}
-            disabled={loading}
             className="w-full py-2 border rounded-lg flex justify-center items-center hover:bg-gray-50"
           >
             <FontAwesomeIcon icon={faGoogle} />
