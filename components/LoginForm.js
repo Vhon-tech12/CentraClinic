@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
@@ -37,6 +38,17 @@ const LoginForm = () => {
       // redirect to homepage
       router.push("/");
     }, 800);
+  };
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      await signIn("google", { callbackUrl: "/" });
+    } catch (err) {
+      console.error(err);
+      setError("Google sign in failed");
+      setLoading(false);
+    }
   };
 
   return (
@@ -107,7 +119,11 @@ const LoginForm = () => {
 
         {/* Social Login */}
         <div className="flex justify-center gap-4">
-          <button className="w-full py-2 border rounded-lg flex justify-center items-center hover:bg-gray-50">
+          <button
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            className="w-full py-2 border rounded-lg flex justify-center items-center hover:bg-gray-50"
+          >
             <FontAwesomeIcon icon={faGoogle} />
             <span className="ml-2">Continue with Google</span>
           </button>
