@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "dev": "cd CentraClinic && next dev",
+    "build": "cd CentraClinic && next build",
+    "start": "cd CentraClinic && next start",
+    "lint": "cd CentraClinic && eslint"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
