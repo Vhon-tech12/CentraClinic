@@ -58,11 +58,12 @@ export const SectionLabel = ({ title, subtitle }: { title: string; subtitle?: st
   </div>
 );
 
-export const ActionChips = ({ options }: { options: string[] }) => (
+export const ActionChips = ({ options, onSelect }: { options: string[]; onSelect?: (option: string) => void }) => (
   <div className="flex flex-wrap gap-2 mt-1">
     {options.map((o) => (
       <button
         key={o}
+        onClick={() => onSelect?.(o)}
         className="px-3 py-1.5 rounded-full text-xs
                    border border-gray-600
                    bg-[#13161d] text-gray-300
