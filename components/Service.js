@@ -1,3 +1,4 @@
+
 import React from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -28,8 +29,8 @@ const services = [
     icon: faFaceSmile,
   },
   {
-    title: "Lip Enhancement",
-    description: "Precision treatments to sculpt and volumize your lips, boosting confidence with natural-looking results tailored to your unique features.",
+    title: "Ear, Nose & Throat Care",
+    description: "Medical and procedural care for ear, nose, and throat conditions.",
     icon: faList,
   },
   {
@@ -98,19 +99,18 @@ function Service() {
               >
                 {service.description}
               </p>
+<Link
+  href="/service"
+  className={
+    "text-base font-semibold inline-flex items-center gap-2 transition-all duration-300 " +
+    (service.active
+      ? "text-white hover:text-indigo-200"
+      : "text-indigo-600 hover:text-indigo-700 group-hover:translate-x-1")
+  }
+>
+  Learn more →
+</Link>
 
-              {/* LINK */}
-              <Link
-                href="#"
-                className={
-                  "text-base font-semibold inline-flex items-center gap-2 transition-all duration-300 " +
-                  (service.active
-                    ? "text-white hover:text-indigo-200"
-                    : "text-indigo-600 hover:text-indigo-700 group-hover:translate-x-1")
-                }
-              >
-                Learn more →
-              </Link>
             </div>
           ))}
         </div>
