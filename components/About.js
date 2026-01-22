@@ -9,7 +9,6 @@ import {
   faCalendarCheck,
   faShieldAlt,
   faMapMarkerAlt,
-  faBrain,
   faCalendarAlt,
   faStethoscope,
 } from "@fortawesome/free-solid-svg-icons";
@@ -19,25 +18,21 @@ const About = () => {
     <>
       {/* ================= ABOUT SECTION ================= */}
       <section className="relative bg-linear-to-br from-purple-600 via-purple-700 to-purple-900 py-24 overflow-hidden">
-        {/* Decorative Blobs */}
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl" />
         <div className="absolute top-1/2 -right-32 w-96 h-96 bg-pink-400/20 rounded-full blur-3xl" />
 
         <div className="relative max-w-7xl mx-auto px-6">
-          {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
               Discover Centra Clinic PH
             </h2>
-            <p className="text-purple-200/90 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-              Your trusted partner in health and wellness. We deliver modern,
-              personalized healthcare designed around your needs.
+            <p className="text-purple-200 max-w-2xl mx-auto text-lg">
+              Your trusted partner in health and wellness with modern,
+              patient-centered healthcare solutions.
             </p>
           </div>
 
-          {/* Content */}
           <div className="grid md:grid-cols-2 gap-14 items-center">
-            {/* Image */}
             <div className="relative h-[520] rounded-3xl overflow-hidden shadow-2xl">
               <Image
                 src="/Centra-Doctor.jpg"
@@ -46,51 +41,29 @@ const About = () => {
                 priority
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-black/10" />
             </div>
 
-            {/* Features */}
             <div className="space-y-6">
-              <Feature
-                icon={<FontAwesomeIcon icon={faUserMd} />}
-                title="Certified Medical Experts"
-              >
-                Our doctors and specialists are fully licensed, experienced, and
-                committed to high-quality patient care.
+              <Feature icon={faUserMd} title="Certified Medical Experts">
+                Our doctors are licensed, experienced, and committed to
+                high-quality patient care.
               </Feature>
 
-              <Feature
-                icon={<FontAwesomeIcon icon={faCalendarCheck} />}
-                title="Same-Day Appointments"
-              >
-                Book and consult with our specialists on the same day — no long
-                queues or delays.
+              <Feature icon={faCalendarCheck} title="Same-Day Appointments">
+                Book and consult with specialists without long waiting times.
               </Feature>
 
-              <Feature
-                icon={<FontAwesomeIcon icon={faShieldAlt} />}
-                title="Secure Health Records"
-              >
-                Your medical history, prescriptions, and results are safely
-                stored and accessible anytime.
+              <Feature icon={faShieldAlt} title="Secure Health Records">
+                Your medical data is protected with secure digital systems.
               </Feature>
 
-              <Feature
-                icon={<FontAwesomeIcon icon={faMapMarkerAlt} />}
-                title="In-Clinic & Online Care"
-              >
-                Choose between virtual consultations or visiting our modern
-                physical clinic.
+              <Feature icon={faMapMarkerAlt} title="In-Clinic & Online Care">
+                Choose between online consultation or visiting our clinic.
               </Feature>
 
-              {/* CTA */}
               <Link
                 href="/appointment"
-                className="inline-flex items-center gap-4 mt-8
-                bg-linear-to-r from-white to-purple-100
-                text-purple-700 px-9 py-4 rounded-full
-                font-semibold shadow-lg
-                hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                className="inline-flex items-center gap-4 mt-8 bg-white text-purple-700 px-9 py-4 rounded-full font-semibold shadow-lg hover:scale-105 transition"
               >
                 Book Appointment
                 <span className="bg-purple-600 text-white w-9 h-9 rounded-full flex items-center justify-center">
@@ -102,56 +75,43 @@ const About = () => {
         </div>
       </section>
 
-      {/* ================= PROCESS SECTION ================= */}
-      <section className="relative bg-linear-to-b from-gray-50 to-white py-28">
+      {/* ================= PROCESS / FEATURES SECTION ================= */}
+      <section className="bg-white py-28">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          {/* Header */}
-          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-5">
-            A Simple, Patient-Focused Care Process
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
-            From booking to recovery, our process is designed to give you a
-            smooth, secure, and stress-free healthcare experience.
+          <p className="text-purple-600 font-semibold mb-3">
+            Patient Care Process
           </p>
 
-          {/* Steps */}
-          <div className="mt-20 grid gap-10 md:grid-cols-3">
-            <ProcessCard
-              step="01"
-              icon={<FontAwesomeIcon icon={faCalendarAlt} />}
-              title="Book Your Appointment"
-              text="Select your service, preferred doctor, and schedule using our fast and secure booking system."
+          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6">
+            Everything you need <br /> to manage your care
+          </h2>
+
+          <p className="text-gray-600 max-w-2xl mx-auto text-lg mb-20">
+            A seamless healthcare journey from booking to follow-up,
+            designed with patients in mind.
+          </p>
+
+          <div className="grid gap-14 md:grid-cols-3 text-left">
+            <SimpleFeature
+              icon={faCalendarAlt}
+              title="Easy Appointment Booking"
+              text="Schedule your visit online with real-time availability."
+              link="/appointment"
             />
 
-            <ProcessCard
-              step="02"
-              icon={<FontAwesomeIcon icon={faStethoscope} />}
-              title="Consult With Specialists"
-              text="Meet with our board-certified ENT and aesthetic specialists for accurate diagnosis and treatment."
+            <SimpleFeature
+              icon={faStethoscope}
+              title="Expert Medical Consultation"
+              text="Get accurate diagnosis and care from certified specialists."
+              link="/services"
             />
 
-            <ProcessCard
-              step="03"
-              icon={<FontAwesomeIcon icon={faBrain} />}
-              title="Follow-Up & Ongoing Care"
-              text="Access prescriptions, records, and follow-up care anytime through our secure patient system."
+            <SimpleFeature
+              icon={faShieldAlt}
+              title="Secure Health Records"
+              text="Access your medical data safely anytime, anywhere."
+              link="/privacy"
             />
-          </div>
-
-          {/* CTA */}
-          <div className="mt-16">
-            <Link
-              href="/appointment"
-              className="inline-flex items-center gap-3
-              bg-linear-to-r from-purple-600 to-purple-800
-              text-white px-10 py-4 rounded-full font-semibold
-              shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300"
-            >
-              Start Your Care Journey
-              <span className="bg-white text-purple-700 w-9 h-9 rounded-full flex items-center justify-center">
-                →
-              </span>
-            </Link>
           </div>
         </div>
       </section>
@@ -161,54 +121,36 @@ const About = () => {
 
 /* ================= REUSABLE COMPONENTS ================= */
 
-const Feature = ({ icon, title, children }) => {
-  return (
-    <div className="flex gap-4 p-6 rounded-2xl
-      bg-white/10 backdrop-blur-md border border-white/10
-      hover:bg-white/20 transition-all duration-300
-      hover:shadow-xl hover:-translate-y-1">
-      
-      <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-purple-700
-        rounded-xl flex items-center justify-center text-white text-xl shadow-md">
-        {icon}
-      </div>
-
-      <div>
-        <h4 className="text-white font-semibold text-lg">{title}</h4>
-        <p className="text-purple-200/90 text-sm leading-relaxed">
-          {children}
-        </p>
-      </div>
+const Feature = ({ icon, title, children }) => (
+  <div className="flex gap-4 p-6 rounded-2xl bg-white/10 border border-white/10 backdrop-blur hover:bg-white/20 transition">
+    <div className="w-12 h-12 rounded-xl bg-purple-600 text-white flex items-center justify-center text-xl">
+      <FontAwesomeIcon icon={icon} />
     </div>
-  );
-};
-
-const ProcessCard = ({ step, icon, title, text }) => {
-  return (
-    <div className="relative rounded-3xl bg-white p-8
-      border shadow-sm hover:shadow-xl
-      transition-all duration-300 hover:-translate-y-2">
-
-      <span className="absolute -top-4 left-6
-        bg-purple-600 text-white text-sm font-bold
-        px-4 py-1 rounded-full shadow">
-        Step {step}
-      </span>
-
-      <div className="w-14 h-14 mb-6 rounded-xl
-        bg-linear-to-br from-purple-600 to-purple-800
-        text-white flex items-center justify-center text-xl shadow-md">
-        {icon}
-      </div>
-
-      <h4 className="text-lg font-semibold text-gray-900 mb-2">
-        {title}
-      </h4>
-      <p className="text-gray-600 text-sm leading-relaxed">
-        {text}
-      </p>
+    <div>
+      <h4 className="text-white font-semibold text-lg">{title}</h4>
+      <p className="text-purple-200 text-sm">{children}</p>
     </div>
-  );
-};
+  </div>
+);
+
+const SimpleFeature = ({ icon, title, text, link }) => (
+  <div>
+    <div className="flex items-center gap-3 mb-4 text-purple-600">
+      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+        <FontAwesomeIcon icon={icon} />
+      </div>
+      <h4 className="font-semibold text-gray-900 text-lg">{title}</h4>
+    </div>
+
+    <p className="text-gray-600 mb-4">{text}</p>
+
+    <Link
+      href={link}
+      className="text-purple-600 font-medium inline-flex items-center gap-1 hover:underline"
+    >
+      Learn more →
+    </Link>
+  </div>
+);
 
 export default About;

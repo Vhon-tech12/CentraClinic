@@ -1,107 +1,135 @@
 import Image from "next/image";
 import Footer from "../../components/Footer";
-import Link from "next/link";
 
-import { FaUserMd, FaLaptopMedical, FaShieldAlt } from "react-icons/fa";
-
-export default function AboutPage() {
+export default function AboutCentraClinic() {
   return (
     <>
-      {/* HERO */}
-      <section className="relative w-full h-[400] bg-linear-to-r from-blue-600 to-purple-600 flex items-center justify-center">
-        {/* Optional background image */}
-        {/* <Image src="/images/clinic-hero.jpg" alt="Clinic" fill className="object-cover opacity-30" /> */}
-        <h1 className="text-4xl md:text-5xl font-bold text-white text-center drop-shadow-lg">
-          About Centra Clinic PH
-        </h1>
-      </section>
+    <section className="relative isolate overflow-hidden bg-white py-24">
+      {/* TOP GRADIENT */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
+      >
+        <div
+          className="relative left-[calc(50%-11rem)] w-[36rem h-24rem
+          -translate-x-1/2 rotate-30 bg-linear-to-tr from-[#ff80b5] to-[#9089fc]
+          opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72rem sm:h-48rem"
+          style={{
+            clipPath:
+              "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
+          }}
+        />
+      </div>
 
       {/* CONTENT */}
-      <div className="max-w-6xl mx-auto px-6 py-20 space-y-24">
-
-        {/* INTRO */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
-            Your Partner in Modern Healthcare
-          </h2>
-          <p className="text-gray-700 text-lg leading-relaxed">
-            Centra Clinic PH is a patient-centered healthcare platform designed
-            to make medical consultations accessible, efficient, and reliable.
-            By combining trusted medical professionals with modern technology,
-            we aim to improve healthcare experiences for every Filipino.
-          </p>
-        </div>
-
-        {/* MISSION & VISION */}
-        <div className="grid md:grid-cols-2 gap-12">
-          <div className="p-10 rounded-3xl bg-linear-to-tr from-blue-50 to-blue-100 hover:shadow-xl transition">
-            <h3 className="text-2xl font-semibold mb-4 text-blue-700">Our Mission</h3>
-            <p className="text-gray-700 leading-relaxed">
-              To provide accessible and high-quality healthcare services through
-              innovative digital solutions that connect patients with trusted
-              medical professionals anytime, anywhere.
-            </p>
-          </div>
-          <div className="p-10 rounded-3xl bg-linear-to-tr from-purple-50 to-purple-100 hover:shadow-xl transition">
-            <h3 className="text-2xl font-semibold mb-4 text-purple-700">Our Vision</h3>
-            <p className="text-gray-700 leading-relaxed">
-              To become a leading digital healthcare platform in the Philippines,
-              empowering communities with reliable medical care and technology-
-              driven health solutions.
-            </p>
-          </div>
-        </div>
-
-        {/* WHY CHOOSE US */}
+      <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-start">
+        {/* LEFT CONTENT */}
         <div>
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">
-            Why Choose Centra Clinic PH?
+          <p className="text-sm uppercase tracking-widest text-indigo-600 mb-4">
+            About Centra Clinic
+          </p>
+
+          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-gray-900 mb-6">
+            On a mission to modernize and{" "}
+            <span className="text-indigo-600">simplify healthcare</span>
           </h2>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
-            <div className="flex flex-col items-center p-8 rounded-2xl bg-white border hover:shadow-xl transition">
-              <FaUserMd className="text-blue-600 text-5xl mb-4" />
-              <h4 className="font-semibold text-lg mb-2 text-center">Licensed Professionals</h4>
-              <p className="text-gray-600 text-center text-sm">
-                Consult with verified and experienced healthcare providers you can trust.
-              </p>
-            </div>
 
-            <div className="flex flex-col items-center p-8 rounded-2xl bg-white border hover:shadow-xl transition">
-              <FaLaptopMedical className="text-purple-600 text-5xl mb-4" />
-              <h4 className="font-semibold text-lg mb-2 text-center">Easy Online Consultations</h4>
-              <p className="text-gray-600 text-center text-sm">
-                Book appointments and receive medical advice from the comfort of your home.
-              </p>
-            </div>
+          <p className="text-gray-600 max-w-xl mb-10">
+            By combining clinical workflows with intelligent digital tools, 
+            Centra Clinic helps healthcare providers focus less on paperwork and more on what truly matters—patient care. 
+            From appointment scheduling to SOAP notes and AI-assisted prescriptions, 
+            every feature is designed to improve efficiency, accuracy, and patient outcomes.
+          </p>
 
-            <div className="flex flex-col items-center p-8 rounded-2xl bg-white border hover:shadow-xl transition">
-              <FaShieldAlt className="text-indigo-600 text-5xl mb-4" />
-              <h4 className="font-semibold text-lg mb-2 text-center">Secure & Confidential</h4>
-              <p className="text-gray-600 text-center text-sm">
-                Your medical records and personal data are protected with industry-standard security.
-              </p>
+          <h3 className="text-xl font-semibold text-gray-900 mb-3">
+            Our Mission
+          </h3>
+
+          <p className="text-gray-600 mb-4">
+            To empower healthcare professionals with intelligent tools that
+            improve clinical decisions, reduce manual workload, and enhance the
+            overall patient experience. 
+
+          </p>
+
+          <p className="text-gray-600 mb-10">
+            Centra Clinic integrates appointment management, SOAP notes,
+            e-prescriptions, and AI-driven insights into one seamless system.
+          </p>
+
+          {/* STATS */}
+          <div className="grid grid-cols-2 gap-8 border-t border-gray-200 pt-8 max-w-lg">
+            <div>
+              <p className="text-3xl font-bold text-indigo-600">10K+</p>
+              <p className="text-sm text-gray-500">Patients Served</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-indigo-600">100+</p>
+              <p className="text-sm text-gray-500">Healthcare Providers</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-indigo-600">24/7</p>
+              <p className="text-sm text-gray-500">Clinic Accessibility</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-indigo-600">AI-Powered</p>
+              <p className="text-sm text-gray-500">Clinical Support</p>
             </div>
           </div>
         </div>
 
-        {/* CLOSING + CTA */}
-        <div className="text-center max-w-2xl mx-auto space-y-4">
-          <h2 className="text-3xl font-bold text-gray-800">Healthcare Made Simple</h2>
-          <p className="text-gray-700 leading-relaxed">
-            At Centra Clinic PH, we believe healthcare should be accessible,
-            reliable, and patient-focused. Our platform bridges the gap between
-            patients and healthcare providers—bringing quality care closer to you.
-          </p>
-          <Link
-            href="/appointment"
-            className="inline-block mt-4 px-10 py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold text-lg hover:scale-105 transition transform shadow-lg"
-          >
-            Book an Appointment
-          </Link>
+        {/* RIGHT IMAGES */}
+        <div className="grid grid-cols-2 gap-6">
+          <div className="col-span-2 rounded-2xl overflow-hidden shadow-lg">
+            <Image
+              src="/Centraa.jpg"
+              alt="Clinic Team"
+              width={800}
+              height={500}
+              className="object-cover w-full h-full"
+            />
+          </div>
+
+          <div className="rounded-2xl overflow-hidden shadow-lg">
+            <Image
+              src="/ear.jpg"
+              alt="Doctor Consultation"
+              width={400}
+              height={400}
+              className="object-cover w-full h-full"
+            />
+          </div>
+
+          <div className="rounded-2xl overflow-hidden shadow-lg">
+            <Image
+              src="/throat.jpg"
+              alt="Clinic Workspace"
+              width={400}
+              height={400}
+              className="object-cover w-full h-full"
+            />
+          </div>
         </div>
       </div>
 
-      <Footer />
+      {/* BOTTOM GRADIENT */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
+      >
+        <div
+          className="relative left-[calc(50%+3rem)] w-[36rem h-[24rem
+          -translate-x-1/2 bg-linear-to-tr from-[#ff80b5] to-[#9089fc]
+          opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72rem sm:h-[48rem"
+          style={{
+            clipPath:
+              "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
+          }}
+        />
+      </div>
+    </section>
+    <Footer />
     </>
+    
   );
 }

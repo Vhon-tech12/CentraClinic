@@ -22,7 +22,7 @@ const Navbar = () => {
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
     { name: "Services", href: "/service" },
-    { name: "Contact", href: "/contact" },
+    { name: "FAQs", href: "/FAQs" },
   ];
 
   // Scroll effect

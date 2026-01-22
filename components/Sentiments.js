@@ -1,121 +1,132 @@
+import React from "react";
 import Image from "next/image";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faQuoteLeft } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
+import { FaStar, FaRegStar } from "react-icons/fa";
 
 const testimonials = [
   {
-    name: "Maria Santos",
-    username: "@maria_santos",
-    role: "Teacher",
-    image: "/Sen3.avif",
+    name: "Leslie Alexander",
+    role: "Patient",
+    image: "sen1.avif",
     message:
-      "The clinic was clean and organized, and the staff were friendly and accommodating. The consultation and procedure went smoothly, and I appreciated how attentive Dr. Ong was to both the medical and aesthetic aspects of my care. Highly recommend!",
-    date: "Dec 12, 2024",
+      "The staff at Centra Clinic PH were very professional and accommodating. Booking an appointment online was fast and easy.",
     rating: 5,
+    sentiment: "Happy 😊",
   },
   {
-    name: "Carlos Rivera",
-    username: "@carlos_rivera",
-    role: "Engineer",
-    image: "/Sen1.avif",
+    name: "Michael Foster",
+    role: "Patient",
+    image: "/sen2.avif",
     message:
-      "I had a great experience at Centra Clinic for my ENT consultation. Dr. John Emmanuel Ong was very professional, knowledgeable, and approachable. He explained everything clearly and made me feel comfortable throughout the visit.",
-    date: "Nov 28, 2024",
-    rating: 5,
+      "I felt safe knowing my medical records were securely stored. The doctors were very attentive and caring.",
+    rating: 4,
+    sentiment: "Satisfied 🙂",
   },
   {
-    name: "Elena Gomez",
-    username: "@elena_gomez",
-    role: "Business Owner",
-    image: "/Sen2.avif",
+    name: "Leonard Krasner",
+    role: "Patient",
+    image: "/sen3.avif",
     message:
-      "Outstanding service! The facial treatment I received was top-notch. The results exceeded my expectations, and the team ensured I was comfortable every step of the way. Centra Clinic truly cares about their patients.",
-    date: "Oct 15, 2024",
+      "Clean facility, friendly staff, and smooth consultation process. Highly recommended clinic!",
     rating: 5,
+    sentiment: "Thrilled 😄",
+  },
+  {
+    name: "Emily Selman",
+    role: "Patient",
+    image: "/sen3.avif",
+    message:
+      "Centra Clinic PH made my consultation stress-free. The online system saved me so much time.",
+    rating: 5,
+    sentiment: "Relaxed 😌",
+  },
+  {
+    name: "Floyd Miles",
+    role: "Patient",
+    image: "sen2.avif",
+    message:
+      "Doctors explained everything clearly. I appreciate how organized and efficient the clinic is.",
+    rating: 4,
+    sentiment: "Grateful 🙏",
+  },
+  {
+    name: "Courtney Henry",
+    role: "Patient",
+    image: "/sen1.avif",
+    message:
+      "Very smooth experience from booking to consultation. Will definitely come back.",
+    rating: 5,
+    sentiment: "Happy 😊",
   },
 ];
 
-const Sentiments = () => {
+export default function TestimonialsSection() {
   return (
-    <section className="py-20 px-6 bg-linear-to-br from-blue-50 to-indigo-100">
-      <div className="max-w-7xl mx-auto text-center">
+    <section className="relative py-24 px-6 bg-linear-to-b from-blue-50 via-white to-purple-50">
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Heading */}
+        <div className="text-center mb-16">
+          <p className="text-blue-600 font-semibold mb-2">Testimonials</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+            We have worked with <br />
+            thousands of amazing people
+          </h2>
+        </div>
 
-        {/* HEADER */}
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-          What Our Patients Say
-        </h2>
-
-        <p className="text-gray-600 max-w-2xl mx-auto mb-6 text-lg leading-relaxed">
-          Hear from real patients who have experienced exceptional care at Centra Clinic PH. Their stories reflect our commitment to quality healthcare and personalized service.
-        </p>
-
-        <p className="text-base text-indigo-600 mb-16 font-semibold">
-          Trusted by <span className="text-2xl font-bold">57,000+</span> satisfied patients
-        </p>
-
-        {/* CARDS */}
-        <div className="grid md:grid-cols-3 gap-8">
+        {/* Masonry layout */}
+        <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
           {testimonials.map((item, index) => (
             <div
               key={index}
-              className="bg-white rounded-3xl p-8 text-left shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group"
+              className="break-inside-avoid rounded-xl border border-gray-200 bg-white p-6 shadow-lg hover:shadow-2xl transition duration-300"
             >
-              {/* QUOTE ICON */}
-              <div className="mb-4">
-                <FontAwesomeIcon
-                  icon={faQuoteLeft}
-                  className="text-indigo-200 text-3xl group-hover:text-indigo-300 transition-colors"
-                />
-              </div>
-
-              {/* RATING */}
-              <div className="flex mb-4">
-                {[...Array(item.rating)].map((_, i) => (
-                  <span key={i} className="text-yellow-400 text-lg">★</span>
-                ))}
-              </div>
-
-              {/* MESSAGE */}
-              <p className="text-gray-700 leading-relaxed mb-6 text-base">
-                {item.message}
+              {/* Sentiment */}
+              <p className="text-sm font-medium text-purple-600 mb-2">
+                {item.sentiment}
               </p>
 
-              {/* USER */}
+              {/* Testimonial Message */}
+              <p className="text-gray-600 mb-4 leading-relaxed">“{item.message}”</p>
+
+              {/* Star Rating */}
+              <div className="flex items-center mb-4">
+                {Array.from({ length: 5 }, (_, i) =>
+                  i < item.rating ? (
+                    <FaStar key={i} className="text-yellow-400 mr-1" />
+                  ) : (
+                    <FaRegStar key={i} className="text-gray-300 mr-1" />
+                  )
+                )}
+              </div>
+
+              {/* Patient Info */}
               <div className="flex items-center gap-4">
-                <div className="relative w-14 h-14 rounded-full overflow-hidden ring-2 ring-indigo-100">
-                  <Image
-                    src={item.image}
-                    alt={`Profile picture of ${item.name}, a satisfied patient at Centra Clinic PH`}
-                    fill
-                    className="object-cover"
-                  />
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  width={40}
+                  height={40}
+                  className="rounded-full object-cover"
+                />
+                <div>
+                  <p className="font-semibold text-gray-900">{item.name}</p>
+                  <p className="text-sm text-gray-500">{item.role}</p>
                 </div>
-
-                <div className="flex-1">
-                  <p className="font-bold text-gray-900 text-lg">
-                    {item.name}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {item.username}
-                  </p>
-                  <p className="text-xs text-indigo-600 font-medium">
-                    {item.role}
-                  </p>
-                </div>
-
-                {/* DATE */}
-                <p className="text-xs text-gray-400 ml-auto">
-                  {item.date}
-                </p>
               </div>
             </div>
           ))}
         </div>
 
+        {/* Optional CTA */}
+        <div className="text-center mt-16">
+          <Link
+            href="/login"
+            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-3 text-white font-semibold hover:bg-blue-700 transition"
+          >
+            Book an Appointment
+          </Link>
+        </div>
       </div>
     </section>
   );
-};
-
-export default Sentiments;
-
+}
