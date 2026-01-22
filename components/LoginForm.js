@@ -16,40 +16,37 @@ const LoginForm = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  // 🔐 MANUAL LOGIN (Credentials Provider)
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     if (!email || !password) {
       setError("Please enter email and password.");
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
+    const res = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
 
-    // 🔐 MOCK LOGIN
-    setTimeout(() => {
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("user_email", email);
-
-      // 🔔 notify navbar (IMPORTANT)
-      window.dispatchEvent(new Event("auth-change"));
-
-      // redirect to homepage
+    if (res?.error) {
+      setError("Invalid email or password");
+      setLoading(false);
+    } else {
       router.push("/");
-    }, 800);
+    }
   };
 
+  // 🔵 GOOGLE LOGIN
   const handleGoogleSignIn = async () => {
-  setLoading(true);
-  try {
+    setLoading(true);
     await signIn("google", { callbackUrl: "/" });
-  } catch (err) {
-    console.error(err);
-    setError("Google sign in failed");
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-linear-to-r from-indigo-100 to-purple-100">
@@ -100,13 +97,6 @@ const LoginForm = () => {
             />
           </div>
 
-          {/* CAPTCHA PLACEHOLDER */}
-          <div className="flex items-center gap-3 border border-gray-300 rounded-lg px-4 py-3 w-fit bg-white">
-            <input type="checkbox" className="w-5 h-5" />
-            <span className="text-sm text-gray-700">I’m not a robot</span>
-            <span className="ml-auto text-xs text-gray-400">reCAPTCHA</span>
-          </div>
-
           {/* Submit */}
           <button
             type="submit"
@@ -124,16 +114,15 @@ const LoginForm = () => {
           <hr className="flex-1 border-gray-300" />
         </div>
 
-        {/* Social Login */}
-        <div className="flex justify-center gap-4">
-          <button
-            onClick={handleGoogleSignIn}
-            className="w-full py-2 border rounded-lg flex justify-center items-center hover:bg-gray-50"
-          >
-            <FontAwesomeIcon icon={faGoogle} />
-            <span className="ml-2">Continue with Google</span>
-          </button>
-        </div>
+        {/* Google Login */}
+        <button
+          onClick={handleGoogleSignIn}
+          disabled={loading}
+          className="w-full py-3 border rounded-lg flex justify-center items-center hover:bg-gray-50"
+        >
+          <FontAwesomeIcon icon={faGoogle} />
+          <span className="ml-2">Continue with Google</span>
+        </button>
 
         <p className="text-center mt-6 text-gray-500">
           Don’t have an account?{" "}

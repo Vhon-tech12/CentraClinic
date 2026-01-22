@@ -35,8 +35,8 @@ type HeadTemplateModalProps = {
 
 /* ================= TEMPLATES ================= */
 const templates = {
-  Nose: [{ name: "Septum", position: [0, 1.6, 1.2] }],
   Ear: [{ name: "Outer Ear", position: [1.2, 1.5, 0] }],
+  Nose: [{ name: "Septum", position: [0, 1.6, 1.2] }],
   Throat: [
     { name: "Tonsils", position: [0, 1.2, 0.8] },
     { name: "Larynx", position: [0, 0.6, 0.5] },
@@ -46,13 +46,29 @@ const templates = {
 };
 
 /* ================= MODELS ================= */
-const EarModel: React.FC = () => {
+const EarModel = () => {
   const { scene } = useGLTF("/models/ear-anatomy/source/ear.glb");
-  return <primitive object={scene} scale={2.5} position={[0, 0, 0]} />;
+  return <primitive object={scene} scale={2.5} />;
 };
 
-const ThroatModel: React.FC = () => {
-  const { scene } = useGLTF("/models/ear-anatomy/throat/larynx_with_muscles_and_ligaments.glb");
+const NoseModel = () => {
+  const { scene } = useGLTF(
+    "/models/ear-anatomy/nose/anatomi_hidung_nose_anatomy/scene.gltf"
+  );
+  return (
+    <primitive
+      object={scene}
+      scale={2.2}
+      position={[0, -0.3, 0.5]}
+      rotation={[0, Math.PI, 0]}
+    />
+  );
+};
+
+const ThroatModel = () => {
+  const { scene } = useGLTF(
+    "/models/ear-anatomy/throat/larynx_with_muscles_and_ligaments.glb"
+  );
   return (
     <primitive
       object={scene}
@@ -63,8 +79,14 @@ const ThroatModel: React.FC = () => {
   );
 };
 
+/* Preload */
 useGLTF.preload("/models/ear-anatomy/source/ear.glb");
-useGLTF.preload("/models/throat/Throat.glb");
+useGLTF.preload(
+  "/models/ear-anatomy/nose/anatomi_hidung_nose_anatomy/scene.gltf"
+);
+useGLTF.preload(
+  "/models/ear-anatomy/throat/larynx_with_muscles_and_ligaments.glb"
+);
 
 /* ================= MAIN ================= */
 const HeadTemplateModal: React.FC<HeadTemplateModalProps> = ({
@@ -84,37 +106,29 @@ const HeadTemplateModal: React.FC<HeadTemplateModalProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
 
-  /* ===== Resize overlay canvas ===== */
+  /* Resize canvas */
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const resize = () => {
       canvas.width = canvas.clientWidth;
       canvas.height = canvas.clientHeight;
     };
-
     resize();
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
   }, []);
 
-  /* ===== Drawing ===== */
-  const startDrawing = (
-    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
-  ) => {
+  /* Drawing */
+  const startDrawing = (e: any) => {
     if (!selectedArea) return;
     drawing.current = true;
     draw(e);
   };
 
-  const stopDrawing = () => {
-    drawing.current = false;
-  };
+  const stopDrawing = () => (drawing.current = false);
 
-  const draw = (
-    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
-  ) => {
+  const draw = (e: any) => {
     if (!drawing.current || !canvasRef.current) return;
     e.preventDefault();
 
@@ -123,13 +137,9 @@ const HeadTemplateModal: React.FC<HeadTemplateModalProps> = ({
 
     const rect = canvasRef.current.getBoundingClientRect();
     const x =
-      "touches" in e
-        ? e.touches[0].clientX - rect.left
-        : e.clientX - rect.left;
+      e.touches?.[0]?.clientX ?? e.clientX - rect.left;
     const y =
-      "touches" in e
-        ? e.touches[0].clientY - rect.top
-        : e.clientY - rect.top;
+      e.touches?.[0]?.clientY ?? e.clientY - rect.top;
 
     ctx.fillStyle = "red";
     ctx.beginPath();
@@ -156,19 +166,13 @@ const HeadTemplateModal: React.FC<HeadTemplateModalProps> = ({
 
   const handleSaveFinding = () => {
     if (!selectedArea) return;
-
     onSaveFinding?.(finding);
     setPastFindings((prev) => [...prev, drawingData]);
     setDrawingData([]);
     setFinding("");
-
-    const ctx = canvasRef.current?.getContext("2d");
-    ctx?.clearRect(
-      0,
-      0,
-      canvasRef.current!.width,
-      canvasRef.current!.height
-    );
+    canvasRef.current
+      ?.getContext("2d")
+      ?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
   };
 
   if (!open) return null;
@@ -176,24 +180,24 @@ const HeadTemplateModal: React.FC<HeadTemplateModalProps> = ({
   return (
     <Modal onClose={onClose}>
       <div className="flex flex-col md:flex-row gap-4">
-        {/* ================= 3D VIEW ================= */}
-        <div className="relative md:w-2/3 w-full h-96 bg-gray-900 rounded-lg">
+        {/* 3D VIEW */}
+        <div className="relative md:w-2/3 h-96 bg-gray-900 rounded">
           <Canvas camera={{ position: [0, 1.5, 5], fov: 45 }}>
             <ambientLight intensity={0.7} />
-            <directionalLight position={[5, 5, 5]} intensity={1} />
-            <OrbitControls enablePan enableZoom />
+            <directionalLight position={[5, 5, 5]} />
+            <OrbitControls />
 
             {selectedTab === "Ear" && <EarModel />}
+            {selectedTab === "Nose" && <NoseModel />}
             {selectedTab === "Throat" && <ThroatModel />}
 
-            {selectedTab !== "Ear" && selectedTab !== "Throat" && (
+            {selectedTab === "Aesthetics" && (
               <mesh>
                 <sphereGeometry args={[1.5, 32, 32]} />
                 <meshStandardMaterial color="#555" />
               </mesh>
             )}
 
-            {/* Hotspots */}
             {templates[selectedTab].map((h) => (
               <mesh
                 key={h.name}
@@ -209,7 +213,7 @@ const HeadTemplateModal: React.FC<HeadTemplateModalProps> = ({
                 />
                 {selectedArea === h.name && (
                   <Html position={[0, 0.3, 0]}>
-                    <div className="bg-gray-800 text-white px-2 py-1 rounded text-sm">
+                    <div className="bg-gray-800 px-2 py-1 rounded text-sm">
                       {h.name}
                     </div>
                   </Html>
@@ -217,18 +221,10 @@ const HeadTemplateModal: React.FC<HeadTemplateModalProps> = ({
               </mesh>
             ))}
 
-            {/* Drawing points */}
-            {drawingData.map((p, i) => (
+            {[...pastFindings.flat(), ...drawingData].map((p, i) => (
               <mesh key={i} position={[p.x, p.y, p.z]}>
                 <sphereGeometry args={[0.05, 8, 8]} />
                 <meshStandardMaterial color="red" />
-              </mesh>
-            ))}
-
-            {pastFindings.flat().map((p, i) => (
-              <mesh key={`past-${i}`} position={[p.x, p.y, p.z]}>
-                <sphereGeometry args={[0.05, 8, 8]} />
-                <meshStandardMaterial color="blue" />
               </mesh>
             ))}
           </Canvas>
@@ -247,8 +243,8 @@ const HeadTemplateModal: React.FC<HeadTemplateModalProps> = ({
           )}
         </div>
 
-        {/* ================= SIDE PANEL ================= */}
-        <div className="md:w-1/3 w-full space-y-4">
+        {/* SIDE PANEL */}
+        <div className="md:w-1/3 space-y-4">
           <div className="flex gap-2 flex-wrap">
             {(Object.keys(templates) as Array<
               keyof typeof templates
@@ -260,9 +256,7 @@ const HeadTemplateModal: React.FC<HeadTemplateModalProps> = ({
                   setSelectedArea(null);
                 }}
                 className={`px-3 py-1 rounded ${
-                  selectedTab === tab
-                    ? "bg-blue-600"
-                    : "bg-gray-700 text-gray-200"
+                  selectedTab === tab ? "bg-blue-600" : "bg-gray-700"
                 }`}
               >
                 {tab}
@@ -280,7 +274,7 @@ const HeadTemplateModal: React.FC<HeadTemplateModalProps> = ({
               />
               <button
                 onClick={handleSaveFinding}
-                className="bg-green-600 hover:bg-green-500 p-2 rounded w-full"
+                className="bg-green-600 p-2 rounded w-full"
               >
                 Save Finding
               </button>
@@ -289,7 +283,7 @@ const HeadTemplateModal: React.FC<HeadTemplateModalProps> = ({
 
           <button
             onClick={onExport}
-            className="bg-yellow-600 hover:bg-yellow-500 p-2 rounded w-full"
+            className="bg-yellow-600 p-2 rounded w-full"
           >
             Export PDF Report
           </button>
