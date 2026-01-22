@@ -172,7 +172,7 @@ export default function DashboardPage() {
               </ResponsiveContainer>
             </div>
           </div>
-        )}
+        )}  
 
       </div>
     </section>

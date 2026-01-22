@@ -2,21 +2,37 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation"; // App Router navigation
+import { signIn } from "next-auth/react";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
 
-    // Simple authentication check (replace with real auth)
-    if (email === "admin@example.com" && password === "admin123") {
-      console.log("Login successful");
-      router.push("/admin/dashboard"); // Redirect to admin page
-    } else {
-      alert("Invalid email or password");
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("Invalid email or password");
+      } else {
+        router.push("/admin/dashboard"); // Redirect to admin page
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,6 +43,10 @@ const AdminLogin = () => {
         className="bg-gray-800 text-gray-100 p-10 rounded-2xl shadow-2xl w-full max-w-md"
       >
         <h2 className="text-3xl font-bold mb-8 text-center">Admin Login</h2>
+
+        {error && (
+          <p className="text-red-500 text-sm text-center mb-3">{error}</p>
+        )}
 
         <div className="mb-6">
           <label className="block mb-2 text-sm font-semibold">Email</label>
@@ -52,9 +72,10 @@ const AdminLogin = () => {
 
         <button
           type="submit"
-          className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors font-semibold text-white text-lg"
+          disabled={loading}
+          className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors font-semibold text-white text-lg disabled:opacity-50"
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         <p className="mt-6 text-center text-sm text-gray-400">

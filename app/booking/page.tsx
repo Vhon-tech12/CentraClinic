@@ -1,27 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function BookPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true); // waiting for auth check
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { data: session, status } = useSession();
 
   useEffect(() => {
-    const loggedIn = localStorage.getItem("isLoggedIn");
+    if (status === "loading") return; // Still loading
 
-    if (!loggedIn) {
+    if (!session) {
       router.push("/login"); // redirect if not logged in
-    } else {
-      setIsLoggedIn(true); // allow booking to render
     }
+  }, [session, status, router]);
 
-    setLoading(false);
-  }, [router]);
-
-  if (loading) return <p className="text-white p-4">Checking login...</p>;
-  if (!isLoggedIn) return null; // render nothing if not logged in
+  if (status === "loading") return <p className="text-white p-4">Checking login...</p>;
+  if (!session) return null; // render nothing if not logged in
 
   return (
     <div className="text-white p-6">

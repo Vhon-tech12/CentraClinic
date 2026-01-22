@@ -116,7 +116,7 @@ function Service() {
         </div>
 
         <Link
-              href="/login"
+              href="/appointment"
               className="inline-flex items-center gap-3 bg-linear-to-r from-indigo-600 to-blue-600 text-white px-12 py-5 rounded-full shadow-lg hover:shadow-xl transition-transform hover:scale-105 font-semibold text-lg"
             >
               Book an Appointment

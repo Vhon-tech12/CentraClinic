@@ -3,13 +3,14 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
+import { HiOutlineMenu, HiOutlineX, HiChevronDown } from "react-icons/hi";
 import { useSession, signOut } from "next-auth/react";
 
 const Navbar = () => {
   const { data: session, status } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -23,6 +24,7 @@ const Navbar = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
       setIsOpen(false);
+      setDropdownOpen(false);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -31,6 +33,23 @@ const Navbar = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.dropdown-container')) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownOpen]);
 
   // 🚪 LOGOUT
   const handleLogout = async () => {
@@ -87,13 +106,22 @@ const Navbar = () => {
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-3">
           {!session && (
-            <Link
-              href="/login"
-              className="px-5 py-2 rounded-full border border-gray-300
-              text-gray-700 hover:bg-gray-100 transition font-medium"
-            >
-              Login
-            </Link>
+            <>
+              <Link
+                href="/login"
+                className="px-5 py-2 rounded-full border border-gray-300
+                text-gray-700 hover:bg-gray-100 transition font-medium"
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                className="px-5 py-2 rounded-full bg-indigo-600 text-white
+                hover:bg-indigo-700 transition font-medium"
+              >
+                Sign Up
+              </Link>
+            </>
           )}
 
           {session && (
@@ -106,13 +134,56 @@ const Navbar = () => {
                 Book Appointment
               </Link>
 
-              <button
-                onClick={handleLogout}
-                className="px-5 py-2 rounded-full border border-gray-300
-                text-gray-700 hover:bg-gray-100 transition font-medium"
-              >
-                Logout
-              </button>
+              <div className="relative dropdown-container">
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300
+                  text-gray-700 hover:bg-gray-100 transition font-medium"
+                >
+                  {session.user?.image ? (
+                    <Image
+                      src={session.user.image}
+                      alt="User Avatar"
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-xs text-white">
+                      {session.user?.name?.charAt(0) || 'U'}
+                    </div>
+                  )}
+                  <span className="text-sm">{session.user?.name || 'User'}</span>
+                  <HiChevronDown className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                    <div className="py-1">
+                      <Link
+                        href="/profile"
+                        onClick={() => setDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        href="/settings"
+                        onClick={() => setDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Settings
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>
@@ -147,14 +218,24 @@ const Navbar = () => {
 
           <div className="pt-4 border-t space-y-3">
             {!session && (
-              <Link
-                href="/login"
-                onClick={() => setIsOpen(false)}
-                className="block text-center px-6 py-2 rounded-full
-                border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
-              >
-                Login
-              </Link>
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-center px-6 py-2 rounded-full
+                  border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-center px-6 py-2 rounded-full
+                  bg-indigo-600 text-white font-medium hover:bg-indigo-700"
+                >
+                  Sign Up
+                </Link>
+              </>
             )}
 
             {session && (
@@ -166,6 +247,24 @@ const Navbar = () => {
                   bg-black text-white font-semibold hover:bg-gray-900"
                 >
                   Book Appointment
+                </Link>
+
+                <Link
+                  href="/profile"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-center px-6 py-2 rounded-full
+                  border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
+                >
+                  Profile
+                </Link>
+
+                <Link
+                  href="/settings"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-center px-6 py-2 rounded-full
+                  border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
+                >
+                  Settings
                 </Link>
 
                 <button

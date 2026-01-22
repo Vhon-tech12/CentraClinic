@@ -1,182 +1,168 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendarAlt, faUser, faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
+import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
-/* ================= MODAL COMPONENT ================= */
-function BookingModal({ onClose }: { onClose: () => void }) {
-  const [step, setStep] = useState(1);
+const AppointmentClient = () => {
+  const { data: session } = useSession();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
-  return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
-      <div className="bg-white w-full max-w-lg rounded-3xl p-8 relative shadow-xl animate-slide-up">
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-lg font-bold"
-        >
-          ✕
-        </button>
+  const [formData, setFormData] = useState({
+    patientType: "",
+    date: "",
+    time: "",
+    name: "",
+    email: "",
+    serviceType: "",
+  });
 
-        <div className="flex justify-center gap-3 mb-6">
-          {[1, 2, 3].map((n) => (
-            <span
-              key={n}
-              className={`w-4 h-4 rounded-full transition-colors duration-300 ${
-                step >= n ? "bg-indigo-600" : "bg-gray-300"
-              }`}
-            />
-          ))}
-        </div>
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-        {/* Step 1: Patient Type */}
-        {step === 1 && (
-          <>
-            <h2 className="text-2xl font-semibold mb-2 text-center text-gray-800">Welcome!</h2>
-            <p className="text-center text-gray-500 mb-6">Select your patient type to proceed</p>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    setSuccess(false);
 
-            <div className="space-y-4">
-              <button
-                onClick={() => setStep(2)}
-                className="w-full border border-indigo-600 text-indigo-700 font-medium py-3 rounded-xl hover:bg-indigo-50 transition"
-              >
-                Existing Patient
-              </button>
-              <button
-                onClick={() => setStep(2)}
-                className="w-full border border-gray-300 text-gray-700 font-medium py-3 rounded-xl hover:bg-gray-50 transition"
-              >
-                New Patient
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* Step 2: Clinic Appointment */}
-        {step === 2 && (
-          <>
-            <h2 className="text-xl font-semibold mb-4 text-gray-800 text-center">Clinic Appointment</h2>
-            <p className="text-gray-500 text-center mb-4">Choose your preferred date for your clinic visit</p>
-
-            <input
-              type="date"
-              className="w-full border border-gray-300 rounded-xl p-3 mb-6 hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
-            />
-
-            <button
-              onClick={() => setStep(3)}
-              className="w-full bg-indigo-600 text-white font-medium py-3 rounded-xl hover:bg-indigo-700 transition"
-            >
-              Continue
-            </button>
-          </>
-        )}
-
-        {/* Step 3: Patient Details */}
-        {step === 3 && (
-          <>
-            <h2 className="text-xl font-semibold mb-4 text-gray-800 text-center">Patient Details</h2>
-
-            <div className="space-y-4">
-              <div className="relative">
-                <FontAwesomeIcon icon={faUser} className="absolute left-3 top-3 text-gray-400" />
-                <input
-                  className="w-full border border-gray-300 rounded-xl p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
-                  placeholder="Full Name"
-                />
-              </div>
-              <div className="relative">
-                <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-3 text-gray-400" />
-                <input
-                  className="w-full border border-gray-300 rounded-xl p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
-                  placeholder="Email"
-                />
-              </div>
-              <div className="relative">
-                <FontAwesomeIcon icon={faPhone} className="absolute left-3 top-3 text-gray-400" />
-                <input
-                  className="w-full border border-gray-300 rounded-xl p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
-                  placeholder="Phone Number"
-                />
-              </div>
-            </div>
-
-            <button
-              onClick={onClose}
-              className="w-full mt-6 bg-indigo-600 text-white font-medium py-3 rounded-xl hover:bg-indigo-700 transition"
-            >
-              Submit
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/* ================= MAIN PAGE COMPONENT ================= */
-export default function AppointmentPage() {
-  const searchParams = useSearchParams();
-  const [openModal, setOpenModal] = useState(false);
-
-  useEffect(() => {
-    if (searchParams.get("book") === "true") {
-      setOpenModal(true);
+    if (!session) {
+      setError("You must be logged in to book an appointment.");
+      setIsLoading(false);
+      return;
     }
-  }, [searchParams]);
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    window.history.replaceState({}, "", "/appointment");
+    try {
+      const response = await fetch('/api/appointment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess(true);
+        setFormData({
+          patientType: "",
+          date: "",
+          time: "",
+          name: "",
+          email: "",
+          serviceType: "",
+        });
+        // Optionally redirect to a confirmation page
+        // router.push('/appointment/confirmation');
+      } else {
+        setError(data.error || 'Failed to book appointment');
+      }
+    } catch (err) {
+      setError('An error occurred while booking the appointment');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 py-12 px-4">
-      {/* Hero Section */}
-      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-10">
-        <div className="flex-1 text-center md:text-left">
-          <h1 className="text-5xl font-bold mb-4 text-gray-800">Book Your Clinic Appointment</h1>
-          <p className="text-gray-600 mb-8 text-lg">
-            Schedule your visit with our expert team in just a few simple steps. We make healthcare easy for you.
-          </p>
-          <button
-            onClick={() => setOpenModal(true)}
-            className="bg-indigo-600 text-white font-medium py-4 px-8 rounded-2xl flex items-center justify-center gap-3 hover:bg-indigo-700 transition"
+    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-4">Book an Appointment</h2>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      {success && <p className="text-green-500 mb-4">Appointment booked successfully!</p>}
+      <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label htmlFor="patientType" className="block text-sm font-medium text-gray-700">Patient Type</label>
+          <select
+            id="patientType"
+            name="patientType"
+            value={formData.patientType}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            required
           >
-            <FontAwesomeIcon icon={faCalendarAlt} />
-            Book Now
-          </button>
+            <option value="">Select Patient Type</option>
+            <option value="new">New Patient</option>
+            <option value="existing">Existing Patient</option>
+          </select>
         </div>
-
-        <div className="flex-1">
-          <img
-            src="Centra-Doctor.jpg"
-            alt="Clinic Appointment"
-            className="w-full rounded-2xl shadow-lg"
+        <div className="mb-4">
+          <label htmlFor="date" className="block text-sm font-medium text-gray-700">Date</label>
+          <input
+            type="date"
+            id="date"
+            name="date"
+            value={formData.date}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            required
           />
         </div>
-      </div>
-
-      {/* Steps Section */}
-      <div className="max-w-4xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { title: "Select Patient Type", desc: "Choose whether you are a new or existing patient." },
-          { title: "Pick a Date", desc: "Select your preferred clinic visit date." },
-          { title: "Enter Details", desc: "Provide your contact and personal information." },
-        ].map((step, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-2xl p-6 text-center shadow hover:shadow-lg transition"
+        <div className="mb-4">
+          <label htmlFor="time" className="block text-sm font-medium text-gray-700">Time</label>
+          <input
+            type="time"
+            id="time"
+            name="time"
+            value={formData.time}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="serviceType" className="block text-sm font-medium text-gray-700">Service Type</label>
+          <select
+            id="serviceType"
+            name="serviceType"
+            value={formData.serviceType}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            required
           >
-            <div className="text-3xl font-bold text-indigo-600 mb-3">{index + 1}</div>
-            <h3 className="font-semibold text-gray-800 mb-2">{step.title}</h3>
-            <p className="text-gray-500">{step.desc}</p>
-          </div>
-        ))}
-      </div>
-
-      {openModal && <BookingModal onClose={handleCloseModal} />}
+            <option value="">Select Service Type</option>
+            <option value="consultation">Consultation</option>
+            <option value="checkup">Checkup</option>
+            <option value="treatment">Treatment</option>
+          </select>
+        </div>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoading ? 'Booking...' : 'Book Appointment'}
+        </button>
+      </form>
     </div>
   );
-}
+};
+
+export default AppointmentClient;
