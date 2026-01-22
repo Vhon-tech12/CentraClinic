@@ -1,60 +1,58 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { HiOutlineMenu, HiOutlineX, HiChevronDown } from "react-icons/hi";
+import { FaUserCircle } from "react-icons/fa";
 import { useSession, signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
+
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
 
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
     { name: "Services", href: "/service" },
-    { name: "Contact", href: "/contact" },
+    { name: "FAQs", href: "/FAQs" },
   ];
 
-  // Handle scroll
+  // Scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
-      setIsOpen(false);
-      setDropdownOpen(false);
     };
-
     window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close dropdown on outside click
+  // Close mobile & profile menu on route change
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.dropdown-container')) {
-        setDropdownOpen(false);
+    setIsOpen(false);
+    setProfileOpen(false);
+  }, [pathname]);
+
+  // Close profile dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
       }
     };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    if (dropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [dropdownOpen]);
-
-  // 🚪 LOGOUT
   const handleLogout = async () => {
     await signOut({ callbackUrl: "/" });
-    setIsOpen(false);
   };
 
   return (
@@ -92,10 +90,9 @@ const Navbar = () => {
             <li key={link.name}>
               <Link
                 href={link.href}
-                className="relative hover:text-indigo-600 transition-colors
-                after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-0
-                after:bg-indigo-600 after:transition-all after:duration-300
-                hover:after:w-full"
+                className={`hover:text-indigo-600 transition ${
+                  pathname === link.href ? "text-indigo-600" : "text-gray-700"
+                }`}
               >
                 {link.name}
               </Link>
@@ -103,9 +100,9 @@ const Navbar = () => {
           ))}
         </ul>
 
-        {/* Desktop CTA */}
-        <div className="hidden md:flex items-center gap-3">
-          {!session && (
+        {/* Desktop Right */}
+        <div className="hidden md:flex items-center gap-4">
+          {status === "loading" ? null : !session ? (
             <>
               <Link
                 href="/login"
@@ -122,65 +119,75 @@ const Navbar = () => {
                 Sign Up
               </Link>
             </>
-          )}
-
-          {session && (
+          ) : (
             <>
               <Link
                 href="/appointment"
                 className="px-6 py-2 rounded-full bg-black
-                text-white font-semibold shadow-md hover:bg-gray-900 hover:shadow-lg transition"
+                text-white font-semibold hover:bg-gray-900 transition"
               >
                 Book Appointment
               </Link>
 
-              <div className="relative dropdown-container">
+              {/* Profile Dropdown */}
+              <div className="relative" ref={profileRef}>
                 <button
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300
-                  text-gray-700 hover:bg-gray-100 transition font-medium"
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  className="flex items-center gap-2 px-3 py-1 rounded-full hover:bg-gray-100 transition"
                 >
-                  {session.user?.image ? (
+                  {session.user.image ? (
                     <Image
                       src={session.user.image}
                       alt="User Avatar"
-                      width={24}
-                      height={24}
-                      className="rounded-full"
+                      width={34}
+                      height={34}
+                      className="rounded-full border"
                     />
                   ) : (
-                    <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-xs text-white">
-                      {session.user?.name?.charAt(0) || 'U'}
+                    <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold">
+                      {session.user.name?.charAt(0).toUpperCase()}
                     </div>
                   )}
-                  <span className="text-sm">{session.user?.name || 'User'}</span>
-                  <HiChevronDown className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                  <span className="text-sm font-medium text-gray-700 max-w-[100px] truncate">
+                    {session.user.name || session.user.email}
+                  </span>
+                  <HiChevronDown
+                    className={`w-4 h-4 transition-transform ${
+                      profileOpen ? "rotate-180" : ""
+                    }`}
+                  />
                 </button>
 
-                {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
-                    <div className="py-1">
-                      <Link
-                        href="/profile"
-                        onClick={() => setDropdownOpen(false)}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Profile
-                      </Link>
-                      <Link
-                        href="/settings"
-                        onClick={() => setDropdownOpen(false)}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Settings
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Logout
-                      </button>
+                {profileOpen && (
+                  <div className="absolute right-0 mt-2 w-44 bg-white border rounded-xl shadow-lg overflow-hidden">
+                    <div className="px-4 py-3 border-b">
+                      <p className="text-sm font-semibold text-gray-800 truncate">
+                        {session.user.name || "User"}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {session.user.email}
+                      </p>
                     </div>
+                    <Link
+                      href="/profile"
+                      onClick={() => setProfileOpen(false)}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href="/settings"
+                      onClick={() => setProfileOpen(false)}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Settings
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition"
+                    >
+                      Logout
+                    </button>
                   </div>
                 )}
               </div>
@@ -191,7 +198,7 @@ const Navbar = () => {
         {/* Mobile Toggle */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden text-gray-900 text-3xl"
+          className="md:hidden text-3xl text-gray-900"
         >
           {isOpen ? <HiOutlineX /> : <HiOutlineMenu />}
         </button>
@@ -199,78 +206,83 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden transition-transform duration-300 ${
+        className={`md:hidden transition-transform duration-300 origin-top ${
           isOpen ? "scale-y-100" : "scale-y-0"
         }`}
-        style={{ transformOrigin: "top" }}
       >
         <div className="px-6 pb-6 pt-2 space-y-5 bg-white shadow-lg rounded-b-2xl">
           {navLinks.map((link) => (
             <Link
               key={link.name}
               href={link.href}
-              onClick={() => setIsOpen(false)}
               className="block text-lg font-medium text-gray-800 hover:text-indigo-600"
             >
               {link.name}
             </Link>
           ))}
 
-          <div className="pt-4 border-t space-y-3">
-            {!session && (
+          <div className="pt-4 border-t space-y-4">
+            {!session ? (
               <>
                 <Link
                   href="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="block text-center px-6 py-2 rounded-full
-                  border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
+                  className="block text-center px-6 py-2 rounded-full border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
                 >
                   Login
                 </Link>
                 <Link
                   href="/register"
-                  onClick={() => setIsOpen(false)}
-                  className="block text-center px-6 py-2 rounded-full
-                  bg-indigo-600 text-white font-medium hover:bg-indigo-700"
+                  className="block text-center px-6 py-2 rounded-full bg-indigo-600 text-white font-medium hover:bg-indigo-700"
                 >
                   Sign Up
                 </Link>
               </>
-            )}
-
-            {session && (
+            ) : (
               <>
+                <div className="flex items-center gap-3">
+                  {session.user.image ? (
+                    <Image
+                      src={session.user.image}
+                      alt="User Avatar"
+                      width={40}
+                      height={40}
+                      className="rounded-full border"
+                    />
+                  ) : (
+                    <FaUserCircle className="text-4xl text-gray-500" />
+                  )}
+                  <div>
+                    <p className="font-semibold text-gray-800">
+                      {session.user.name || "User"}
+                    </p>
+                    <p className="text-sm text-gray-500">{session.user.email}</p>
+                  </div>
+                </div>
+
                 <Link
                   href="/appointment"
-                  onClick={() => setIsOpen(false)}
-                  className="block text-center px-6 py-2 rounded-full
-                  bg-black text-white font-semibold hover:bg-gray-900"
+                  className="block text-center px-6 py-2 rounded-full bg-black text-white font-semibold hover:bg-gray-900"
                 >
                   Book Appointment
                 </Link>
 
                 <Link
                   href="/profile"
-                  onClick={() => setIsOpen(false)}
-                  className="block text-center px-6 py-2 rounded-full
-                  border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
+                  className="block text-center px-6 py-2 rounded-full border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
                 >
                   Profile
                 </Link>
 
                 <Link
                   href="/settings"
-                  onClick={() => setIsOpen(false)}
-                  className="block text-center px-6 py-2 rounded-full
-                  border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
+                  className="block text-center px-6 py-2 rounded-full border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
                 >
                   Settings
                 </Link>
 
                 <button
                   onClick={handleLogout}
-                  className="block w-full text-center px-6 py-2 rounded-full
-                  border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
+                  className="block w-full text-center px-6 py-2 rounded-full border border-gray-300 text-red-600 font-medium hover:bg-red-50"
                 >
                   Logout
                 </button>
