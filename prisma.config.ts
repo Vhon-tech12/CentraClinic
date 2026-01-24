@@ -1,5 +1,0 @@
-export default {
-  datasource: {
-    url: "postgresql://postgres:1234@localhost:5432/centraclinicclient_db",
-  },
-};

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { HiOutlineMenu, HiOutlineX, HiChevronDown } from "react-icons/hi";
+import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 import { FaUserCircle } from "react-icons/fa";
 import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
@@ -15,6 +15,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+
   const profileRef = useRef(null);
 
   const navLinks = [
@@ -39,7 +40,7 @@ const Navbar = () => {
     setProfileOpen(false);
   }, [pathname]);
 
-  // Close profile dropdown on outside click
+  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
@@ -91,7 +92,9 @@ const Navbar = () => {
               <Link
                 href={link.href}
                 className={`hover:text-indigo-600 transition ${
-                  pathname === link.href ? "text-indigo-600" : "text-gray-700"
+                  pathname === link.href
+                    ? "text-indigo-600"
+                    : "text-gray-700"
                 }`}
               >
                 {link.name}
@@ -103,22 +106,13 @@ const Navbar = () => {
         {/* Desktop Right */}
         <div className="hidden md:flex items-center gap-4">
           {status === "loading" ? null : !session ? (
-            <>
-              <Link
-                href="/login"
-                className="px-5 py-2 rounded-full border border-gray-300
-                text-gray-700 hover:bg-gray-100 transition font-medium"
-              >
-                Login
-              </Link>
-              <Link
-                href="/register"
-                className="px-5 py-2 rounded-full bg-indigo-600 text-white
-                hover:bg-indigo-700 transition font-medium"
-              >
-                Sign Up
-              </Link>
-            </>
+            <Link
+              href="/login"
+              className="px-5 py-2 rounded-full border border-gray-300
+              text-gray-700 hover:bg-gray-100 transition font-medium"
+            >
+              Login
+            </Link>
           ) : (
             <>
               <Link
@@ -133,7 +127,8 @@ const Navbar = () => {
               <div className="relative" ref={profileRef}>
                 <button
                   onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex items-center gap-2 px-3 py-1 rounded-full hover:bg-gray-100 transition"
+                  className="flex items-center gap-2 px-3 py-1 rounded-full
+                  hover:bg-gray-100 transition"
                 >
                   {session.user.image ? (
                     <Image
@@ -144,22 +139,20 @@ const Navbar = () => {
                       className="rounded-full border"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold">
+                    <div className="w-8 h-8 rounded-full bg-indigo-600
+                    flex items-center justify-center text-white font-semibold">
                       {session.user.name?.charAt(0).toUpperCase()}
                     </div>
                   )}
-                  <span className="text-sm font-medium text-gray-700 max-w-[100px] truncate">
+
+                  <span className="text-sm font-medium text-gray-700 max-w-[100] truncate">
                     {session.user.name || session.user.email}
                   </span>
-                  <HiChevronDown
-                    className={`w-4 h-4 transition-transform ${
-                      profileOpen ? "rotate-180" : ""
-                    }`}
-                  />
                 </button>
 
                 {profileOpen && (
-                  <div className="absolute right-0 mt-2 w-44 bg-white border rounded-xl shadow-lg overflow-hidden">
+                  <div className="absolute right-0 mt-2 w-44 bg-white
+                  border rounded-xl shadow-lg overflow-hidden">
                     <div className="px-4 py-3 border-b">
                       <p className="text-sm font-semibold text-gray-800 truncate">
                         {session.user.name || "User"}
@@ -168,23 +161,11 @@ const Navbar = () => {
                         {session.user.email}
                       </p>
                     </div>
-                    <Link
-                      href="/profile"
-                      onClick={() => setProfileOpen(false)}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Profile
-                    </Link>
-                    <Link
-                      href="/settings"
-                      onClick={() => setProfileOpen(false)}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Settings
-                    </Link>
+
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition"
+                      className="w-full text-left px-4 py-2
+                      text-sm text-red-600 hover:bg-red-50 transition"
                     >
                       Logout
                     </button>
@@ -223,20 +204,13 @@ const Navbar = () => {
 
           <div className="pt-4 border-t space-y-4">
             {!session ? (
-              <>
-                <Link
-                  href="/login"
-                  className="block text-center px-6 py-2 rounded-full border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/register"
-                  className="block text-center px-6 py-2 rounded-full bg-indigo-600 text-white font-medium hover:bg-indigo-700"
-                >
-                  Sign Up
-                </Link>
-              </>
+              <Link
+                href="/login"
+                className="block text-center px-6 py-2 rounded-full
+                border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
+              >
+                Login
+              </Link>
             ) : (
               <>
                 <div className="flex items-center gap-3">
@@ -255,34 +229,24 @@ const Navbar = () => {
                     <p className="font-semibold text-gray-800">
                       {session.user.name || "User"}
                     </p>
-                    <p className="text-sm text-gray-500">{session.user.email}</p>
+                    <p className="text-sm text-gray-500">
+                      {session.user.email}
+                    </p>
                   </div>
                 </div>
 
                 <Link
                   href="/appointment"
-                  className="block text-center px-6 py-2 rounded-full bg-black text-white font-semibold hover:bg-gray-900"
+                  className="block text-center px-6 py-2 rounded-full
+                  bg-black text-white font-semibold hover:bg-gray-900"
                 >
                   Book Appointment
                 </Link>
 
-                <Link
-                  href="/profile"
-                  className="block text-center px-6 py-2 rounded-full border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
-                >
-                  Profile
-                </Link>
-
-                <Link
-                  href="/settings"
-                  className="block text-center px-6 py-2 rounded-full border border-gray-300 text-gray-700 font-medium hover:bg-gray-100"
-                >
-                  Settings
-                </Link>
-
                 <button
                   onClick={handleLogout}
-                  className="block w-full text-center px-6 py-2 rounded-full border border-gray-300 text-red-600 font-medium hover:bg-red-50"
+                  className="block w-full text-center px-6 py-2 rounded-full
+                  border border-gray-300 text-red-600 font-medium hover:bg-red-50"
                 >
                   Logout
                 </button>

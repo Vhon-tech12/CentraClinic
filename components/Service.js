@@ -52,10 +52,11 @@ const services = [
   },
 ];
 
-export default function Service() {
+function Service() {
   return (
     <section className="py-20 bg-linear-to-br from-gray-50 to-blue-50">
       <div className="max-w-6xl mx-auto px-6 text-center">
+        {/* TITLE */}
         <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-800">
           Comprehensive Medical <br /> Support for Every Need
         </h2>
@@ -64,6 +65,7 @@ export default function Service() {
           Discover our full range of healthcare services, designed to meet your medical and aesthetic needs with the highest standards of care, convenience, and expertise.
         </p>
 
+        {/* CARDS */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           {services.map((service, index) => (
             <motion.div
@@ -79,6 +81,7 @@ export default function Service() {
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
+              {/* ICON */}
               <div
                 className={
                   "w-16 h-16 rounded-full flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 " +
@@ -90,10 +93,12 @@ export default function Service() {
                 <FontAwesomeIcon icon={service.icon} className="text-2xl" />
               </div>
 
+              {/* TITLE */}
               <h3 className="font-bold text-xl mb-3 text-gray-800 group-hover:text-indigo-600 transition-colors">
                 {service.title}
               </h3>
 
+              {/* DESCRIPTION */}
               <p
                 className={
                   "text-base mb-8 leading-relaxed " +
@@ -119,7 +124,7 @@ export default function Service() {
         </div>
 
         <Link
-          href="/appointment"
+          href="/login"
           className="inline-flex items-center gap-3 bg-linear-to-r from-indigo-600 to-blue-600 text-white px-12 py-5 rounded-full shadow-lg hover:shadow-xl transition-transform hover:scale-105 font-semibold text-lg"
         >
           Book an Appointment
@@ -131,3 +136,5 @@ export default function Service() {
     </section>
   );
 }
+
+export default Service;

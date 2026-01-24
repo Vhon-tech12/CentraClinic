@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Geist, Montserrat } from "next/font/google";
 import "@/app/globals.css";
 import Sidebar from "@/components/Sidebar";
-import Providers from "@/components/Providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,11 +23,9 @@ type AdminLayoutProps = React.PropsWithChildren<{}>;
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
-    <Providers>
-      <div className="flex min-h-screen bg-[#111418] text-gray-200">
-        <Sidebar />
-        <main className="flex-1 p-8">{children}</main>
-      </div>
-    </Providers>
+    <div className="flex min-h-screen bg-[#111418] text-gray-200">
+      <Sidebar />
+      <main className="flex-1 p-8">{children}</main>
+    </div>
   );
 }
