@@ -1,3 +1,6 @@
+import React from "react";
+import Footer from "../../components/Footer";
+
 export default function FAQSection() {
   const faqs = [
     {
@@ -33,6 +36,7 @@ export default function FAQSection() {
   ];
 
   return (
+    <>
     <section className="bg-white py-20 px-6">
       <div className="max-w-6xl mx-auto">
         {/* Title */}
@@ -61,5 +65,8 @@ export default function FAQSection() {
         </div>
       </div>
     </section>
+  );
+  <Footer />
+  </>
   );
 }

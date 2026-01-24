@@ -1,156 +1,188 @@
-"use client";
-
+'use client'
 import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faUserMd,
-  faCalendarCheck,
-  faShieldAlt,
-  faMapMarkerAlt,
-  faCalendarAlt,
-  faStethoscope,
-} from "@fortawesome/free-solid-svg-icons";
 
-const About = () => {
+export default function CentraClinicFeatures() {
+  const features = [
+    { name: "Modern Equipment", description: "State-of-the-art medical devices for accurate diagnosis and treatment." },
+    { name: "Experienced Doctors", description: "Board-certified physicians with years of experience in their specialties." },
+    { name: "Personalized Care", description: "Tailored treatment plans to meet your unique health needs." },
+    { name: "Convenient Appointments", description: "Flexible scheduling and online booking for your convenience." },
+    { name: "Hygienic Environment", description: "Clean, safe, and sanitized facilities for your peace of mind." },
+    { name: "Comprehensive Services", description: "From general consultations to specialized treatments, we cover it all." },
+  ];
+
+  const images = [
+    { src: "/image.png", alt: "Doctor attending a patient in consultation room" },
+    { src: "/Clean.jpg", alt: "Modern diagnostic equipment in Centra Clinic" },
+    { src: "/Pain.jpg", alt: "Nurse assisting patient with care" },
+    { src: "/ear.jpg", alt: "Reception and waiting area at Centra Clinic" },
+  ];
+
+  const links = [
+    { name: 'About', href: 'about' },
+    { name: 'Services', href: 'service' },
+    { name: 'Our FAQs', href: 'FAQs' },
+    { name: 'Meet our doctor', href: '#' },
+  ];
+
+  const stats = [
+    { name: 'Clinics Nationwide', value: '1' },
+    { name: 'Dedicated Healthcare Professionals', value: '50+' },
+    { name: 'Patients Served Weekly', value: '500+' },
+    { name: 'Years of Trusted Care', value: '10+' },
+  ];
+
   return (
     <>
-      {/* ================= ABOUT SECTION ================= */}
-      <section className="relative bg-linear-to-br from-purple-600 via-purple-700 to-purple-900 py-24 overflow-hidden">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 -right-32 w-96 h-96 bg-pink-400/20 rounded-full blur-3xl" />
+      {/* Features + Images + Work With Us Section */}
+      <section className="bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+          <div className="grid grid-cols-1 gap-y-16 lg:grid-cols-2 lg:gap-x-8 lg:items-center">
+            {/* Left side: Features */}
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                Discover Centra Clinic Product Features
+              </h2>
+              <p className="mt-4 text-gray-500">
+                Centra Clinic Ph offers advanced healthcare solutions designed for your convenience, comfort, and safety. Explore our key features below.
+              </p>
 
-        <div className="relative max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
-              Discover Centra Clinic PH
-            </h2>
-            <p className="text-purple-200 max-w-2xl mx-auto text-lg">
-              Your trusted partner in health and wellness with modern,
-              patient-centered healthcare solutions.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-14 items-center">
-            <div className="relative h-[520] rounded-3xl overflow-hidden shadow-2xl">
-              <Image
-                src="/Centra-Doctor.jpg"
-                alt="Centra Clinic PH"
-                fill
-                priority
-                className="object-cover"
-              />
+              <dl className="mt-16 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 sm:gap-y-16 lg:gap-x-8">
+                {features.map((feature) => (
+                  <div key={feature.name} className="border-t border-gray-200 pt-4">
+                    <dt className="font-medium text-gray-900">{feature.name}</dt>
+                    <dd className="mt-2 text-sm text-gray-500">{feature.description}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
 
-            <div className="space-y-6">
-              <Feature icon={faUserMd} title="Certified Medical Experts">
-                Our doctors are licensed, experienced, and committed to
-                high-quality patient care.
-              </Feature>
+            {/* Right side: Images */}
+            <div className="grid grid-cols-2 grid-rows-2 gap-4 sm:gap-6 lg:gap-8">
+              {images.map((img, index) => (
+                <img
+                  key={index}
+                  src={img.src}
+                  alt={img.alt}
+                  className="rounded-lg bg-gray-100 object-cover w-full h-full"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
 
-              <Feature icon={faCalendarCheck} title="Same-Day Appointments">
-                Book and consult with specialists without long waiting times.
-              </Feature>
+        {/* Work With Us Section */}
+        <div className="relative isolate overflow-hidden bg-white py-24 sm:py-32">
+          <img
+            alt=""
+            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&crop=focalpoint&fp-y=.8&w=2830&h=1500&q=80&blend=111827&sat=-100&exp=15&blend-mode=screen"
+            className="absolute inset-0 -z-10 w-full h-full object-cover object-right opacity-10 md:object-center"
+          />
 
-              <Feature icon={faShieldAlt} title="Secure Health Records">
-                Your medical data is protected with secure digital systems.
-              </Feature>
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="mx-auto max-w-2xl lg:mx-0">
+              <h2 className="text-5xl font-semibold tracking-tight text-gray-900 sm:text-7xl">
+                Work with us
+              </h2>
+              <p className="mt-8 text-lg leading-8 text-gray-700 sm:text-xl">
+                We’re seeking passionate individuals who are eager to make an impact—whether it’s through patient care, research, or supporting services. At Centra Clinic, your work contributes directly to healthier, happier communities.
+              </p>
+            </div>
 
-              <Feature icon={faMapMarkerAlt} title="In-Clinic & Online Care">
-                Choose between online consultation or visiting our clinic.
-              </Feature>
+            <div className="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
+              <div className="grid grid-cols-1 gap-x-8 gap-y-6 text-base font-semibold text-gray-900 sm:grid-cols-2 md:flex lg:gap-x-10">
+                {links.map((link) => (
+                  <a key={link.name} href={link.href}>
+                    {link.name} <span aria-hidden="true">&rarr;</span>
+                  </a>
+                ))}
+              </div>
 
-              <Link
-                href="/appointment"
-                className="inline-flex items-center gap-4 mt-8 bg-white text-purple-700 px-9 py-4 rounded-full font-semibold shadow-lg hover:scale-105 transition"
-              >
-                Book Appointment
-                <span className="bg-purple-600 text-white w-9 h-9 rounded-full flex items-center justify-center">
-                  →
-                </span>
-              </Link>
+              <dl className="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4">
+                {stats.map((stat) => (
+                  <div key={stat.name} className="flex flex-col-reverse gap-1">
+                    <dt className="text-base text-gray-700">{stat.name}</dt>
+                    <dd className="text-4xl font-semibold tracking-tight text-gray-900">{stat.value}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ================= PROCESS / FEATURES SECTION ================= */}
-      <section className="bg-white py-28">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <p className="text-purple-600 font-semibold mb-3">
-            Patient Care Process
-          </p>
-
-          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6">
-            Everything you need <br /> to manage your care
-          </h2>
-
-          <p className="text-gray-600 max-w-2xl mx-auto text-lg mb-20">
-            A seamless healthcare journey from booking to follow-up,
-            designed with patients in mind.
-          </p>
-
-          <div className="grid gap-14 md:grid-cols-3 text-left">
-            <SimpleFeature
-              icon={faCalendarAlt}
-              title="Easy Appointment Booking"
-              text="Schedule your visit online with real-time availability."
-              link="/appointment"
-            />
-
-            <SimpleFeature
-              icon={faStethoscope}
-              title="Expert Medical Consultation"
-              text="Get accurate diagnosis and care from certified specialists."
-              link="/services"
-            />
-
-            <SimpleFeature
-              icon={faShieldAlt}
-              title="Secure Health Records"
-              text="Access your medical data safely anytime, anywhere."
-              link="/privacy"
-            />
-          </div>
-        </div>
-      </section>
+      {/* Blog Section */}
+      <BlogSection />
     </>
   );
-};
+}
 
-/* ================= REUSABLE COMPONENTS ================= */
+function BlogSection() {
+  const posts = [
+    {
+      id: 1,
+      title: 'White Medience Luhilo',
+      href: '#',
+      description: 'Learn how Centra Clinic PH helps streamline patient care and administrative tasks for faster, smarter healthcare.',
+      date: 'June 2, 2024',
+      datetime: '2024-03-16',
+      author: { name: 'Dr.John Ong', imageUrl: 'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80' },
+      imageUrl: '/white.jpg',
+    },
+    {
+      id: 2,
+      title: 'Hyaluronic acid fillers and skinboosters.',
+      href: '#',
+      description: 'Discover how technology improves patient satisfaction with seamless appointment scheduling and personalized care.',
+      date: 'May 8, 2024',
+      datetime: '2024-03-10',
+      author: { name: 'Dr.John Ong', imageUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80' },
+      imageUrl: '/galderma.jpg',
+    },
+    {
+      id: 3,
+      title: 'Polynucleotide (PN) and Polydeoxyribonucleotide (PDRN)',
+      href: '#',
+      description: 'Centra Clinic PH ensures your medical records are protected with top-level encryption and secure storage.',
+      date: 'October 11, 2024',
+      datetime: '2023-02-12',
+      author: { name: 'Dr. John Ong', imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80' },
+      imageUrl: '/rejuran.jpg',
+    },
+  ];
 
-const Feature = ({ icon, title, children }) => (
-  <div className="flex gap-4 p-6 rounded-2xl bg-white/10 border border-white/10 backdrop-blur hover:bg-white/20 transition">
-    <div className="w-12 h-12 rounded-xl bg-purple-600 text-white flex items-center justify-center text-xl">
-      <FontAwesomeIcon icon={icon} />
-    </div>
-    <div>
-      <h4 className="text-white font-semibold text-lg">{title}</h4>
-      <p className="text-purple-200 text-sm">{children}</p>
-    </div>
-  </div>
-);
+  return (
+    <section className="bg-white py-24 sm:py-32">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">From the Blog</h2>
+          <p className="mt-2 text-lg text-gray-600">Learn how Centra Clinic PH enhances patient care and clinic efficiency.</p>
+        </div>
 
-const SimpleFeature = ({ icon, title, text, link }) => (
-  <div>
-    <div className="flex items-center gap-3 mb-4 text-purple-600">
-      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-        <FontAwesomeIcon icon={icon} />
+        <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post) => (
+            <a
+              key={post.id}
+              href={post.href}
+              className="relative block rounded-lg overflow-hidden shadow-lg group"
+            >
+              {/* Background image */}
+              <div
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
+                style={{ backgroundImage: `url(${post.imageUrl})` }}
+              />
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
+
+              {/* Text content */}
+              <div className="relative p-6 flex flex-col justify-end h-72">
+                <p className="text-xs text-gray-200">{post.date} • {post.author.name}</p>
+                <h3 className="mt-2 text-lg font-semibold text-white">{post.title}</h3>
+              </div>
+            </a>
+          ))}
+        </div>
       </div>
-      <h4 className="font-semibold text-gray-900 text-lg">{title}</h4>
-    </div>
-
-    <p className="text-gray-600 mb-4">{text}</p>
-
-    <Link
-      href={link}
-      className="text-purple-600 font-medium inline-flex items-center gap-1 hover:underline"
-    >
-      Learn more →
-    </Link>
-  </div>
-);
-
-export default About;
+    </section>
+  );
+}
