@@ -1,18 +1,22 @@
 "use client";
 import { Field } from "./UIHelpers";
 import { Placeholder } from "./UIHelpers";
-
-
-
-
+import PatientNotes from "./PatientNotes"; // ✅ Correct default import
 
 /* ----------------------- PATIENT DETAILS VIEW ----------------------- */
-const PatientDetailsModal = ({ open, onClose, patient, tab, setTab, onCreateMedicalHistory}: any) => {
+const PatientDetailsModal = ({
+  open,
+  onClose,
+  patient,
+  tab,
+  setTab,
+  onCreateMedicalHistory,
+}: any) => {
   if (!open || !patient) return null;
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-      <div className="w-[950] bg-[#111318] rounded-2xl p-6">
+      <div className="w-[950px] bg-[#111318] rounded-2xl p-6">
         {/* Header */}
         <div className="flex justify-between mb-4">
           <h2 className="text-xl font-semibold">Patient Details</h2>
@@ -62,19 +66,22 @@ const PatientDetailsModal = ({ open, onClose, patient, tab, setTab, onCreateMedi
             <Field label="Email Address" value={patient.email} />
           </div>
         )}
-        {tab === "notes" && <Placeholder text="Start Notes......" />}
+
+        {tab === "notes" && <PatientNotes patient={patient} />} {/* ✅ Correctly renders notes */}
+
         {tab === "treatment" && <Placeholder text="Next treatment..." />}
+
         {tab === "medical" && (
-    <div className="flex justify-between items-center">
-       <Placeholder text="Medical history..." />
-    <button
-      onClick={onCreateMedicalHistory} // <-- use the prop we pass from PatientsPage
-      className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white transition"
-     >
-      + Create Medical History
-    </button>
-     </div>
-)}
+          <div className="flex justify-between items-center">
+            <Placeholder text="Medical history..." />
+            <button
+              onClick={onCreateMedicalHistory}
+              className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white transition"
+            >
+              + Create Medical History
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
