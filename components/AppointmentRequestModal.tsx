@@ -53,7 +53,7 @@ export default function AppointmentRequestsModal({
                 </div>
               </div>
 
-              <p className="col-span-3 text-sm text-white">{r.start.toDateString()}</p>
+              <p className="col-span-3 text-sm text-white">{r.start?.toDateString() || 'N/A'}</p>
               <p className="col-span-3 text-sm text-white">{r.location}</p>
 
               {/* Actions */}

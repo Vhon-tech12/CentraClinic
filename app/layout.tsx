@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import ConditionalNavBar from "@/components/ConditionalNavBar";
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
+
 
 export const metadata: Metadata = {
   title: "Centra Clinic",

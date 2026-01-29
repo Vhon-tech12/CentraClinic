@@ -1,358 +1,316 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, dateFnsLocalizer } from "react-big-calendar";
-import { format, parse, startOfWeek, getDay } from "date-fns";
-import { Bell, MoreHorizontal, Clock, X } from "lucide-react";
-import Image from "next/image";
-import "react-big-calendar/lib/css/react-big-calendar.css";
+import AppointmentRequestsModal from "@/components/AppointmentRequestModal";
 
-const locales = {
-  "en-US": require("date-fns/locale/en-US"),
+/* ================= TYPES ================= */
+
+export type ServiceType = "ear" | "nose" | "throat" | "aesthetics";
+
+export type CalendarEvent = {
+  id: number;
+  patient: string;
+  service: ServiceType;
+  title: string;
+  date: Date;
+  time: string;
 };
 
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek: () => startOfWeek(new Date(), { weekStartsOn: 1 }),
-  getDay,
-  locales,
-});
-
-/* ===== Custom Toolbar ===== */
-const CustomToolbar = (toolbar: any) => {
-  const goToBack = () => toolbar.onNavigate("PREV");
-  const goToNext = () => toolbar.onNavigate("NEXT");
-  const goToToday = () => toolbar.onNavigate("TODAY");
-
-  return (
-    <div className="flex items-center justify-between px-2 mb-3">
-      <div className="flex items-center gap-2">
-        <button
-          onClick={goToToday}
-          className="px-3 py-1.5 text-sm rounded-lg bg-[#1b1f29] border border-white/10 hover:bg-[#222736]"
-        >
-          Today
-        </button>
-
-        <button
-          onClick={goToBack}
-          className="px-3 py-1.5 text-sm rounded-lg bg-[#1b1f29] border border-white/10 hover:bg-[#222736]"
-        >
-          ‹
-        </button>
-
-        <button
-          onClick={goToNext}
-          className="px-3 py-1.5 text-sm rounded-lg bg-[#1b1f29] border border-white/10 hover:bg-[#222736]"
-        >
-          ›
-        </button>
-
-        <h2 className="ml-3 text-lg font-semibold">{toolbar.label}</h2>
-      </div>
-
-      <div className="flex gap-2">
-        {["month", "week", "day"].map((view) => (
-          <button
-            key={view}
-            onClick={() => toolbar.onView(view)}
-            className={`px-3 py-1.5 text-sm rounded-lg capitalize ${
-              toolbar.view === view
-                ? "bg-blue-500"
-                : "bg-[#1b1f29] border border-white/10 hover:bg-[#222736]"
-            }`}
-          >
-            {view}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
+export type AppointmentRequest = {
+  id: number;
+  name: string;
+  type: ServiceType;
+  label: string;
 };
 
-/* ===== Event Styling ===== */
-const eventStyleGetter = () => ({
-  style: {
-    backgroundColor: "#2563eb",
-    borderRadius: "12px",
-    padding: "4px 6px",
-    border: "none",
+/* ================= STYLES ================= */
+
+const SERVICE_STYLES: Record<ServiceType, string> = {
+  ear: "bg-blue-500/90",
+  nose: "bg-green-500/90",
+  throat: "bg-purple-500/90",
+  aesthetics: "bg-pink-500/90",
+};
+
+/* ================= SAMPLE DATA ================= */
+
+const sampleEvents: CalendarEvent[] = [
+  {
+    id: 1,
+    patient: "Juan Dela Cruz",
+    service: "ear",
+    title: "Ear Cleaning",
+    date: new Date(2026, 1, 15), // Feb 15, 2026
+    time: "10:00 AM",
   },
-});
+  {
+    id: 2,
+    patient: "Maria Santos",
+    service: "nose",
+    title: "Nose Checkup",
+    date: new Date(2026, 2, 8), // Mar 8, 2026
+    time: "1:00 PM",
+  },
+];
 
-export default function AppointmentCalendar() {
-  const [openModal, setOpenModal] = useState(false);
+const sampleRequests: AppointmentRequest[] = [
+  { id: 101, name: "Ana Lopez", type: "ear", label: "Ear Consultation" },
+  { id: 102, name: "Carlos Mendoza", type: "nose", label: "Nose Checkup" },
+  { id: 103, name: "Liza Ramos", type: "aesthetics", label: "Facial Treatment" },
+];
+
+/* ================= CONSTANTS ================= */
+
+const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const monthNames = [
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December",
+];
+const clinicHours = Array.from({ length: 10 }, (_, i) => 8 + i); // 8AM to 5PM
+
+/* ================= HELPERS ================= */
+
+function isSameDay(d1: Date, d2: Date) {
+  return (
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate()
+  );
+}
+
+function getMonthGrid(year: number, month: number) {
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+
+  const grid: Date[] = [];
+  const startDay = firstDay.getDay();
+
+  for (let i = startDay - 1; i >= 0; i--) {
+    grid.push(new Date(year, month, -i));
+  }
+
+  for (let d = 1; d <= lastDay.getDate(); d++) {
+    grid.push(new Date(year, month, d));
+  }
+
+  while (grid.length % 7 !== 0) {
+    const last = grid[grid.length - 1];
+    grid.push(
+      new Date(last.getFullYear(), last.getMonth(), last.getDate() + 1)
+    );
+  }
+
+  return grid;
+}
+
+function startOfWeek(date: Date) {
+  const day = date.getDay();
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() - day);
+}
+
+function getWeekDays(start: Date) {
+  return Array.from({ length: 7 }).map((_, i) => {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    return d;
+  });
+}
+
+/* ================= COMPONENT ================= */
+
+export default function WeekCalendar() {
+  const [events] = useState(sampleEvents);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [view, setView] = useState<"week" | "month">("month");
+
+  // Month state
+  const [currentMonth, setCurrentMonth] = useState(new Date(2026, 0));
+
+  // Week state
+  const [weekStart, setWeekStart] = useState<Date>(startOfWeek(new Date()));
+
+  // Modal menu
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
 
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: "Juan Dela Cruz — Consultation",
-      start: new Date(2026, 0, 4, 10, 0),
-      end: new Date(2026, 0, 4, 11, 0),
-    },
-    {
-      id: 2,
-      title: "Maria Santos — Follow-up",
-      start: new Date(2026, 0, 5, 14, 0),
-      end: new Date(2026, 0, 5, 14, 30),
-    },
-  ]);
+  function handleEdit(id: number) {
+    console.log("Edit request:", id);
+  }
 
-  const [newBookings, setNewBookings] = useState([
-    {
-      id: 3,
-      name: "Pedro Reyes",
-      avatar: "/avatar.png",
-      type: "Virtual Consult",
-      label: "Follow-up",
-      start: new Date(2026, 0, 6, 15, 0),
-      end: new Date(2026, 0, 6, 15, 30),
-      location: "Centra Virtual Clinic",
-    },
-    {
-      id: 4,
-      name: "Ana Cruz",
-      avatar: "/avatar.png",
-      type: "Clinic Visit",
-      label: "New Patient",
-      start: new Date(2026, 0, 6, 16, 0),
-      end: new Date(2026, 0, 6, 16, 30),
-      location: "Centra Health Manila",
-    },
-  ]);
+  function prevMonth() {
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
+    );
+  }
 
-  /* Handle opening the edit modal */
-  const handleEdit = (appointment: any) => {
-    setSelectedAppointment({ ...appointment }); // copy to avoid mutation
-    setEditModalOpen(true);
-    setMenuOpenId(null);
-  };
+  function nextMonth() {
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
+    );
+  }
 
-  /* Save edited appointment */
-  const saveEdit = () => {
-    if (selectedAppointment) {
-      // If appointment already exists in events, update it
-      const isExisting = events.some((e) => e.id === selectedAppointment.id);
+  function prevWeek() {
+    setWeekStart(new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() - 7));
+  }
 
-      if (isExisting) {
-        setEvents((prev) =>
-          prev.map((e) =>
-            e.id === selectedAppointment.id
-              ? { ...e, start: new Date(selectedAppointment.start), end: new Date(selectedAppointment.end) }
-              : e
-          )
-        );
-      } else {
-        // New booking becomes confirmed event
-        setEvents((prev) => [
-          ...prev,
-          {
-            id: selectedAppointment.id,
-            title: `${selectedAppointment.name} — ${selectedAppointment.label}`,
-            start: new Date(selectedAppointment.start),
-            end: new Date(selectedAppointment.end),
-          },
-        ]);
-        setNewBookings((prev) => prev.filter((b) => b.id !== selectedAppointment.id));
-      }
-    }
-    setEditModalOpen(false);
-  };
+  function nextWeek() {
+    setWeekStart(new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 7));
+  }
+
+  const monthGrid = getMonthGrid(currentMonth.getFullYear(), currentMonth.getMonth());
+  const weekDays = getWeekDays(weekStart);
+
+  const currentMonthYear = `${monthNames[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
 
   return (
-    <section className="flex-1 bg-[#0e1014] min-h-screen text-white p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="bg-[#0b0d12] text-white rounded-2xl p-6 shadow-xl">
+      {/* HEADER */}
+      <div className="flex flex-wrap justify-between items-center mb-4 gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Appointments</h1>
-          <p className="text-gray-400 text-sm">Calendar schedule & patient queue</p>
+          <h2 className="text-xl font-semibold">Schedule</h2>
+          <p className="text-gray-400 text-sm">{view === "month" ? currentMonthYear : `Week of ${weekStart.getDate()} ${monthNames[weekStart.getMonth()]}`}</p>
         </div>
 
-        <button
-          onClick={() => setOpenModal(true)}
-          className="relative flex items-center gap-2 bg-[#1b1f29] px-3 py-2 rounded-xl border border-white/10 hover:bg-[#222736] transition"
-        >
-          <Bell size={18} />
-          <span className="text-sm">Appointment Requests</span>
-          {newBookings.length > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-xs px-1.5 py-0.5 rounded-full shadow">
-              {newBookings.length}
-            </span>
+        <div className="flex gap-2 flex-wrap">
+          {view === "month" && (
+            <>
+              <button onClick={prevMonth} className="px-3 py-1 bg-gray-700 rounded">◀</button>
+              <button onClick={nextMonth} className="px-3 py-1 bg-gray-700 rounded">▶</button>
+            </>
           )}
-        </button>
+          {view === "week" && (
+            <>
+              <button onClick={prevWeek} className="px-3 py-1 bg-gray-700 rounded">◀</button>
+              <button onClick={nextWeek} className="px-3 py-1 bg-gray-700 rounded">▶</button>
+            </>
+          )}
+
+          <button
+            onClick={() => setView("month")}
+            className={`px-3 py-1 rounded ${view === "month" ? "bg-indigo-600" : "bg-gray-700"}`}
+          >
+            Month
+          </button>
+
+          <button
+            onClick={() => setView("week")}
+            className={`px-3 py-1 rounded ${view === "week" ? "bg-indigo-600" : "bg-gray-700"}`}
+          >
+            Week
+          </button>
+
+          <button
+            onClick={() => {
+              const today = new Date();
+              setCurrentMonth(today);
+              setWeekStart(startOfWeek(today));
+              setView("week");
+            }}
+            className="px-3 py-1 bg-gray-700 rounded"
+          >
+            Today
+          </button>
+
+          <button
+            onClick={() => setModalOpen(true)}
+            className="bg-indigo-600 px-4 py-2 rounded-lg text-sm"
+          >
+            Appointment Requests
+          </button>
+        </div>
       </div>
 
-      {/* Calendar */}
-      <div className="bg-[#111318] rounded-2xl border border-white/10 shadow-lg overflow-hidden">
-        <div className="px-4 py-3 border-b border-white/10">
-          <p className="text-sm text-gray-300">Clinic Schedule</p>
-        </div>
-        <div className="p-3">
-          <Calendar
-            localizer={localizer}
-            events={events}
-            startAccessor="start"
-            endAccessor="end"
-            style={{ height: 540 }}
-            components={{ toolbar: CustomToolbar }}
-            eventPropGetter={eventStyleGetter}
-          />
-        </div>
-      </div>
+      {/* MONTH VIEW */}
+      {view === "month" && (
+        <div className="grid grid-cols-7 gap-1">
+          {days.map((d) => (
+            <div key={d} className="text-xs text-center text-gray-400">{d}</div>
+          ))}
 
-      {/* ===== Appointment Requests Modal ===== */}
-      {openModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="w-[780] bg-[#111318] rounded-2xl shadow-2xl text-white">
-            {/* Header */}
-            <div className="flex justify-between items-center px-6 py-4 border-b border-white/10">
-              <h2 className="text-lg font-semibold">Appointment Requests</h2>
-              <button onClick={() => setOpenModal(false)} className="text-gray-400 hover:text-white">
-                ✕
-              </button>
-            </div>
+          {monthGrid.map((day) => (
+            <div
+              key={day.toISOString()}
+              className={`border border-white/10 p-2 h-24 ${
+                day.getMonth() === currentMonth.getMonth() ? "bg-[#0b0d12]" : "bg-gray-900/50"
+              }`}
+            >
+              <div className="text-xs mb-1">{day.getDate()}</div>
 
-            {/* Table Head */}
-            <div className="px-6 py-3 grid grid-cols-12 text-xs text-gray-400">
-              <p className="col-span-5">PATIENT</p>
-              <p className="col-span-3">DATE</p>
-              <p className="col-span-3">LOCATION</p>
-              <span></span>
-            </div>
-
-            {/* Table Rows */}
-            <div className="px-6 pb-5">
-              {newBookings.map((r) => (
+              {events.filter((e) => isSameDay(e.date, day)).map((e) => (
                 <div
-                  key={r.id}
-                  className="grid grid-cols-12 items-center py-4 border-b border-white/10 last:border-0"
+                  key={e.id}
+                  className={`text-[10px] rounded px-1 py-0.5 text-white ${SERVICE_STYLES[e.service]}`}
                 >
-                  {/* Patient */}
-                  <div className="col-span-5 flex items-center gap-3">
-                    <Image src={r.avatar} alt="avatar" width={42} height={42} className="rounded-full" />
-                    <div>
-                      <p className="font-medium text-white">{r.name}</p>
-                      <p className="text-sm text-gray-400">
-                        {r.type} • {r.label}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Date */}
-                  <p className="col-span-3 text-sm text-white">{format(r.start, "MMM dd yyyy, EEE")}</p>
-
-                  {/* Location */}
-                  <p className="col-span-3 text-sm text-white">{r.location}</p>
-
-                  {/* Actions */}
-                  <div className="col-span-1 flex items-center justify-end gap-2">
-                    <button
-                      onClick={() => handleEdit(r)}
-                      className="px-3 py-1.5 bg-blue-600 text-white border border-blue-700 rounded-full text-xs font-medium hover:bg-blue-700 transition"
-                    >
-                      CONFIRM
-                    </button>
-
-                    {/* Menu */}
-                    <div className="relative">
-                      <button
-                        onClick={() => setMenuOpenId(menuOpenId === r.id ? null : r.id)}
-                        className="p-1 rounded hover:bg-white/10 transition"
-                      >
-                        <MoreHorizontal size={16} />
-                      </button>
-
-                      {menuOpenId === r.id && (
-                        <div className="absolute right-0 top-7 bg-[#1b1f29] border border-white/10 rounded-xl shadow-lg w-44 text-sm overflow-hidden">
-                          <button
-                            onClick={() => handleEdit(r)}
-                            className="flex items-center gap-2 px-3 py-2 hover:bg-white/10 w-full text-white"
-                          >
-                            ✏️ Edit Date & Time
-                          </button>
-                          <button className="flex items-center gap-2 px-3 py-2 hover:bg-red-600/80 text-red-500 w-full">
-                            <X size={14} /> Decline
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  {e.title}
                 </div>
               ))}
             </div>
-          </div>
+          ))}
         </div>
       )}
 
-      {/* ===== Edit Appointment Modal ===== */}
-      {editModalOpen && selectedAppointment && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="w-[500] bg-[#111318] rounded-2xl shadow-2xl text-white p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Edit Appointment</h2>
-              <button
-                onClick={() => setEditModalOpen(false)}
-                className="text-gray-400 hover:text-white"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <p className="text-sm text-gray-400">Patient: {selectedAppointment.name}</p>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-xs text-gray-400">Start Time</label>
-                <input
-                  type="datetime-local"
-                  value={format(selectedAppointment.start, "yyyy-MM-dd'T'HH:mm")}
-                  onChange={(e) =>
-                    setSelectedAppointment({
-                      ...selectedAppointment,
-                      start: new Date(e.target.value),
-                    })
-                  }
-                  className="w-full px-3 py-2 rounded-lg bg-[#1b1f29] border border-white/10 text-white"
-                />
+      {/* WEEK VIEW */}
+      {view === "week" && (
+        <div className="grid grid-cols-8 border-t border-white/10">
+          {/* TIME COLUMN */}
+          <div className="border-r border-white/10">
+            <div className="h-8 border-b border-white/10"></div>
+            {clinicHours.map(hour => (
+              <div key={hour} className="h-16 text-xs text-gray-400 flex items-center justify-end pr-2 border-b border-white/10">
+                {hour <= 11 ? `${hour}:00 AM` : hour === 12 ? `12:00 PM` : `${hour-12}:00 PM`}
               </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-xs text-gray-400">End Time</label>
-                <input
-                  type="datetime-local"
-                  value={format(selectedAppointment.end, "yyyy-MM-dd'T'HH:mm")}
-                  onChange={(e) =>
-                    setSelectedAppointment({
-                      ...selectedAppointment,
-                      end: new Date(e.target.value),
-                    })
-                  }
-                  className="w-full px-3 py-2 rounded-lg bg-[#1b1f29] border border-white/10 text-white"
-                />
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                onClick={() => setEditModalOpen(false)}
-                className="px-4 py-2 rounded-lg border border-white/10 hover:bg-white/10"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={saveEdit}
-                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700"
-              >
-                Save
-              </button>
-            </div>
+            ))}
           </div>
+
+          {/* DAYS */}
+          {weekDays.map(day => (
+            <div key={day.toISOString()} className="border-r border-white/10">
+              <div className="h-8 text-center border-b border-white/10">{days[day.getDay()]} {day.getDate()}</div>
+              {clinicHours.map(hour => (
+                <div key={hour} className="h-16 border-b border-white/10 relative">
+                  {events.filter(e => isSameDay(e.date, day) && parseInt(e.time.split(":")[0]) === (hour <= 12 ? hour : hour - 12)).map(e => (
+                    <div
+                      key={e.id}
+                      className={`absolute top-1 left-1 right-1 text-[10px] rounded px-1 py-0.5 text-white ${SERVICE_STYLES[e.service]}`}
+                    >
+                      {e.title}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
       )}
-    </section>
+
+      {/* LEGEND */}
+      <div className="flex gap-4 mt-4 text-xs text-gray-300">
+        <Legend color="bg-blue-500" label="Ear" />
+        <Legend color="bg-green-500" label="Nose" />
+        <Legend color="bg-purple-500" label="Throat" />
+        <Legend color="bg-pink-500" label="Aesthetics" />
+      </div>
+
+      {/* MODAL */}
+      {modalOpen && (
+        <AppointmentRequestsModal
+          newBookings={sampleRequests}
+          setOpenModal={setModalOpen}
+          menuOpenId={menuOpenId}
+          setMenuOpenId={setMenuOpenId}
+          handleEdit={handleEdit}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ================= LEGEND ================= */
+
+function Legend({ color, label }: { color: string; label: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className={`w-3 h-3 rounded-full ${color}`} />
+      <span>{label}</span>
+    </div>
   );
 }

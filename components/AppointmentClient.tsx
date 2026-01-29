@@ -1,182 +1,173 @@
-"use client";
+import { ChevronDownIcon } from '@heroicons/react/16/solid'
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendarAlt, faUser, faEnvelope, faPhone } from "@fortawesome/free-solid-svg-icons";
-
-/* ================= MODAL COMPONENT ================= */
-function BookingModal({ onClose }: { onClose: () => void }) {
-  const [step, setStep] = useState(1);
-
+export default function Example() {
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
-      <div className="bg-white w-full max-w-lg rounded-3xl p-8 relative shadow-xl animate-slide-up">
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-lg font-bold"
-        >
-          ✕
-        </button>
+    <div className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
+      {/* Background blur */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
+      >
+        <div
+          style={{
+            clipPath:
+              'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
+          }}
+          className="relative left-1/2 -z-10 aspect-1155/678 w-xlmax-w-none -translate-x-1/2 rotate-30 bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-40rem)] sm:w-6xl"
+        />
+      </div>
 
-        <div className="flex justify-center gap-3 mb-6">
-          {[1, 2, 3].map((n) => (
-            <span
-              key={n}
-              className={`w-4 h-4 rounded-full transition-colors duration-300 ${
-                step >= n ? "bg-indigo-600" : "bg-gray-300"
-              }`}
+      {/* Header */}
+      <div className="mx-auto max-w-2xl text-center">
+        <h2 className="text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+          Schedule an Appointment
+        </h2>
+        <p className="mt-2 text-lg text-gray-600">
+          Fill out the form below and we'll get back to you as soon as possible to confirm your appointment.
+        </p>
+      </div>
+
+      {/* Form */}
+      <form action="#" method="POST" className="mx-auto mt-16 max-w-xl sm:mt-20">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
+          {/* First name */}
+          <div>
+            <label htmlFor="first-name" className="block text-sm font-semibold text-gray-900">
+              First name
+            </label>
+            <div className="mt-2.5">
+              <input
+                id="first-name"
+                name="first-name"
+                type="text"
+                autoComplete="given-name"
+                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900  outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600"
+              />
+            </div>
+          </div>
+
+          {/* Last name */}
+          <div>
+            <label htmlFor="last-name" className="block text-sm font-semibold text-gray-900">
+              Last name
+            </label>
+            <div className="mt-2.5">
+              <input
+                id="last-name"
+                name="last-name"
+                type="text"
+                autoComplete="family-name"
+                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900  outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600"
+              />
+            </div>
+          </div>
+
+          {/* Patient Type */}
+          <div className="sm:col-span-2">
+            <label htmlFor="patient-type" className="block text-sm font-semibold text-gray-900">
+              Patient Type
+            </label>
+            <div className="mt-2.5 relative">
+              <select
+                id="patient-type"
+                name="patient-type"
+                required
+                defaultValue=""
+                className="block w-full appearance-none rounded-md bg-white px-3.5 py-2 pr-10 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600"
+              >
+                <option value="" disabled>
+                  Select patient type
+                </option>
+                <option value="new">New Patient</option>
+                <option value="existing">Existing Patient</option>
+              </select>
+
+              <ChevronDownIcon
+                aria-hidden="true"
+                className="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-gray-500"
+              />
+            </div>
+          </div>
+
+          {/* Email */}
+          <div className="sm:col-span-2">
+            <label htmlFor="email" className="block text-sm font-semibold text-gray-900">
+              Email
+            </label>
+            <div className="mt-2.5">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600"
+              />
+            </div>
+          </div>
+
+          {/* Phone */}
+          <div className="sm:col-span-2">
+            <label htmlFor="phone-number" className="block text-sm font-semibold text-gray-900">
+              Phone number
+            </label>
+            <div className="mt-2.5 flex rounded-md bg-white  outline-1 outline-gray-300 focus-within:outline-2 focus-within:outline-indigo-600">
+              <select className="rounded-l-md bg-transparent py-2 pl-3 pr-6 text-gray-500 focus:outline-none">
+                <option>PH</option>
+                <option>US</option>
+                <option>CA</option>
+              </select>
+              <input
+                id="phone-number"
+                name="phone-number"
+                type="text"
+                placeholder="0917 123 4567"
+                className="block w-full px-3 py-2 text-base text-gray-900 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Message */}
+          <div className="sm:col-span-2">
+            <label htmlFor="message" className="block text-sm font-semibold text-gray-900">
+              Message
+            </label>
+            <div className="mt-2.5">
+              <textarea
+                id="message"
+                name="message"
+                rows={4}
+                className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900  outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600"
+              />
+            </div>
+          </div>
+
+          {/* Privacy */}
+          <div className="flex gap-x-4 sm:col-span-2">
+            <input
+              id="agree"
+              type="checkbox"
+              className="mt-1 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
             />
-          ))}
+            <label htmlFor="agree" className="text-sm text-gray-600">
+              By selecting this, you agree to our{' '}
+              <a href="#" className="font-semibold text-indigo-600">
+                privacy policy
+              </a>
+              .
+            </label>
+          </div>
         </div>
 
-        {/* Step 1: Patient Type */}
-        {step === 1 && (
-          <>
-            <h2 className="text-2xl font-semibold mb-2 text-center text-gray-800">Welcome!</h2>
-            <p className="text-center text-gray-500 mb-6">Select your patient type to proceed</p>
-
-            <div className="space-y-4">
-              <button
-                onClick={() => setStep(2)}
-                className="w-full border border-indigo-600 text-indigo-700 font-medium py-3 rounded-xl hover:bg-indigo-50 transition"
-              >
-                Existing Patient
-              </button>
-              <button
-                onClick={() => setStep(2)}
-                className="w-full border border-gray-300 text-gray-700 font-medium py-3 rounded-xl hover:bg-gray-50 transition"
-              >
-                New Patient
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* Step 2: Clinic Appointment */}
-        {step === 2 && (
-          <>
-            <h2 className="text-xl font-semibold mb-4 text-gray-800 text-center">Clinic Appointment</h2>
-            <p className="text-gray-500 text-center mb-4">Choose your preferred date for your clinic visit</p>
-
-            <input
-              type="date"
-              className="w-full border border-gray-300 rounded-xl p-3 mb-6 hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
-            />
-
-            <button
-              onClick={() => setStep(3)}
-              className="w-full bg-indigo-600 text-white font-medium py-3 rounded-xl hover:bg-indigo-700 transition"
-            >
-              Continue
-            </button>
-          </>
-        )}
-
-        {/* Step 3: Patient Details */}
-        {step === 3 && (
-          <>
-            <h2 className="text-xl font-semibold mb-4 text-gray-800 text-center">Patient Details</h2>
-
-            <div className="space-y-4">
-              <div className="relative">
-                <FontAwesomeIcon icon={faUser} className="absolute left-3 top-3 text-gray-400" />
-                <input
-                  className="w-full border border-gray-300 rounded-xl p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
-                  placeholder="Full Name"
-                />
-              </div>
-              <div className="relative">
-                <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-3 text-gray-400" />
-                <input
-                  className="w-full border border-gray-300 rounded-xl p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
-                  placeholder="Email"
-                />
-              </div>
-              <div className="relative">
-                <FontAwesomeIcon icon={faPhone} className="absolute left-3 top-3 text-gray-400" />
-                <input
-                  className="w-full border border-gray-300 rounded-xl p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
-                  placeholder="Phone Number"
-                />
-              </div>
-            </div>
-
-            <button
-              onClick={onClose}
-              className="w-full mt-6 bg-indigo-600 text-white font-medium py-3 rounded-xl hover:bg-indigo-700 transition"
-            >
-              Submit
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/* ================= MAIN PAGE COMPONENT ================= */
-export default function AppointmentPage() {
-  const searchParams = useSearchParams();
-  const [openModal, setOpenModal] = useState(false);
-
-  useEffect(() => {
-    if (searchParams.get("book") === "true") {
-      setOpenModal(true);
-    }
-  }, [searchParams]);
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    window.history.replaceState({}, "", "/appointment");
-  };
-
-  return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 py-12 px-4">
-      {/* Hero Section */}
-      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-10">
-        <div className="flex-1 text-center md:text-left">
-          <h1 className="text-5xl font-bold mb-4 text-gray-800">Book Your Clinic Appointment</h1>
-          <p className="text-gray-600 mb-8 text-lg">
-            Schedule your visit with our expert team in just a few simple steps. We make healthcare easy for you.
-          </p>
+        {/* Submit */}
+        <div className="mt-10">
           <button
-            onClick={() => setOpenModal(true)}
-            className="bg-indigo-600 text-white font-medium py-4 px-8 rounded-2xl flex items-center justify-center gap-3 hover:bg-indigo-700 transition"
+            type="submit"
+            className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-indigo-600"
           >
-            <FontAwesomeIcon icon={faCalendarAlt} />
-            Book Now
+            Let&apos;s talk
           </button>
         </div>
-
-        <div className="flex-1">
-          <img
-            src="Centra-Doctor.jpg"
-            alt="Clinic Appointment"
-            className="w-full rounded-2xl shadow-lg"
-          />
-        </div>
-      </div>
-
-      {/* Steps Section */}
-      <div className="max-w-4xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { title: "Select Patient Type", desc: "Choose whether you are a new or existing patient." },
-          { title: "Pick a Date", desc: "Select your preferred clinic visit date." },
-          { title: "Enter Details", desc: "Provide your contact and personal information." },
-        ].map((step, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-2xl p-6 text-center shadow hover:shadow-lg transition"
-          >
-            <div className="text-3xl font-bold text-indigo-600 mb-3">{index + 1}</div>
-            <h3 className="font-semibold text-gray-800 mb-2">{step.title}</h3>
-            <p className="text-gray-500">{step.desc}</p>
-          </div>
-        ))}
-      </div>
-
-      {openModal && <BookingModal onClose={handleCloseModal} />}
+      </form>
     </div>
-  );
+  )
 }

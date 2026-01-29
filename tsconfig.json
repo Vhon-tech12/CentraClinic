@@ -33,6 +33,6 @@
     "**/*.mts",
     "components/AppointmentOverview.jsx",
     "components/AdminLogin.JS"
-  ],
+, "components/LoginForm.js", "components/LoginForm.js"  ],
   "exclude": ["node_modules"]
 }

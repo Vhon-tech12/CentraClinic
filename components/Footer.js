@@ -14,7 +14,7 @@ export default function Footer() {
                 Stay Informed with Centra Clinic
               </h2>
               <p className="mt-4 text-lg text-gray-600">
-                Subscribe to our newsletter for the latest health tips, clinic updates, and wellness advice from our team of experts. Stay empowered to make informed health decisions.
+                Subscribe to our newsletter for the latest health tips, clinic updates, and wellness advice from our team of experts.
               </p>
               <div className="mt-6 flex max-w-md gap-x-4">
                 <label htmlFor="email-address" className="sr-only">
@@ -37,23 +37,29 @@ export default function Footer() {
                 </button>
               </div>
             </div>
+
             <dl className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:pt-2">
               <div className="flex flex-col items-start">
                 <div className="rounded-md bg-white/50 p-2 ring-1 ring-gray-200">
-                  <CalendarDaysIcon className="h-6 w-6 text-gray-600" aria-hidden="true" />
+                  <CalendarDaysIcon className="h-6 w-6 text-gray-600" />
                 </div>
-                <dt className="mt-4 text-base font-semibold text-gray-900">Weekly Health Insights</dt>
+                <dt className="mt-4 text-base font-semibold text-gray-900">
+                  Weekly Health Insights
+                </dt>
                 <dd className="mt-2 text-base leading-7 text-gray-600">
-                  Receive expert tips, articles, and advice to help you live a healthier life and stay up-to-date on medical advancements.
+                  Receive expert tips, articles, and advice to help you live a healthier life.
                 </dd>
               </div>
+
               <div className="flex flex-col items-start">
                 <div className="rounded-md bg-white/50 p-2 ring-1 ring-gray-200">
-                  <HandRaisedIcon className="h-6 w-6 text-gray-600" aria-hidden="true" />
+                  <HandRaisedIcon className="h-6 w-6 text-gray-600" />
                 </div>
-                <dt className="mt-4 text-base font-semibold text-gray-900">No Spam, Only Care</dt>
+                <dt className="mt-4 text-base font-semibold text-gray-900">
+                  No Spam, Only Care
+                </dt>
                 <dd className="mt-2 text-base leading-7 text-gray-600">
-                  We respect your inbox. Expect only relevant updates, health news, and important announcements from Centra Clinic.
+                  We respect your inbox. Only relevant updates and clinic news.
                 </dd>
               </div>
             </dl>
@@ -67,11 +73,16 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <Image src="/centraLogo.jpg" alt="Centra Clinic Ph" width={40} height={40} />
+              <Image
+                src="/centraLogo.jpg"
+                alt="Centra Clinic Ph"
+                width={40}
+                height={40}
+              />
               <h3 className="text-white font-semibold">Centra Clinic Ph</h3>
             </div>
             <p className="text-sm mb-4">
-              Providing modern healthcare with a human touch. Your health and well-being are our top priorities.
+              Providing modern healthcare with a human touch.
             </p>
             <div className="flex gap-3">
               <span className="w-9 h-9 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 cursor-pointer">📘</span>
@@ -82,7 +93,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Quick links</h4>
+            <h4 className="text-white font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-3 text-sm">
               <li><Link href="#">Services</Link></li>
               <li><Link href="#">Meet our Team</Link></li>
@@ -95,8 +106,8 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">Clinic Hours</h4>
             <p className="text-sm mb-2">Mon - Sat: 9:00am - 6:00pm</p>
             <p className="text-sm mb-4">Sunday - Closed</p>
-            <p className="text-sm leading-relaxed">
-              Location: 1488 A. Apolinario St. corner Calhoun, Barangay Pio Del Pilar, Makati City
+            <p className="text-sm">
+              1488 A. Apolinario St. corner Calhoun, Makati City
             </p>
           </div>
 
@@ -104,7 +115,7 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">Stay Updated</h4>
             <p className="text-sm mb-4">
-              Receive updates about new treatments, health tips, and clinic announcements directly in your inbox.
+              Health tips, clinic updates, and announcements.
             </p>
             <div className="flex bg-white/10 rounded-full overflow-hidden">
               <input
@@ -121,7 +132,9 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="border-t border-white/10 mt-12 pt-6 text-center text-sm text-gray-400">
-          © {new Date().getFullYear()} Centra Clinic Ph. All rights reserved.
+          <span suppressHydrationWarning>
+            © {new Date().getFullYear()} Centra Clinic Ph. All rights reserved.
+          </span>
         </div>
       </div>
     </footer>

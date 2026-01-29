@@ -1,135 +1,150 @@
 import Image from "next/image";
 import Footer from "../../components/Footer";
 
-export default function AboutCentraClinic() {
+export default function AboutPage() {
   return (
     <>
-    <section className="relative isolate overflow-hidden bg-white py-24">
-      {/* TOP GRADIENT */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
-      >
-        <div
-          className="relative left-[calc(50%-11rem)] w-[36rem h-24rem
-          -translate-x-1/2 rotate-30 bg-linear-to-tr from-[#ff80b5] to-[#9089fc]
-          opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72rem sm:h-48rem"
-          style={{
-            clipPath:
-              "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-          }}
-        />
-      </div>
+      <main className="bg-white text-gray-900">
+        {/* HERO SECTION */}
+        <section className="max-w-7xl mx-auto px-6 py-24 grid lg:grid-cols-2 gap-16 items-center">
+          {/* LEFT */}
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
+              Compassionate care, centered around you
+            </h1>
 
-      {/* CONTENT */}
-      <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-start">
-        {/* LEFT CONTENT */}
-        <div>
-          <p className="text-sm uppercase tracking-widest text-indigo-600 mb-4">
-            About Centra Clinic
-          </p>
+            <p className="text-gray-600 max-w-xl">
+              Centra Clinic PH is committed to delivering accessible,
+              compassionate, and high-quality healthcare. We bring patients and
+              medical professionals together through a modern clinic experience
+              built on trust, efficiency, and genuine care.
+            </p>
 
-          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-gray-900 mb-6">
-            On a mission to modernize and{" "}
-            <span className="text-indigo-600">simplify healthcare</span>
-          </h2>
-
-          <p className="text-gray-600 max-w-xl mb-10">
-            By combining clinical workflows with intelligent digital tools, 
-            Centra Clinic helps healthcare providers focus less on paperwork and more on what truly matters—patient care. 
-            From appointment scheduling to SOAP notes and AI-assisted prescriptions, 
-            every feature is designed to improve efficiency, accuracy, and patient outcomes.
-          </p>
-
-          <h3 className="text-xl font-semibold text-gray-900 mb-3">
-            Our Mission
-          </h3>
-
-          <p className="text-gray-600 mb-4">
-            To empower healthcare professionals with intelligent tools that
-            improve clinical decisions, reduce manual workload, and enhance the
-            overall patient experience. 
-
-          </p>
-
-          <p className="text-gray-600 mb-10">
-            Centra Clinic integrates appointment management, SOAP notes,
-            e-prescriptions, and AI-driven insights into one seamless system.
-          </p>
-
-          {/* STATS */}
-          <div className="grid grid-cols-2 gap-8 border-t border-gray-200 pt-8 max-w-lg">
-            <div>
-              <p className="text-3xl font-bold text-indigo-600">10K+</p>
-              <p className="text-sm text-gray-500">Patients Served</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold text-indigo-600">100+</p>
-              <p className="text-sm text-gray-500">Healthcare Providers</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold text-indigo-600">24/7</p>
-              <p className="text-sm text-gray-500">Clinic Accessibility</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold text-indigo-600">AI-Powered</p>
-              <p className="text-sm text-gray-500">Clinical Support</p>
+            {/* MISSION */}
+            <div className="mt-16">
+              <h2 className="text-2xl font-semibold mb-4">Our mission</h2>
+              <p className="text-gray-600 max-w-xl">
+                Our mission is to improve patient outcomes by providing reliable
+                medical services, innovative healthcare solutions, and a
+                supportive environment where every individual feels heard,
+                respected, and cared for.
+              </p>
             </div>
           </div>
-        </div>
 
-        {/* RIGHT IMAGES */}
-        <div className="grid grid-cols-2 gap-6">
-          <div className="col-span-2 rounded-2xl overflow-hidden shadow-lg">
+          {/* RIGHT IMAGES */}
+          <div className="relative h-[420px]">
             <Image
-              src="/Centraa.jpg"
-              alt="Clinic Team"
-              width={800}
-              height={500}
-              className="object-cover w-full h-full"
+              src="/e.jpg"
+              alt="ENT consultation at Centra Clinic PH"
+              width={260}
+              height={360}
+              className="absolute right-0 top-0 rounded-xl shadow-lg object-cover"
+            />
+            <Image
+              src="/a.jpg"
+              alt="Patient care experience"
+              width={240}
+              height={300}
+              className="absolute right-40 top-24 rounded-xl shadow-lg object-cover"
+            />
+            <Image
+              src="/s.jpg"
+              alt="Modern clinic facility"
+              width={220}
+              height={260}
+              className="absolute right-16 bottom-0 rounded-xl shadow-lg object-cover"
             />
           </div>
+        </section>
 
-          <div className="rounded-2xl overflow-hidden shadow-lg">
-            <Image
-              src="/ear.jpg"
-              alt="Doctor Consultation"
-              width={400}
-              height={400}
-              className="object-cover w-full h-full"
-            />
+        {/* STATS */}
+        <section className="max-w-7xl mx-auto px-6 pb-24 grid md:grid-cols-3 gap-12">
+          <Stat number="44,000+" label="Patients served nationwide" />
+          <Stat number="120+" label="Healthcare professionals partnered" />
+          <Stat number="10+ years" label="Of trusted medical service" />
+        </section>
+
+        {/* VALUES IMAGE */}
+        <section className="relative h-[420px]">
+          <Image
+            src="/sample.avif"
+            alt="Centra Clinic PH team values"
+            fill
+            className="object-cover"
+          />
+        </section>
+
+        {/* VALUES CONTENT */}
+        <section className="max-w-7xl mx-auto px-6 py-24">
+          <h2 className="text-3xl font-bold mb-4">Our values</h2>
+          <p className="text-gray-600 max-w-2xl mb-16">
+            At Centra Clinic PH, our values guide every consultation, diagnosis,
+            and interaction. These principles define how we care for our patients
+            and support our healthcare professionals.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            <Value title="Be world-class">
+              We uphold the highest medical standards by continuously improving
+              our clinical practices, facilities, and quality of patient care.
+            </Value>
+
+            <Value title="Share everything you know">
+              We believe informed patients make better decisions. Clear
+              communication and patient education are central to our care.
+            </Value>
+
+            <Value title="Always learning">
+              Our team stays updated with the latest medical knowledge,
+              technologies, and best practices to provide safe and effective
+              treatment.
+            </Value>
+
+            <Value title="Be supportive">
+              We foster a welcoming and respectful environment where patients and
+              staff feel supported at every step of the healthcare journey.
+            </Value>
+
+            <Value title="Take responsibility">
+              We take full responsibility for our actions, decisions, and
+              outcomes to maintain patient safety, trust, and accountability.
+            </Value>
+
+            <Value title="Enjoy downtime">
+              We value balance and well-being, knowing that healthy and rested
+              healthcare professionals provide better care to patients.
+            </Value>
           </div>
+        </section>
+      </main>
 
-          <div className="rounded-2xl overflow-hidden shadow-lg">
-            <Image
-              src="/throat.jpg"
-              alt="Clinic Workspace"
-              width={400}
-              height={400}
-              className="object-cover w-full h-full"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* BOTTOM GRADIENT */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
-      >
-        <div
-          className="relative left-[calc(50%+3rem)] w-[36rem h-[24rem
-          -translate-x-1/2 bg-linear-to-tr from-[#ff80b5] to-[#9089fc]
-          opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72rem sm:h-[48rem"
-          style={{
-            clipPath:
-              "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-          }}
-        />
-      </div>
-    </section>
-    <Footer />
+      <Footer />
     </>
-    
+  );
+}
+
+/* COMPONENTS */
+function Stat({ number, label }: { number: string; label: string }) {
+  return (
+    <div>
+      <h3 className="text-3xl font-bold mb-1">{number}</h3>
+      <p className="text-gray-500">{label}</p>
+    </div>
+  );
+}
+
+function Value({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <h4 className="font-semibold mb-2">{title}</h4>
+      <p className="text-gray-600">{children}</p>
+    </div>
   );
 }
