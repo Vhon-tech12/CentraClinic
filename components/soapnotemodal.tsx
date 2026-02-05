@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FieldBlock, SectionLabel, ActionChips } from "./UIHelpers";
 import PrescriptionModal, { Prescription } from "./PrescriptionModal";
 import HeadTemplateModal from "./HeadTemplateModal";
@@ -8,6 +8,11 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 type Patient = { name: string; id?: string };
+
+type Diagnostic = {
+  imageData: string;
+  strokes: Record<string, Record<string, { strokes: any[][] }>>;
+};
 
 const SoapNoteModal = ({
   open,
@@ -23,7 +28,45 @@ const SoapNoteModal = ({
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
 
   const [open3DModal, setOpen3DModal] = useState(false);
-  const [diagnosis, setDiagnosis] = useState("");
+  const [diagnosis, setDiagnosis] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("diagnosis") || "";
+    }
+    return "";
+  });
+  const [diagnostics, setDiagnostics] = useState<Diagnostic[]>([]);
+
+  // SOAP Note Fields State
+  const [chiefComplaint, setChiefComplaint] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("chiefComplaint") || "";
+    }
+    return "";
+  });
+  const [historyOfPresentIllness, setHistoryOfPresentIllness] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("historyOfPresentIllness") || "";
+    }
+    return "";
+  });
+  const [remarks, setRemarks] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("remarks") || "";
+    }
+    return "";
+  });
+  const [plan, setPlan] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("plan") || "";
+    }
+    return "";
+  });
+  const [followUp, setFollowUp] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("followUp") || "";
+    }
+    return "";
+  });
 
   if (!open || !patient) return null;
 
@@ -53,11 +96,18 @@ const SoapNoteModal = ({
 
   // --- Save SOAP Note Handler ---
   const handleSaveNote = () => {
-    console.log({
+    const soapNote = {
       patientId: patient.id,
+      chiefComplaint,
+      historyOfPresentIllness,
+      remarks,
       diagnosis,
+      plan,
+      followUp,
       prescriptions,
-    });
+    };
+    console.log("Saving SOAP Note:", soapNote);
+    // Here you could save to database or further processing
     onClose();
   };
 
@@ -75,6 +125,12 @@ const SoapNoteModal = ({
 
     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
     pdf.save(`SOAP_Report_${patient.name}.pdf`);
+  };
+
+  // --- Save Diagnostic Handler ---
+  const handleSaveDiagnostic = (diagnostic: Diagnostic) => {
+    setDiagnostics(prev => [...prev, diagnostic]);
+    setDiagnosis(prev => prev ? prev + " [Diagnostic image attached]" : "[Diagnostic image attached]");
   };
 
   return (
@@ -104,12 +160,27 @@ const SoapNoteModal = ({
           >
             {/* SUBJECTIVE */}
             <SectionLabel title="SUBJECTIVE" />
-            <FieldBlock label="Chief Complaint" placeholder="Enter patient's chief complaint" />
-            <FieldBlock label="History of Present Illness" placeholder="Describe symptoms, duration, onset..." />
+            <FieldBlock
+              label="Chief Complaint"
+              placeholder="Enter patient's chief complaint"
+              value={chiefComplaint}
+              onChange={(e) => setChiefComplaint(e.target.value)}
+            />
+            <FieldBlock
+              label="History of Present Illness"
+              placeholder="Describe symptoms, duration, onset..."
+              value={historyOfPresentIllness}
+              onChange={(e) => setHistoryOfPresentIllness(e.target.value)}
+            />
 
             {/* OBJECTIVE */}
             <SectionLabel title="OBJECTIVE" subtitle="(Physical exam, labs, vitals, notes)" />
-            <FieldBlock label="Remarks" placeholder="Physical exam findings, observations..." />
+            <FieldBlock
+              label="Remarks"
+              placeholder="Physical exam findings, observations..."
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+            />
             <ActionChips options={["Add Remarks"]} onSelect={() => {}} />
 
             {/* ASSESSMENT */}
@@ -129,9 +200,29 @@ const SoapNoteModal = ({
               }}
             />
 
+            {/* DIAGNOSTICS */}
+            {diagnostics.length > 0 && (
+              <div className="space-y-3 mt-4">
+                {diagnostics.map((diag, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-[#262b36] border border-gray-700 p-4 rounded-xl shadow-sm hover:shadow-md transition"
+                  >
+                    <img src={diag.imageData} alt="Diagnostic snapshot" className="w-full h-auto rounded-lg" />
+                    <p className="text-gray-300 text-sm mt-2">Strokes: {JSON.stringify(diag.strokes)}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* PLAN */}
             <SectionLabel title="PLAN" />
-            <FieldBlock label="Plan" placeholder="Treatment plan, medications, follow-up..." />
+            <FieldBlock
+              label="Plan"
+              placeholder="Treatment plan, medications, follow-up..."
+              value={plan}
+              onChange={(e) => setPlan(e.target.value)}
+            />
             <ActionChips
               options={["Add Plan", "Add Prescription"]}
               onSelect={(opt) => {
@@ -171,7 +262,12 @@ const SoapNoteModal = ({
               </div>
             )}
 
-            <FieldBlock label="Follow-up Check-up" placeholder="Clinic and Date" />
+            <FieldBlock
+              label="Follow-up Check-up"
+              placeholder="Clinic and Date"
+              value={followUp}
+              onChange={(e) => setFollowUp(e.target.value)}
+            />
           </div>
 
           {/* Footer */}
@@ -216,6 +312,8 @@ const SoapNoteModal = ({
             setDiagnosis(prev => prev ? prev + "; " + text : text);
           }}
           onExport={handleExportPDF}
+          onSaveDiagnostic={handleSaveDiagnostic}
+          initialStrokes={diagnostics.length > 0 ? diagnostics[diagnostics.length - 1].strokes : undefined}
         />
       )}
     </>

@@ -11,7 +11,7 @@ function Model() {
     <primitive
       object={gltf.scene}
       scale={1.5}
-      position={[0, -0.5, 0]}
+      position={[0, -0.4, 0]}
       rotation={[0, Math.PI, 0]}
     />
   );
