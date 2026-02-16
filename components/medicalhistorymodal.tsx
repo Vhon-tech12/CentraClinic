@@ -34,9 +34,7 @@ const MedicalHistoryModal = ({ open, onClose }: { open: boolean; onClose: () => 
       alert("Please fix the following errors:\n" + Object.values(errors).join("\n"));
       return;
     }
-    // Here you would typically send the data to an API or parent component
-    console.log('Saving medical history data:', formData);
-    // Reset form
+    console.log("Saving medical history data:", formData);
     setFormData({
       type: "",
       resultDate: "",
@@ -50,38 +48,87 @@ const MedicalHistoryModal = ({ open, onClose }: { open: boolean; onClose: () => 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="w-[700] max-h-[90vh] bg-[#111318] text-gray-200 rounded-2xl border border-gray-700 shadow-2xl overflow-y-auto">
+    <div className="fixed inset-0 bg-gray-200/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
+      <div className="w-full max-w-xl bg-white text-gray-900 rounded-2xl shadow-xl overflow-y-auto transform transition-all duration-300 scale-95 animate-scaleUp max-h-[90vh]">
+        
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-700 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-white">New Medical History</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-200 p-2 rounded-lg">
+        <div className="px-6 py-4 border-b border-gray-300 flex justify-between items-center">
+          <h2 className="text-xl font-bold text-gray-900">New Medical History</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 p-2 rounded-lg transition">
             ✕
           </button>
         </div>
 
         {/* Body */}
-        <div className="px-6 py-6 space-y-4">
-          <FieldBlock label="Type" placeholder="Type of medical history" value={formData.type} onChange={(e) => handleInputChange('type', e.target.value)} />
-          <FieldBlock label="Result Date" placeholder="YYYY-MM-DD" type="date" value={formData.resultDate} onChange={(e) => handleInputChange('resultDate', e.target.value)} />
-          <FieldBlock label="Lab (Optional)" placeholder="Lab name or leave blank" value={formData.lab} onChange={(e) => handleInputChange('lab', e.target.value)} />
-          <FieldBlock label="Remarks" placeholder="Additional notes..." type="textarea" value={formData.remarks} onChange={(e) => handleInputChange('remarks', e.target.value)} />
+        <div className="px-6 py-6 space-y-5">
+          <FieldBlock
+            label="Type"
+            placeholder="Type of medical history"
+            value={formData.type}
+            onChange={(e) => handleInputChange("type", e.target.value)}
+          />
 
+          <FieldBlock
+            label="Result Date"
+            placeholder="YYYY-MM-DD"
+            type="date"
+            value={formData.resultDate}
+            onChange={(e) => handleInputChange("resultDate", e.target.value)}
+          />
+
+          <FieldBlock
+            label="Lab (Optional)"
+            placeholder="Lab name or leave blank"
+            value={formData.lab}
+            onChange={(e) => handleInputChange("lab", e.target.value)}
+          />
+
+          <FieldBlock
+            label="Remarks"
+            placeholder="Additional notes..."
+            type="textarea"
+            value={formData.remarks}
+            onChange={(e) => handleInputChange("remarks", e.target.value)}
+          />
+
+          {/* File Upload */}
           <div>
-            <p className="text-sm font-medium text-gray-300 mb-1">Add Photos (Optional)</p>
-            <input type="file" multiple accept="image/*" className="w-full text-gray-200" onChange={handleFileChange} />
+            <p className="text-sm font-medium text-gray-600 mb-2">Add Photos (Optional)</p>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              className="w-full text-gray-900 bg-gray-100 border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-violet-400"
+              onChange={handleFileChange}
+            />
+            {formData.photos.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {formData.photos.map((file, index) => (
+                  <div key={index} className="w-16 h-16 border border-gray-300 rounded-lg overflow-hidden">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt="preview"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-700 flex justify-end gap-2">
+        <div className="px-6 py-4 border-t border-gray-300 flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-[#1b1f27] transition"
+            className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
           >
             Cancel
           </button>
-          <button onClick={handleSave} className="px-4 py-2 rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition">
+          <button
+            onClick={handleSave}
+            className="px-5 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white font-semibold transition"
+          >
             Save History
           </button>
         </div>
@@ -91,5 +138,3 @@ const MedicalHistoryModal = ({ open, onClose }: { open: boolean; onClose: () => 
 };
 
 export default MedicalHistoryModal;
-
-

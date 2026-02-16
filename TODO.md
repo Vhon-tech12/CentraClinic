@@ -1,26 +1,55 @@
-# Medical Report PDF Generator Implementation
+# Admin UI Light Theme Conversion - TODO List
 
-## Overview
-Create a comprehensive medical report generator that combines patient information, SOAP notes, and 3D annotation snapshots into a single PDF document.
+## Summary
+Convert the entire admin side UI from dark theme to light-only theme.
 
-## Tasks
-- [ ] Create MedicalReportGenerator component
-- [ ] Implement patient details section in PDF
-- [ ] Add SOAP notes section with proper formatting
-- [ ] Capture and include 3D annotation snapshots
-- [ ] Add prescription information if available
-- [ ] Implement proper PDF layout and styling
-- [ ] Update admin report page to use the new generator
-- [ ] Test PDF generation functionality
+## Files Analyzed
+- `app/globals.css` - Has both light and dark mode CSS variables
+- `app/admin/layout.tsx` - Dark mode bg
+- `app/admin/dashboard/page.tsx` - Dark mode styles
+- `app/admin/patients/page.tsx` - Dark mode styles
+- `app/admin/appointments/page.tsx` - Dark mode styles
+- `app/admin/report/page.tsx` - Simple, minimal styles
+- `components/Sidebar.js` - Dark mode styles
+- `components/StatCard.js` - Dark mode styles
+- `components/UIHelpers.tsx` - Dark mode styles
+- `components/HeadTemplateModal.tsx` - Already light theme ✓
+- `components/PatientDetailsModal.tsx` - Dark mode styles
+- `components/AddPatientModal.tsx` - Dark mode styles
+- Additional modal components to check
 
-## Dependencies
-- jsPDF (already installed)
-- html2canvas (already installed)
-- Existing components: PatientNotes, soapnotemodal, HeadTemplateModal
+## Conversion Plan
 
-## Implementation Steps
-1. Create MedicalReportGenerator.tsx component
-2. Implement PDF generation logic with multiple sections
-3. Add snapshot capture functionality for 3D annotations
-4. Integrate with existing patient data structures
-5. Update report page to use new generator
+### Phase 1: Global Styles
+- [ ] 1.1 Update `app/globals.css` - Keep light mode, remove/ignore dark mode CSS variables
+
+### Phase 2: Admin Layout & Pages
+- [ ] 2.1 Update `app/admin/layout.tsx` - Change background to white/light-gray
+- [ ] 2.2 Update `app/admin/dashboard/page.tsx` - Convert all dark backgrounds to white/light-gray
+- [ ] 2.3 Update `app/admin/patients/page.tsx` - Convert dark styles to light
+- [ ] 2.4 Update `app/admin/appointments/page.tsx` - Convert dark styles to light
+- [ ] 2.5 Update `app/admin/report/page.tsx` - Already simple, verify light theme
+
+### Phase 3: Core Components
+- [ ] 3.1 Update `components/Sidebar.js` - Light background and text
+- [ ] 3.2 Update `components/StatCard.js` - Light card backgrounds
+- [ ] 3.3 Update `components/UIHelpers.tsx` - Light form inputs and components
+
+### Phase 4: Modal Components
+- [ ] 4.1 Update `components/PatientDetailsModal.tsx` - Light modal background
+- [ ] 4.2 Update `components/AddPatientModal.tsx` - Light modal background
+- [ ] 4.3 Check and update other admin modals (AppointmentRequestModal, SoapNoteModal, MedicalHistoryModal, etc.)
+
+### Phase 5: Additional Components
+- [ ] 5.1 Check and update other components used in admin (Profile.js, etc.)
+
+## Light Theme Design Specs
+- **Background**: `bg-white` or `bg-gray-50` for main content areas
+- **Cards**: `bg-white` with `border-gray-200` shadow
+- **Text**: `text-gray-800` or `text-gray-900` for headings, `text-gray-600` for body
+- **Borders**: `border-gray-200` or `border-gray-300`
+- **Inputs**: `bg-white` with `border-gray-300`, `text-gray-800`
+- **Buttons**: Keep primary colors but ensure good contrast
+- **Sidebar**: `bg-white` or `bg-gray-50` with `text-gray-700`
+
+## Progress: Not Started

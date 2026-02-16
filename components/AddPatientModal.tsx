@@ -30,7 +30,6 @@ const AddPatientModal = ({ open, onClose }: { open: boolean; onClose: () => void
 
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
-
     if (!formData.fullName.trim()) errors.fullName = "Full name is required";
     if (!formData.email.trim()) errors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = "Email is invalid";
@@ -39,7 +38,6 @@ const AddPatientModal = ({ open, onClose }: { open: boolean; onClose: () => void
     if (!formData.phone.trim()) errors.phone = "Phone number is required";
     if (!formData.address.trim()) errors.address = "Address is required";
     if (!formData.consentChecked) errors.consent = "You must consent to proceed";
-
     return errors;
   };
 
@@ -49,30 +47,29 @@ const AddPatientModal = ({ open, onClose }: { open: boolean; onClose: () => void
       alert("Please fix the following errors:\n" + Object.values(errors).join("\n"));
       return;
     }
-
-    // Here you would typically send the data to an API or parent component
-    console.log('Saving patient data:', formData);
-    // Reset form or close modal
+    console.log("Saving patient data:", formData);
     onClose();
   };
+
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="w-[820] max-h-[90vh] bg-[#111318] text-gray-200 rounded-2xl border border-gray-700 shadow-2xl overflow-y-auto">
+    <div className="fixed inset-0 bg-gray-200/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
+      <div className="w-full max-w-3xl bg-white text-gray-900 rounded-2xl shadow-xl overflow-y-auto transform transition-all duration-300 scale-95 animate-scaleUp max-h-[90vh]">
+        
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-700 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Add New Patient</h2>
+        <div className="px-6 py-4 border-b border-gray-300 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-900">Add New Patient</h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-[#1b1f27] text-gray-400 hover:text-gray-200 transition"
+            className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition"
           >
             ✕
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="px-6 py-4 border-b border-gray-700 flex gap-6">
+        <div className="px-6 py-4 border-b border-gray-300 flex gap-6">
           {[
             { id: "personal", label: "Personal Information" },
             { id: "emergency", label: "Emergency Contact" },
@@ -84,8 +81,8 @@ const AddPatientModal = ({ open, onClose }: { open: boolean; onClose: () => void
               onClick={() => setTab(t.id)}
               className={`pb-2 text-sm font-medium ${
                 tab === t.id
-                  ? "text-purple-400 border-b-2 border-purple-400"
-                  : "opacity-60 hover:opacity-100"
+                  ? "text-purple-600 border-b-2 border-purple-600"
+                  : "text-gray-500 hover:text-gray-700"
               }`}
             >
               {t.label}
@@ -105,6 +102,7 @@ const AddPatientModal = ({ open, onClose }: { open: boolean; onClose: () => void
               <FieldBlock label="Address" placeholder="Enter address" value={formData.address} onChange={(e) => handleInputChange('address', e.target.value)} />
             </div>
           )}
+
           {tab === "emergency" && (
             <div className="grid grid-cols-2 gap-4">
               <FieldBlock label="Contact Name" placeholder="Enter contact name" value={formData.emergencyName} onChange={(e) => handleInputChange('emergencyName', e.target.value)} />
@@ -113,6 +111,7 @@ const AddPatientModal = ({ open, onClose }: { open: boolean; onClose: () => void
               <FieldBlock label="Alternate Phone" placeholder="Optional" value={formData.emergencyAltPhone} onChange={(e) => handleInputChange('emergencyAltPhone', e.target.value)} />
             </div>
           )}
+
           {tab === "physician" && (
             <div className="grid grid-cols-2 gap-4">
               <FieldBlock label="Primary Physician" placeholder="Physician name" value={formData.physicianName} onChange={(e) => handleInputChange('physicianName', e.target.value)} />
@@ -121,12 +120,13 @@ const AddPatientModal = ({ open, onClose }: { open: boolean; onClose: () => void
               <FieldBlock label="Email" placeholder="Physician email" value={formData.physicianEmail} onChange={(e) => handleInputChange('physicianEmail', e.target.value)} />
             </div>
           )}
+
           {tab === "consent" && (
             <div className="space-y-4">
               <FieldBlock label="Consent Form" placeholder="Type patient consent or notes here..." type="textarea" value={formData.consent} onChange={(e) => handleInputChange('consent', e.target.value)} />
               <div className="flex items-center gap-2">
-                <input type="checkbox" id="consent" className="accent-purple-500" checked={formData.consentChecked} onChange={(e) => handleInputChange('consentChecked', e.target.checked)} />
-                <label htmlFor="consent" className="text-sm text-gray-300">
+                <input type="checkbox" id="consent" className="accent-purple-600" checked={formData.consentChecked} onChange={(e) => handleInputChange('consentChecked', e.target.checked)} />
+                <label htmlFor="consent" className="text-sm text-gray-700">
                   I hereby consent to the treatment and data collection.
                 </label>
               </div>
@@ -135,14 +135,14 @@ const AddPatientModal = ({ open, onClose }: { open: boolean; onClose: () => void
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-700 bg-[#0f1115] flex justify-end gap-2">
+        <div className="px-6 py-4 border-t border-gray-300 flex justify-end gap-2 bg-gray-50">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-[#1b1f27] transition"
+            className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
           >
             Cancel
           </button>
-          <button className="px-4 py-2 rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition">
+          <button onClick={handleSave} className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition">
             Save Patient
           </button>
         </div>

@@ -49,7 +49,6 @@ const PrescriptionModal = ({
   const [filtered, setFiltered] = useState<DrugData[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Populate form when editing
   useEffect(() => {
     if (defaultValues) {
       setDrug(defaultValues.drug);
@@ -66,7 +65,6 @@ const PrescriptionModal = ({
     }
   }, [defaultValues, open]);
 
-  // Fuzzy search
   useEffect(() => {
     if (!drug.trim()) {
       setFiltered([]);
@@ -101,7 +99,6 @@ const PrescriptionModal = ({
 
   if (!open) return null;
 
-  // Group suggestions by category
   const groupedSuggestions: Record<string, DrugData[]> = {};
   filtered.forEach((d) => {
     if (!groupedSuggestions[d.category]) groupedSuggestions[d.category] = [];
@@ -109,18 +106,32 @@ const PrescriptionModal = ({
   });
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="w-full max-w-[600px] max-h-[90vh] bg-[#111318] text-gray-200 rounded-2xl border border-gray-700 shadow-2xl overflow-y-auto relative">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="
+        w-full max-w-[620px] max-h-[90vh]
+        bg-white
+        rounded-2xl
+        border border-gray-200
+        shadow-2xl shadow-black/10
+        ring-1 ring-black/5
+        overflow-y-auto
+        relative
+      ">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-700 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-800">
             {defaultValues ? "Edit Prescription" : "Add Prescription"}
           </h2>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#1b1f27] text-gray-400 hover:text-gray-200">✕</button>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition"
+          >
+            ✕
+          </button>
         </div>
 
         {/* Body */}
-        <div className="px-6 py-6 space-y-6 relative">
+        <div className="px-6 py-6 space-y-5 relative">
           <div className="relative">
             <FieldBlock
               label="Drug Name"
@@ -128,16 +139,28 @@ const PrescriptionModal = ({
               value={drug}
               onChange={(e) => setDrug(e.target.value)}
             />
+
             {showSuggestions && (
-              <div className="absolute top-20 left-0 right-0 bg-[#1b1f27] border border-gray-600 rounded-md shadow-md max-h-60 overflow-y-auto z-50">
+              <div className="
+                absolute top-[5.25rem] left-0 right-0
+                bg-white
+                border border-gray-200
+                rounded-xl
+                shadow-lg
+                max-h-64
+                overflow-y-auto
+                z-50
+              ">
                 {Object.entries(groupedSuggestions).map(([cat, drugs]) => (
-                  <div key={cat} className="py-1">
-                    <div className="px-4 py-1 text-xs font-semibold text-gray-400 uppercase">{cat}</div>
+                  <div key={cat} className="py-2">
+                    <div className="px-4 py-1 text-xs font-semibold text-gray-400 uppercase">
+                      {cat}
+                    </div>
                     {drugs.map((d, idx) => (
                       <div
                         key={idx}
                         onClick={() => handleSelect(d.name)}
-                        className="px-4 py-2 cursor-pointer hover:bg-gray-700"
+                        className="px-4 py-2 cursor-pointer text-sm hover:bg-violet-50 hover:text-violet-700 transition"
                       >
                         {d.name}
                       </div>
@@ -148,16 +171,41 @@ const PrescriptionModal = ({
             )}
           </div>
 
-          <FieldBlock label="Dose" placeholder="e.g., 500mg, 10ml" value={dose} onChange={(e) => setDose(e.target.value)} />
-          <FieldBlock label="Frequency" placeholder="e.g., twice daily, every 8 hours" value={frequency} onChange={(e) => setFrequency(e.target.value)} />
-          <FieldBlock label="Duration" placeholder="e.g., 7 days, 2 weeks" value={duration} onChange={(e) => setDuration(e.target.value)} />
-          <FieldBlock label="Instructions" placeholder="Special instructions (optional)" value={instructions} onChange={(e) => setInstructions(e.target.value)} type="textarea" />
+          <div className="grid grid-cols-2 gap-4">
+            <FieldBlock label="Dose" placeholder="e.g., 500mg, 10ml" value={dose} onChange={(e) => setDose(e.target.value)} />
+            <FieldBlock label="Frequency" placeholder="e.g., twice daily" value={frequency} onChange={(e) => setFrequency(e.target.value)} />
+            <FieldBlock label="Duration" placeholder="e.g., 7 days" value={duration} onChange={(e) => setDuration(e.target.value)} />
+          </div>
+
+          <FieldBlock
+            label="Instructions"
+            placeholder="Special instructions (optional)"
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
+            type="textarea"
+          />
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-700 bg-[#0f1115] flex justify-end gap-2 sticky bottom-0">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-[#1b1f27]">Cancel</button>
-          <button onClick={handleSave} disabled={!drug.trim()} className="px-4 py-2 rounded-lg bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50">
+        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-2 sticky bottom-0">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={!drug.trim()}
+            className="
+              px-4 py-2 rounded-lg
+              bg-violet-600 text-white
+              hover:bg-violet-700
+              disabled:opacity-50
+              transition
+              shadow-md
+            "
+          >
             {defaultValues ? "Save Changes" : "Add Prescription"}
           </button>
         </div>

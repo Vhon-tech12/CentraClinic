@@ -22,7 +22,7 @@ export const FieldBlock = ({ label, placeholder, value, onChange, type = "text" 
         value={value}
         onChange={onChange}
         className="w-full rounded-xl px-3 py-2 text-sm
-                   bg-[#0f1115] text-gray-200
+                   bg-white text-black
                    border border-gray-700
                    placeholder-gray-500
                    focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
@@ -34,7 +34,7 @@ export const FieldBlock = ({ label, placeholder, value, onChange, type = "text" 
         value={value}
         onChange={onChange}
         className="w-full rounded-xl px-3 py-2 text-sm
-                   bg-[#0f1115] text-gray-200
+                   bg-white text-gray-900
                    border border-gray-700
                    placeholder-gray-500
                    focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
@@ -66,8 +66,8 @@ export const ActionChips = ({ options, onSelect }: { options: string[]; onSelect
         onClick={() => onSelect?.(o)}
         className="px-3 py-1.5 rounded-full text-xs
                    border border-gray-600
-                   bg-[#13161d] text-gray-300
-                   hover:bg-[#1b1f27] hover:border-gray-500 transition"
+                   bg-white text-gray-900
+                   hover:bg-gray-100 hover:border-gray-500 transition"
       >
         + {o}
       </button>

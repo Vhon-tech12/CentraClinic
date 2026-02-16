@@ -40,7 +40,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 min-h-screen bg-[#0f1216] text-gray-400 flex flex-col justify-between border-r border-gray-800">
+    <aside className="w-64 min-h-screen bg-white text-gray-600 flex flex-col justify-between border-r border-gray-200 shadow-sm">
       
       {/* TOP */}
       <div className="p-6">
@@ -56,8 +56,8 @@ export default function Sidebar() {
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
                   ${
                     isActive
-                      ? "bg-gray-800 text-white"
-                      : "hover:bg-gray-800 hover:text-white"
+                      ? "bg-indigo-50 text-indigo-700 font-medium"
+                      : "hover:bg-gray-100 hover:text-gray-800"
                   }`}
               >
                 <Icon size={18} />
@@ -69,15 +69,17 @@ export default function Sidebar() {
       </div>
 
       {/* BOTTOM */}
-      <div className="p-6 border-t border-gray-800 space-y-4">
+      <div className="p-6 border-t border-gray-200 space-y-4">
         {/* PROFILE */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gray-700" />
+          <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center">
+            <span className="text-indigo-600 font-medium">GX</span>
+          </div>
           <div>
-            <p className="text-sm font-medium text-white">
+            <p className="text-sm font-medium text-gray-800">
               Gustavo Xavier
             </p>
-            <span className="text-xs text-yellow-400">Admin</span>
+            <span className="text-xs text-indigo-600">Admin</span>
           </div>
         </div>
 
@@ -85,13 +87,13 @@ export default function Sidebar() {
         <div className="space-y-2 text-sm">
           <Link
             href="/admin/settings"
-            className="flex items-center gap-3 hover:text-white"
+            className="flex items-center gap-3 hover:text-gray-800"
           >
             <Settings size={16} />
             Settings
           </Link>
 
-          <button className="flex items-center gap-3 text-red-500 hover:text-red-400">
+          <button className="flex items-center gap-3 text-red-600 hover:text-red-700">
             <LogOut size={16} />
             Log out
           </button>

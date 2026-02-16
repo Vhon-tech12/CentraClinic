@@ -2,30 +2,27 @@
 
 import { useState, useEffect } from "react";
 import StatCard from "@/components/StatCard";
-
 import dynamic from "next/dynamic";
 
-// Dynamically import Recharts components so they render only on client
-const LineChart = dynamic(() => import("recharts").then((mod) => mod.LineChart), { ssr: false });
-const Line = dynamic(() => import("recharts").then((mod) => mod.Line), { ssr: false });
-const XAxis = dynamic(() => import("recharts").then((mod) => mod.XAxis), { ssr: false });
-const YAxis = dynamic(() => import("recharts").then((mod) => mod.YAxis), { ssr: false });
-const CartesianGrid = dynamic(() => import("recharts").then((mod) => mod.CartesianGrid), { ssr: false });
-const Tooltip = dynamic(() => import("recharts").then((mod) => mod.Tooltip), { ssr: false });
-const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => mod.ResponsiveContainer), { ssr: false });
-const PieChart = dynamic(() => import("recharts").then((mod) => mod.PieChart), { ssr: false });
-const Pie = dynamic(() => import("recharts").then((mod) => mod.Pie), { ssr: false });
-const Cell = dynamic(() => import("recharts").then((mod) => mod.Cell), { ssr: false });
-const Legend = dynamic(() => import("recharts").then((mod) => mod.Legend), { ssr: false });
-const BarChart = dynamic(() => import("recharts").then((mod) => mod.BarChart), { ssr: false });
-const Bar = dynamic(() => import("recharts").then((mod) => mod.Bar), { ssr: false });
+/* -------------------- RECHARTS (CLIENT ONLY) -------------------- */
+const LineChart = dynamic(() => import("recharts").then(m => m.LineChart), { ssr: false });
+const Line = dynamic(() => import("recharts").then(m => m.Line), { ssr: false });
+const XAxis = dynamic(() => import("recharts").then(m => m.XAxis), { ssr: false });
+const YAxis = dynamic(() => import("recharts").then(m => m.YAxis), { ssr: false });
+const CartesianGrid = dynamic(() => import("recharts").then(m => m.CartesianGrid), { ssr: false });
+const Tooltip = dynamic(() => import("recharts").then(m => m.Tooltip), { ssr: false });
+const ResponsiveContainer = dynamic(() => import("recharts").then(m => m.ResponsiveContainer), { ssr: false });
+
+const PieChart = dynamic(() => import("recharts").then(m => m.PieChart), { ssr: false });
+const Pie = dynamic(() => import("recharts").then(m => m.Pie), { ssr: false });
+const Cell = dynamic(() => import("recharts").then(m => m.Cell), { ssr: false });
+const Legend = dynamic(() => import("recharts").then(m => m.Legend), { ssr: false });
 
 export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
-
-  // Ensure charts only render after client mounts
   useEffect(() => setMounted(true), []);
 
+  /* -------------------- DATA -------------------- */
   const totalUsersData = [
     { month: "Jan", users: 400 },
     { month: "Feb", users: 600 },
@@ -42,82 +39,73 @@ export default function DashboardPage() {
   ];
 
   const consultationData = [
-    { name: "Ear", value: 38.6 },
-    { name: "Nose", value: 22.5 },
-    { name: "Throat", value: 30.8 },
-    { name: "Aesthetics", value: 8.1 },
+    { name: "Facial", value: 45 },
+    { name: "Laser", value: 25 },
+    { name: "Consultation", value: 20 },
+    { name: "Others", value: 10 },
   ];
 
-  const prescriptionsData = [
-    { month: "Jan", count: 120 },
-    { month: "Feb", count: 180 },
-    { month: "Mar", count: 150 },
-    { month: "Apr", count: 210 },
-    { month: "May", count: 260 },
-    { month: "Jun", count: 300 },
+  /* 🔥 COMBINED TABLE DATA */
+  const recentActivities = [
+    // APPOINTMENTS (name lang ng nag-book)
+    { id: "A-001", name: "Glory Mae T.", service: "Acne Intense Facial", type: "Appointment", payment: "-", price: "-" },
+    { id: "A-002", name: "Glory Mae T.", service: "Carbon Facial", type: "Appointment", payment: "-", price: "-" },
+    { id: "A-003", name: "Glory Mae T.", service: "Brightening Laser", type: "Appointment", payment: "-", price: "-" },
+
+    // TRANSACTIONS
+    { id: "T-001", name: "Monic Yabat", service: "AquaPure", type: "Transaction", payment: "Cash", price: "₱3,000" },
+    { id: "T-002", name: "Cendy De Vera", service: "Pevonia Light", type: "Transaction", payment: "Cash", price: "₱4,000" },
+    { id: "T-003", name: "Sofie Vidal", service: "Cryo Facial", type: "Transaction", payment: "Cash", price: "₱7,000" },
   ];
 
-  const consultationsBreakdown = [
-    { name: "Online", value: 65 },
-    { name: "In-Clinic", value: 25 },
-    { name: "Follow-up", value: 10 },
-  ];
-
-  const COLORS = ["#6c63ff", "#4fd1c5", "#a78bfa", "#f6ad55"];
+  const COLORS = ["#6c63ff", "#4fd1c5", "#f6ad55", "#a78bfa"];
 
   return (
-    <section className="flex flex-col bg-[#0f1115] text-white min-h-screen">
-      <div className="flex-1 p-6 sm:p-8 space-y-6 overflow-y-auto">
+    <section className="flex flex-col bg-gray-50 min-h-screen">
+      <div className="flex-1 p-6 sm:p-8 space-y-6">
 
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        {/* HEADER */}
+        <div className="flex flex-col sm:flex-row justify-between gap-4">
           <h1 className="text-3xl font-semibold">Dashboard</h1>
           <input
             type="text"
             placeholder="Search..."
-            className="bg-[#181b20] px-5 py-3 rounded-lg text-sm outline-none w-full sm:w-64"
+            className="bg-white px-5 py-3 rounded-lg border border-gray-200 w-full sm:w-64"
           />
         </div>
 
-        {/* Stat Cards */}
+        {/* STAT CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-          <StatCard title="Customers" value="721K" change="+11.01%" positive />
-          <StatCard title="Visits" value="367K" change="-0.03%" />
-          <StatCard title="New Appointment" value="1,156" change="+3.55%" positive />
-          <StatCard title="Active Users" value="239K" change="+6.08%" positive />
+          <StatCard title="Revenue" value="₱12,500+" change="+11.01%" positive />
+          <StatCard title="Expenses" value="₱12,500+" change="-0.03%" />
+          <StatCard title="Appointments" value="34" change="+3.55%" positive />
+          <StatCard title="Customers" value="721K" change="+6.08%" positive />
         </div>
 
-        {/* Charts Row */}
+        {/* CHART ROW */}
         {mounted && (
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-            {/* Line Chart */}
-            <div className="xl:col-span-2 bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
-              <h2 className="font-medium mb-4">Total Users (Jan — Dec)</h2>
-              <ResponsiveContainer width="100%" height="90%">
+            {/* LINE CHART */}
+            <div className="xl:col-span-2 bg-white rounded-xl p-6 shadow-sm border">
+              <h2 className="font-medium mb-4">Total Users</h2>
+              <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={totalUsersData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2c2f36" />
-                  <XAxis dataKey="month" stroke="#ccc" />
-                  <YAxis stroke="#ccc" />
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
                   <Tooltip />
                   <Line type="monotone" dataKey="users" stroke="#6c63ff" strokeWidth={3} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
 
-            {/* Pie Chart */}
-            <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
-              <h2 className="font-medium mb-4">Consultations In Progress</h2>
-              <ResponsiveContainer width="100%" height="90%">
+            {/* PIE CHART */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <h2 className="font-medium mb-4">Service Distribution</h2>
+              <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
-                  <Pie
-                    data={consultationData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    dataKey="value"
-                    label
-                  >
+                  <Pie data={consultationData} dataKey="value" cx="50%" cy="50%" outerRadius={90} label>
                     {consultationData.map((_, i) => (
                       <Cell key={i} fill={COLORS[i % COLORS.length]} />
                     ))}
@@ -130,49 +118,47 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Bottom Charts */}
-        {mounted && (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-
-            {/* Bar Chart */}
-            <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
-              <h2 className="font-medium mb-4">AI Prescriptions Generated</h2>
-              <ResponsiveContainer width="100%" height="90%">
-                <BarChart data={prescriptionsData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2c2f36" />
-                  <XAxis dataKey="month" stroke="#ccc" />
-                  <YAxis stroke="#ccc" />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#6c63ff" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Donut Chart */}
-            <div className="bg-[#181b20] rounded-xl p-6 xl:p-8 h-80 sm:h-96">
-              <h2 className="font-medium mb-4">Consultations</h2>
-              <ResponsiveContainer width="100%" height="90%">
-                <PieChart>
-                  <Pie
-                    data={consultationsBreakdown}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={4}
-                    dataKey="value"
-                  >
-                    {consultationsBreakdown.map((_, i) => (
-                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Legend verticalAlign="bottom" />
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+        {/* 🔥 ONE TABLE ONLY */}
+        <div className="bg-white rounded-xl p-6 shadow-sm border">
+          <div className="flex justify-between mb-4">
+            <h2 className="font-semibold">Recent Activities</h2>
+            <span className="text-sm text-blue-600 cursor-pointer">See All</span>
           </div>
-        )}
+
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-gray-500 border-b">
+                <th className="pb-2 text-left">ID</th>
+                <th className="pb-2 text-left">Name</th>
+                <th className="pb-2 text-left">Service</th>
+                <th className="pb-2 text-left">Type</th>
+                <th className="pb-2 text-left">Payment</th>
+                <th className="pb-2 text-left">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentActivities.map(item => (
+                <tr key={item.id} className="border-b last:border-none hover:bg-gray-50">
+                  <td className="py-3">{item.id}</td>
+                  <td>{item.name}</td>
+                  <td>{item.service}</td>
+                  <td>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium
+                        ${item.type === "Appointment"
+                          ? "bg-blue-100 text-blue-600"
+                          : "bg-green-100 text-green-600"}`}
+                    >
+                      {item.type}
+                    </span>
+                  </td>
+                  <td>{item.payment}</td>
+                  <td className="font-medium">{item.price}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
       </div>
     </section>

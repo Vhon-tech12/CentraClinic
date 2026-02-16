@@ -121,7 +121,7 @@
     const weekDays = getWeekDays(startOfWeek(weekStart));
 
     return (
-      <div className="bg-[#0b0d12] text-white rounded-2xl p-6 shadow-xl space-y-6">
+      <div className="bg-white text-gray-800 rounded-2xl p-6 shadow-xl space-y-6 border border-gray-200">
 
 
         {/* HEADER */}
@@ -129,11 +129,11 @@
 
   {/* TITLE */}
   <div>
-    <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-      <CalendarDays className="w-6 h-6 text-indigo-400" />
+    <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2 text-gray-800">
+      <CalendarDays className="w-6 h-6 text-indigo-600" />
       Schedule
     </h2>
-    <p className="text-sm text-gray-400">
+    <p className="text-sm text-gray-500">
       {view === "month"
         ? `${monthNames[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`
         : view === "week"
@@ -146,10 +146,10 @@
   <div className="flex flex-wrap items-center gap-3">
 
     {/* NAVIGATION */}
-    <div className="flex items-center bg-white/5 rounded-xl overflow-hidden border border-white/10">
+    <div className="flex items-center bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
       <button
         onClick={goToToday}
-        className="px-4 py-2 text-sm hover:bg-white/10 transition"
+        className="px-4 py-2 text-sm hover:bg-gray-200 transition text-gray-700"
       >
         Today
       </button>
@@ -158,13 +158,13 @@
         <>
           <button
             onClick={view === "month" ? prevMonth : prevWeek}
-            className="px-3 py-2 hover:bg-white/10 transition"
+            className="px-3 py-2 hover:bg-gray-200 transition text-gray-600"
           >
             <ChevronLeft size={16} />
           </button>
           <button
             onClick={view === "month" ? nextMonth : nextWeek}
-            className="px-3 py-2 hover:bg-white/10 transition"
+            className="px-3 py-2 hover:bg-gray-200 transition text-gray-600"
           >
             <ChevronRight size={16} />
           </button>
@@ -173,7 +173,7 @@
     </div>
 
     {/* VIEW SWITCHER */}
-    <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
+    <div className="flex items-center bg-gray-100 rounded-xl p-1 border border-gray-200">
       {(["month", "week"] as const).map(v => (
         <button
           key={v}
@@ -181,7 +181,7 @@
           className={`px-4 py-1.5 text-sm rounded-lg transition
             ${view === v
               ? "bg-indigo-600 text-white shadow"
-              : "text-gray-300 hover:bg-white/10"}
+              : "text-gray-600 hover:bg-gray-200"}
           `}
         >
           {v.charAt(0).toUpperCase() + v.slice(1)}
@@ -192,7 +192,7 @@
     {/* APPOINTMENT REQUESTS */}
     <button
       onClick={() => setModalOpen(true)}
-      className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 transition px-5 py-2 rounded-xl text-sm font-medium shadow-lg shadow-indigo-600/20"
+      className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 transition px-5 py-2 rounded-xl text-sm font-medium shadow-lg shadow-indigo-600/20 text-white"
     >
       <Inbox size={16} />
       Appointment Requests
@@ -206,11 +206,11 @@
         {/* MONTH VIEW */}
         {view === "month" && (
           <div className="grid grid-cols-7 gap-1">
-            {days.map(d => <div key={d} className="text-xs text-center text-gray-400">{d}</div>)}
+            {days.map(d => <div key={d} className="text-xs text-center text-gray-500">{d}</div>)}
             {monthGrid.map(day => {
               const closed = isSunday(day);
               return (
-                <div key={day.toISOString()} className={`h-28 p-2 border border-white/10 rounded-lg ${closed ? "bg-red-900/30 text-red-300" : "hover:bg-gray-800 transition"}`}>
+                <div key={day.toISOString()} className={`h-28 p-2 border border-gray-200 rounded-lg ${closed ? "bg-red-50 text-red-600" : "hover:bg-gray-50 transition bg-white"}`}>
                   <div className="text-xs flex justify-between mb-1">
                     <span>{day.getDate()}</span>
                     {closed && <span className="text-[10px]">Closed</span>}
@@ -228,18 +228,18 @@
 
         {/* WEEK VIEW */}
         {view === "week" && (
-          <div className="grid grid-cols-8 border-t border-white/10">
-            <div className="border-r border-white/10"></div>
+          <div className="grid grid-cols-8 border-t border-gray-200">
+            <div className="border-r border-gray-200"></div>
             {weekDays.map(day => {
               const closed = isSunday(day);
               return (
-                <div key={day.toISOString()} className={`border-r border-white/10 ${closed ? "bg-red-900/20" : ""}`}>
-                  <div className="h-8 text-center border-b border-white/10 text-xs font-semibold">
+                <div key={day.toISOString()} className={`border-r border-gray-200 ${closed ? "bg-red-50" : ""}`}>
+                  <div className="h-8 text-center border-b border-gray-200 text-xs font-semibold text-gray-700">
                     {days[day.getDay()]} {day.getDate()}
-                    {closed && <div className="text-[10px]">Closed</div>}
+                    {closed && <div className="text-[10px] text-red-600">Closed</div>}
                   </div>
                   {clinicHours.map(hour => (
-                    <div key={hour} className="h-16 border-b border-white/10 relative">
+                    <div key={hour} className="h-16 border-b border-gray-200 relative bg-white">
                       {!closed && events.filter(e => isSameDay(e.date, day)).map(e => (
                         <div key={e.id} className={`absolute top-1 left-1 right-1 text-[10px] rounded px-1 py-0.5 ${SERVICE_STYLES[e.service]} hover:scale-105 transition cursor-pointer`}>
                           {e.title} ({e.patient})
@@ -255,23 +255,23 @@
 
         {/* DAY VIEW */}
         {view === "day" && (
-          <div className="grid grid-cols-2 border-t border-white/10">
+          <div className="grid grid-cols-2 border-t border-gray-200">
             {/* Time column */}
-            <div className="border-r border-white/10">
+            <div className="border-r border-gray-200 bg-gray-50">
               {clinicHours.map(hour => (
-                <div key={hour} className="h-16 border-b border-white/10 text-xs flex items-center justify-end pr-2">
+                <div key={hour} className="h-16 border-b border-gray-200 text-xs flex items-center justify-end pr-2 text-gray-600">
                   {hour}:00
                 </div>
               ))}
             </div>
 
             {/* Today events */}
-            <div className="border-b border-white/10">
-              <div className="h-8 text-center border-b border-white/10 text-xs font-semibold">
+            <div className="border-b border-gray-200 bg-white">
+              <div className="h-8 text-center border-b border-gray-200 text-xs font-semibold text-gray-700">
                 Today {weekStart.getDate()}
               </div>
               {clinicHours.map(hour => (
-                <div key={hour} className="h-16 border-b border-white/10 relative">
+                <div key={hour} className="h-16 border-b border-gray-200 relative">
                   {events.filter(e => isSameDay(e.date, weekStart)).map(e => (
                     <div key={e.id} className={`absolute top-1 left-1 right-1 text-[10px] rounded px-1 py-0.5 ${SERVICE_STYLES[e.service]} hover:scale-105 transition cursor-pointer`}>
                       {e.title} ({e.patient})

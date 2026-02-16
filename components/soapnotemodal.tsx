@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FieldBlock, SectionLabel, ActionChips } from "./UIHelpers";
 import PrescriptionModal, { Prescription } from "./PrescriptionModal";
 import HeadTemplateModal from "./HeadTemplateModal";
@@ -26,56 +26,37 @@ const SoapNoteModal = ({
   const [openPrescription, setOpenPrescription] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
-
   const [open3DModal, setOpen3DModal] = useState(false);
-  const [diagnosis, setDiagnosis] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("diagnosis") || "";
-    }
-    return "";
-  });
+
+  const [diagnosis, setDiagnosis] = useState(
+    typeof window !== "undefined" ? localStorage.getItem("diagnosis") || "" : ""
+  );
+
   const [diagnostics, setDiagnostics] = useState<Diagnostic[]>([]);
 
-  // SOAP Note Fields State
-  const [chiefComplaint, setChiefComplaint] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("chiefComplaint") || "";
-    }
-    return "";
-  });
-  const [historyOfPresentIllness, setHistoryOfPresentIllness] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("historyOfPresentIllness") || "";
-    }
-    return "";
-  });
-  const [remarks, setRemarks] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("remarks") || "";
-    }
-    return "";
-  });
-  const [plan, setPlan] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("plan") || "";
-    }
-    return "";
-  });
-  const [followUp, setFollowUp] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("followUp") || "";
-    }
-    return "";
-  });
+  const [chiefComplaint, setChiefComplaint] = useState(
+    typeof window !== "undefined" ? localStorage.getItem("chiefComplaint") || "" : ""
+  );
+  const [historyOfPresentIllness, setHistoryOfPresentIllness] = useState(
+    typeof window !== "undefined"
+      ? localStorage.getItem("historyOfPresentIllness") || ""
+      : ""
+  );
+  const [remarks, setRemarks] = useState(
+    typeof window !== "undefined" ? localStorage.getItem("remarks") || "" : ""
+  );
+  const [plan, setPlan] = useState(
+    typeof window !== "undefined" ? localStorage.getItem("plan") || "" : ""
+  );
+  const [followUp, setFollowUp] = useState(
+    typeof window !== "undefined" ? localStorage.getItem("followUp") || "" : ""
+  );
 
   if (!open || !patient) return null;
 
-  // --- Prescription Handlers ---
   const handleAddOrUpdatePrescription = (rx: Prescription) => {
     if (editingIndex !== null) {
-      setPrescriptions(prev =>
-        prev.map((p, i) => (i === editingIndex ? rx : p))
-      );
+      setPrescriptions(prev => prev.map((p, i) => (i === editingIndex ? rx : p)));
       setEditingIndex(null);
     } else {
       setPrescriptions(prev => [...prev, rx]);
@@ -89,12 +70,11 @@ const SoapNoteModal = ({
   };
 
   const handleDelete = (idx: number) => {
-    if (confirm("Are you sure you want to delete this prescription?")) {
+    if (confirm("Delete this prescription?")) {
       setPrescriptions(prev => prev.filter((_, i) => i !== idx));
     }
   };
 
-  // --- Save SOAP Note Handler ---
   const handleSaveNote = () => {
     const soapNote = {
       patientId: patient.id,
@@ -107,11 +87,9 @@ const SoapNoteModal = ({
       prescriptions,
     };
     console.log("Saving SOAP Note:", soapNote);
-    // Here you could save to database or further processing
     onClose();
   };
 
-  // --- PDF Export Handler ---
   const handleExportPDF = async () => {
     const modalEl = document.getElementById("soap-modal-content");
     if (!modalEl) return;
@@ -127,27 +105,28 @@ const SoapNoteModal = ({
     pdf.save(`SOAP_Report_${patient.name}.pdf`);
   };
 
-  // --- Save Diagnostic Handler ---
   const handleSaveDiagnostic = (diagnostic: Diagnostic) => {
     setDiagnostics(prev => [...prev, diagnostic]);
-    setDiagnosis(prev => prev ? prev + " [Diagnostic image attached]" : "[Diagnostic image attached]");
+    setDiagnosis(prev =>
+      prev ? prev + " [Diagnostic image attached]" : "[Diagnostic image attached]"
+    );
   };
 
   return (
     <>
-      {/* SOAP Note Modal */}
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="w-full max-w-[900px] max-h-[90vh] bg-[#1b1f27] text-gray-200 rounded-2xl border border-gray-700 shadow-2xl overflow-hidden flex flex-col">
-          
+      {/* Overlay */}
+      <div className="fixed inset-0 bg-gray-900/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="w-full max-w-225 max-h-[90vh] bg-white text-gray-800 rounded-2xl border border-gray-200 shadow-xl overflow-hidden flex flex-col">
+
           {/* Header */}
-          <div className="px-6 py-4 border-b border-gray-700 flex items-center justify-between bg-[#22252f]">
+          <div className="px-6 py-4 border-b border-gray-200 flex justify-between bg-gray-50">
             <div>
-              <h2 className="text-xl font-bold text-white">SOAP Note</h2>
-              <p className="text-sm text-gray-400">{patient.name}</p>
+              <h2 className="text-xl font-bold text-gray-900">SOAP Note</h2>
+              <p className="text-sm text-gray-500">{patient.name}</p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-gray-700 text-gray-400 hover:text-white transition"
+              className="p-2 rounded-lg hover:bg-gray-200 text-gray-500"
             >
               ✕
             </button>
@@ -156,137 +135,122 @@ const SoapNoteModal = ({
           {/* Body */}
           <div
             id="soap-modal-content"
-            className="px-6 py-6 space-y-6 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
+            className="px-6 py-6 space-y-6 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
           >
-            {/* SUBJECTIVE */}
             <SectionLabel title="SUBJECTIVE" />
             <FieldBlock
               label="Chief Complaint"
               placeholder="Enter patient's chief complaint"
               value={chiefComplaint}
-              onChange={(e) => setChiefComplaint(e.target.value)}
+              onChange={e => setChiefComplaint(e.target.value)}
             />
             <FieldBlock
               label="History of Present Illness"
               placeholder="Describe symptoms, duration, onset..."
               value={historyOfPresentIllness}
-              onChange={(e) => setHistoryOfPresentIllness(e.target.value)}
+              onChange={e => setHistoryOfPresentIllness(e.target.value)}
             />
 
-            {/* OBJECTIVE */}
-            <SectionLabel title="OBJECTIVE" subtitle="(Physical exam, labs, vitals, notes)" />
+            <SectionLabel title="OBJECTIVE" subtitle="(Physical exam, labs, vitals)" />
             <FieldBlock
               label="Remarks"
-              placeholder="Physical exam findings, observations..."
+              placeholder="Physical exam findings..."
               value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
+              onChange={e => setRemarks(e.target.value)}
             />
-            <ActionChips options={["Add Remarks"]} onSelect={() => {}} />
 
-            {/* ASSESSMENT */}
             <SectionLabel title="ASSESSMENT" />
             <FieldBlock
               label="Diagnosis"
-              placeholder="Enter diagnosis / impression"
+              placeholder="Diagnosis / impression"
               value={diagnosis}
-              onChange={(e) => setDiagnosis(e.target.value)}
-            />
-            <ActionChips
-              options={["Add Diagnosis"]}
-              onSelect={(opt) => {
-                // Debug to check if click works
-                console.log("Selected Option:", opt);
-                if (String(opt).includes("Add Diagnosis")) setOpen3DModal(true);
-              }}
+              onChange={e => setDiagnosis(e.target.value)}
             />
 
-            {/* DIAGNOSTICS */}
+            <ActionChips
+              options={["Add Diagnosis"]}
+              onSelect={() => setOpen3DModal(true)}
+            />
+
             {diagnostics.length > 0 && (
-              <div className="space-y-3 mt-4">
-                {diagnostics.map((diag, idx) => (
+              <div className="space-y-3">
+                {diagnostics.map((d, i) => (
                   <div
-                    key={idx}
-                    className="bg-[#262b36] border border-gray-700 p-4 rounded-xl shadow-sm hover:shadow-md transition"
+                    key={i}
+                    className="bg-gray-50 border border-gray-200 p-4 rounded-xl"
                   >
-                    <img src={diag.imageData} alt="Diagnostic snapshot" className="w-full h-auto rounded-lg" />
-                    <p className="text-gray-300 text-sm mt-2">Strokes: {JSON.stringify(diag.strokes)}</p>
+                    <img src={d.imageData} className="rounded-lg" />
                   </div>
                 ))}
               </div>
             )}
 
-            {/* PLAN */}
             <SectionLabel title="PLAN" />
             <FieldBlock
               label="Plan"
-              placeholder="Treatment plan, medications, follow-up..."
+              placeholder="Treatment plan"
               value={plan}
-              onChange={(e) => setPlan(e.target.value)}
-            />
-            <ActionChips
-              options={["Add Plan", "Add Prescription"]}
-              onSelect={(opt) => {
-                if (opt === "Add Prescription") setOpenPrescription(true);
-              }}
+              onChange={e => setPlan(e.target.value)}
             />
 
-            {/* PRESCRIPTIONS */}
-            {prescriptions.length > 0 && (
-              <div className="space-y-3 mt-4">
-                {prescriptions.map((rx, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-[#262b36] border border-gray-700 p-4 rounded-xl shadow-sm hover:shadow-md transition flex justify-between items-start"
+            <ActionChips
+              options={["Add Prescription","Add Body Diagram"]}
+              onSelect={() => setOpenPrescription(true)}
+            />
+
+            {prescriptions.map((rx, idx) => (
+              <div
+                key={idx}
+                className="bg-gray-50 border border-gray-200 p-4 rounded-xl flex justify-between"
+              >
+                <div>
+                  <p className="font-semibold text-gray-900">{rx.drug}</p>
+                  <p className="text-sm text-gray-600">
+                    {rx.dose} · {rx.frequency} · {rx.duration}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(idx)}
+                    className="px-3 py-1 bg-blue-600 text-white rounded-lg"
                   >
-                    <div>
-                      <p className="font-semibold text-white text-lg">{rx.drug}</p>
-                      <p className="text-gray-300 text-sm">{rx.dose} · {rx.frequency} · {rx.duration}</p>
-                      {rx.instructions && <p className="text-gray-400 text-sm mt-1">{rx.instructions}</p>}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <button
-                        onClick={() => handleEdit(idx)}
-                        className="px-3 py-1 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(idx)}
-                        className="px-3 py-1 rounded-lg bg-red-600 text-white text-sm hover:bg-red-700"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(idx)}
+                    className="px-3 py-1 bg-red-600 text-white rounded-lg"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            )}
+            ))}
 
             <FieldBlock
-              label="Follow-up Check-up"
-              placeholder="Clinic and Date"
+              label="Follow-up"
+              placeholder="Clinic and date"
               value={followUp}
-              onChange={(e) => setFollowUp(e.target.value)}
+              onChange={e => setFollowUp(e.target.value)}
             />
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-gray-700 bg-[#22252f] flex justify-end gap-3 sticky bottom-0">
+          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
             <button
               onClick={onClose}
-              className="px-5 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 transition"
+              className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
             >
               Cancel
             </button>
             <button
               onClick={handleSaveNote}
-              className="px-5 py-2 rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition"
+              className="px-5 py-2 bg-violet-600 text-white rounded-lg"
             >
               Save Note
             </button>
             <button
               onClick={handleExportPDF}
-              className="px-5 py-2 rounded-lg bg-yellow-500 text-white hover:bg-yellow-600 transition"
+              className="px-5 py-2 bg-amber-500 text-white rounded-lg"
             >
               Export PDF
             </button>
@@ -294,26 +258,26 @@ const SoapNoteModal = ({
         </div>
       </div>
 
-      {/* Prescription Modal */}
       <PrescriptionModal
         open={openPrescription}
-        onClose={() => { setOpenPrescription(false); setEditingIndex(null); }}
+        onClose={() => {
+          setOpenPrescription(false);
+          setEditingIndex(null);
+        }}
         onSave={handleAddOrUpdatePrescription}
         defaultValues={editingIndex !== null ? prescriptions[editingIndex] : undefined}
       />
 
-      {/* Head 3D Diagnostic Modal */}
       {open3DModal && patient && (
         <HeadTemplateModal
           open={open3DModal}
           onClose={() => setOpen3DModal(false)}
           patientId={patient.id || "temp"}
-          onSaveFinding={(text: string) => {
-            setDiagnosis(prev => prev ? prev + "; " + text : text);
-          }}
+          onSaveFinding={text =>
+            setDiagnosis(prev => (prev ? prev + "; " + text : text))
+          }
           onExport={handleExportPDF}
           onSaveDiagnostic={handleSaveDiagnostic}
-          initialStrokes={diagnostics.length > 0 ? diagnostics[diagnostics.length - 1].strokes : undefined}
         />
       )}
     </>

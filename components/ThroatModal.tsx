@@ -5,7 +5,7 @@ import { OrbitControls, useGLTF } from "@react-three/drei";
 
 function Model() {
   // Load the GLB file from public/models/ear-anatomy/Throat/Throat.glb
-  const gltf = useGLTF("/models/ear-anatomy/throat/larynx_with_muscles_and_ligaments.glb");
+  const gltf = useGLTF("/models/ear-anatomy/throat/larynx_model/scene.gltf");
 
   return (
     <primitive

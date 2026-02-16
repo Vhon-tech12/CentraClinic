@@ -7,7 +7,7 @@ import * as THREE from "three";
 
 /* ================= MODAL ================= */
 const Modal = ({ onClose, children }: { onClose: () => void; children: React.ReactNode }) => (
-  <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-white flex items-center justify-center z-50 p-4">
+  <div className="fixed inset-0 bg-linear-to-br from-blue-50 to-white flex items-center justify-center z-50 p-4">
     <div className="relative bg-white w-full max-w-7xl rounded-xl shadow-2xl text-gray-800 flex flex-col h-[90vh] border border-gray-200">
       <button
         onClick={onClose}
@@ -69,7 +69,7 @@ const NoseModel = () => {
 
 const ThroatModel = () => {
   const { scene } = useGLTF(
-    "/models/ear-anatomy/throat/larynx_with_muscles_and_ligaments.glb"
+    "/models/ear-anatomy/throat/larynx_model/scene.gltf"
   );
   return <primitive object={scene} />;
 };
@@ -120,11 +120,19 @@ const smoothPointsRealtime = (points: Stroke[], smoothing = 0.25): Vec3[] => {
 export default function HeadTemplateModal({
   open,
   onClose,
+  patientId,
   onSaveDiagnostic,
+  onSaveFinding,
+  onExport,
+  initialStrokes,
 }: {
   open: boolean;
   onClose: () => void;
+  patientId: string;
   onSaveDiagnostic?: (diagnostic: { imageData: string; strokes: Record<string, Record<string, AreaData>> }) => void;
+  onSaveFinding?: (text: string) => void;
+  onExport?: () => void;
+  initialStrokes?: Record<string, Record<string, AreaData>>;
 }) {
   const [tab, setTab] = useState<TabKey>("Ear");
   const [area, setArea] = useState<string | null>(null);
@@ -141,11 +149,24 @@ export default function HeadTemplateModal({
   const rendererRef = useRef<any>(null);
 
   // Persistent strokes for all modes
-  const [data, setData] = useState<Record<TabKey, Record<string, AreaData>>>( {
+  const [data, setData] = useState<Record<TabKey, Record<string, AreaData>>>(initialStrokes || {
     Ear: {},
     Nose: {},
     Throat: {},
   });
+
+  const loadDiagnostic = (savedData: { imageData: string; strokes: Record<TabKey, Record<string, AreaData>> }) => {
+    setData(savedData.strokes);
+  };
+
+  useEffect(() => {
+    if (open) {
+      const saved = localStorage.getItem('diagnostic');
+      if (saved) {
+        loadDiagnostic(JSON.parse(saved));
+      }
+    }
+  }, [open]);
 
   // Temporary strokes for real-time drawing
   const [tempData, setTempData] = useState<Record<TabKey, Record<string, AreaData>>>( {
@@ -344,7 +365,7 @@ export default function HeadTemplateModal({
   return (
     <Modal onClose={onClose}>
       {/* HEADER */}
-      <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+      <div className="px-6 py-4 bg-linear-to-r from-blue-600 to-blue-800 text-white shadow-lg">
         <h2 className="text-xl font-bold">Medical Annotation Tool</h2>
         <p className="text-sm opacity-90">Interactive 3D Model Documentation</p>
       </div>

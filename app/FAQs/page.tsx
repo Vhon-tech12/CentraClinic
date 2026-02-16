@@ -21,7 +21,7 @@ export default function FAQSection() {
     {
       question: "Do you accept walk-in patients?",
       answer:
-        "Yes, we accept walk-in patients depending on availability. However, booking online is highly recommended."
+        "No, we accept walk-in patients depending on availability. However, booking online is highly recommended."
     },
     {
       question: "Is my medical information secure?",
