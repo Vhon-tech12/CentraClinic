@@ -1,19 +1,21 @@
 "use client";
-
+ 
 import { useState } from "react";
 import { FieldBlock, SectionLabel, ActionChips } from "./UIHelpers";
 import PrescriptionModal, { Prescription } from "./PrescriptionModal";
 import HeadTemplateModal from "./HeadTemplateModal";
+import EducationalMaterialModal from "./EducationalMaterialModal";
+import { EducationalMaterial } from "@/types/EducationalMaterial";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-
+ 
 type Patient = { name: string; id?: string };
-
+ 
 type Diagnostic = {
   imageData: string;
   strokes: Record<string, Record<string, { strokes: any[][] }>>;
 };
-
+ 
 const SoapNoteModal = ({
   open,
   onClose,
@@ -27,13 +29,15 @@ const SoapNoteModal = ({
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [open3DModal, setOpen3DModal] = useState(false);
-
+  const [openEducationalMaterial, setOpenEducationalMaterial] = useState(false);
+  const [selectedMaterials, setSelectedMaterials] = useState<EducationalMaterial[]>([]);
+ 
   const [diagnosis, setDiagnosis] = useState(
     typeof window !== "undefined" ? localStorage.getItem("diagnosis") || "" : ""
   );
-
+ 
   const [diagnostics, setDiagnostics] = useState<Diagnostic[]>([]);
-
+ 
   const [chiefComplaint, setChiefComplaint] = useState(
     typeof window !== "undefined" ? localStorage.getItem("chiefComplaint") || "" : ""
   );
@@ -51,9 +55,9 @@ const SoapNoteModal = ({
   const [followUp, setFollowUp] = useState(
     typeof window !== "undefined" ? localStorage.getItem("followUp") || "" : ""
   );
-
+ 
   if (!open || !patient) return null;
-
+ 
   const handleAddOrUpdatePrescription = (rx: Prescription) => {
     if (editingIndex !== null) {
       setPrescriptions(prev => prev.map((p, i) => (i === editingIndex ? rx : p)));
@@ -63,18 +67,24 @@ const SoapNoteModal = ({
     }
     setOpenPrescription(false);
   };
-
+ 
   const handleEdit = (idx: number) => {
     setEditingIndex(idx);
     setOpenPrescription(true);
   };
-
+ 
   const handleDelete = (idx: number) => {
     if (confirm("Delete this prescription?")) {
       setPrescriptions(prev => prev.filter((_, i) => i !== idx));
     }
   };
-
+ 
+  const handleRemoveMaterial = (idx: number) => {
+    if (confirm("Remove this educational material?")) {
+      setSelectedMaterials(prev => prev.filter((_, i) => i !== idx));
+    }
+  };
+ 
   const handleSaveNote = () => {
     const soapNote = {
       patientId: patient.id,
@@ -89,35 +99,35 @@ const SoapNoteModal = ({
     console.log("Saving SOAP Note:", soapNote);
     onClose();
   };
-
+ 
   const handleExportPDF = async () => {
     const modalEl = document.getElementById("soap-modal-content");
     if (!modalEl) return;
-
+ 
     const canvas = await html2canvas(modalEl, { scale: 2 });
     const imgData = canvas.toDataURL("image/png");
-
+ 
     const pdf = new jsPDF("p", "mm", "a4");
     const pdfWidth = 210;
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
+ 
     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
     pdf.save(`SOAP_Report_${patient.name}.pdf`);
   };
-
+ 
   const handleSaveDiagnostic = (diagnostic: Diagnostic) => {
     setDiagnostics(prev => [...prev, diagnostic]);
     setDiagnosis(prev =>
       prev ? prev + " [Diagnostic image attached]" : "[Diagnostic image attached]"
     );
   };
-
+ 
   return (
     <>
       {/* Overlay */}
       <div className="fixed inset-0 bg-gray-900/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div className="w-full max-w-225 max-h-[90vh] bg-white text-gray-800 rounded-2xl border border-gray-200 shadow-xl overflow-hidden flex flex-col">
-
+ 
           {/* Header */}
           <div className="px-6 py-4 border-b border-gray-200 flex justify-between bg-gray-50">
             <div>
@@ -131,7 +141,7 @@ const SoapNoteModal = ({
               ✕
             </button>
           </div>
-
+ 
           {/* Body */}
           <div
             id="soap-modal-content"
@@ -150,7 +160,7 @@ const SoapNoteModal = ({
               value={historyOfPresentIllness}
               onChange={e => setHistoryOfPresentIllness(e.target.value)}
             />
-
+ 
             <SectionLabel title="OBJECTIVE" subtitle="(Physical exam, labs, vitals)" />
             <FieldBlock
               label="Remarks"
@@ -158,7 +168,7 @@ const SoapNoteModal = ({
               value={remarks}
               onChange={e => setRemarks(e.target.value)}
             />
-
+ 
             <SectionLabel title="ASSESSMENT" />
             <FieldBlock
               label="Diagnosis"
@@ -166,12 +176,12 @@ const SoapNoteModal = ({
               value={diagnosis}
               onChange={e => setDiagnosis(e.target.value)}
             />
-
+ 
             <ActionChips
               options={["Add Diagnosis"]}
               onSelect={() => setOpen3DModal(true)}
             />
-
+ 
             {diagnostics.length > 0 && (
               <div className="space-y-3">
                 {diagnostics.map((d, i) => (
@@ -184,7 +194,7 @@ const SoapNoteModal = ({
                 ))}
               </div>
             )}
-
+ 
             <SectionLabel title="PLAN" />
             <FieldBlock
               label="Plan"
@@ -192,12 +202,20 @@ const SoapNoteModal = ({
               value={plan}
               onChange={e => setPlan(e.target.value)}
             />
-
+ 
             <ActionChips
-              options={["Add Prescription","Add Body Diagram"]}
-              onSelect={() => setOpenPrescription(true)}
+              options={["Add Prescription", "Add Body Diagram", "Add Educational Material"]}
+              onSelect={(option) => {
+                if (option === "Add Prescription") {
+                  setOpenPrescription(true);
+                } else if (option === "Add Body Diagram") {
+                  setOpen3DModal(true);
+                } else if (option === "Add Educational Material") {
+                  setOpenEducationalMaterial(true);
+                }
+              }}
             />
-
+ 
             {prescriptions.map((rx, idx) => (
               <div
                 key={idx}
@@ -225,7 +243,39 @@ const SoapNoteModal = ({
                 </div>
               </div>
             ))}
-
+ 
+            {selectedMaterials.length > 0 && (
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-gray-700">Attached Educational Materials</p>
+                {selectedMaterials.map((material, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-gray-50 border border-gray-200 p-4 rounded-xl flex justify-between items-center"
+                  >
+                    <div className="flex items-center gap-3">
+                      {material.thumbnail && (
+                        <img
+                          src={material.thumbnail}
+                          alt={material.title}
+                          className="w-12 h-12 object-cover rounded-lg"
+                        />
+                      )}
+                      <div>
+                        <p className="font-semibold text-gray-900">{material.title}</p>
+                        <p className="text-sm text-gray-500">{material.category}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveMaterial(idx)}
+                      className="px-3 py-1 bg-red-600 text-white rounded-lg"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+ 
             <FieldBlock
               label="Follow-up"
               placeholder="Clinic and date"
@@ -233,7 +283,7 @@ const SoapNoteModal = ({
               onChange={e => setFollowUp(e.target.value)}
             />
           </div>
-
+ 
           {/* Footer */}
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
             <button
@@ -257,7 +307,7 @@ const SoapNoteModal = ({
           </div>
         </div>
       </div>
-
+ 
       <PrescriptionModal
         open={openPrescription}
         onClose={() => {
@@ -267,7 +317,7 @@ const SoapNoteModal = ({
         onSave={handleAddOrUpdatePrescription}
         defaultValues={editingIndex !== null ? prescriptions[editingIndex] : undefined}
       />
-
+ 
       {open3DModal && patient && (
         <HeadTemplateModal
           open={open3DModal}
@@ -280,8 +330,18 @@ const SoapNoteModal = ({
           onSaveDiagnostic={handleSaveDiagnostic}
         />
       )}
+ 
+      <EducationalMaterialModal
+        open={openEducationalMaterial}  
+        onClose={() => setOpenEducationalMaterial(false)}
+        onAttach={(materials) => {
+          setSelectedMaterials(materials);
+          setOpenEducationalMaterial(false);
+        }}
+        selected={selectedMaterials}
+      />
     </>
   );
 };
-
+ 
 export default SoapNoteModal;
