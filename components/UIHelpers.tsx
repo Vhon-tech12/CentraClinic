@@ -1,5 +1,4 @@
-
-
+import React from "react";
 
 export const Field = ({ label, value }: any) => (
   <div>
@@ -13,19 +12,20 @@ export const Placeholder = ({ text }: any) => (
 );
 
 export const FieldBlock = ({ label, placeholder, value, onChange, type = "text" }: { label: string; placeholder?: string; value?: string; onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void; type?: string }) => (
-  <div className="space-y-1">
-    <p className="text-sm font-medium text-gray-300">{label}</p>
+  <div className="space-y-1.5">
+    <p className="text-sm font-medium text-gray-700">{label}</p>
     {type === "textarea" ? (
       <textarea
-        rows={2}
+        rows={3}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className="w-full rounded-xl px-3 py-2 text-sm
-                   bg-white text-black
-                   border border-gray-700
-                   placeholder-gray-500
-                   focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+        className="w-full rounded-lg px-3 py-2.5 text-sm
+                   bg-gray-50 text-gray-900
+                   border border-gray-200
+                   placeholder-gray-400
+                   focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500
+                   resize-none"
       />
     ) : (
       <input
@@ -33,10 +33,10 @@ export const FieldBlock = ({ label, placeholder, value, onChange, type = "text" 
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className="w-full rounded-xl px-3 py-2 text-sm
-                   bg-white text-gray-900
-                   border border-gray-700
-                   placeholder-gray-500
+        className="w-full rounded-lg px-3 py-2.5 text-sm
+                   bg-gray-50 text-gray-900
+                   border border-gray-200
+                   placeholder-gray-400
                    focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
       />
     )}

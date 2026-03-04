@@ -7,11 +7,11 @@ import * as THREE from "three";
 
 /* ================= MODAL ================= */
 const Modal = ({ onClose, children }: { onClose: () => void; children: React.ReactNode }) => (
-  <div className="fixed inset-0 bg-linear-to-br from-blue-50 to-white flex items-center justify-center z-50 p-4">
-    <div className="relative bg-white w-full max-w-7xl rounded-xl shadow-2xl text-gray-800 flex flex-col h-[90vh] border border-gray-200">
+  <div className="fixed inset-0 bg-slate-950 flex items-center justify-center z-50 p-2 md:p-4">
+    <div className="relative bg-slate-900 w-full max-w-[98vw] md:max-w-[96vw] lg:max-w-[95vw] rounded-xl shadow-2xl text-gray-100 flex flex-col h-[95vh] border border-slate-700 overflow-hidden">
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500 z-10 bg-white rounded-full p-2 shadow-md"
+        className="absolute top-3 right-3 md:top-4 md:right-4 text-2xl text-slate-400 hover:text-red-400 z-50 bg-slate-800/80 hover:bg-slate-700 rounded-full p-2 shadow-lg transition-colors"
       >
         ✕
       </button>
@@ -22,7 +22,7 @@ const Modal = ({ onClose, children }: { onClose: () => void; children: React.Rea
 
 /* ================= TYPES ================= */
 type SOAPType = "S" | "O" | "A" | "P";
-type TabKey = "Ear" | "Nose" | "Throat";
+type TabKey = "Ear" | "Nose" | "Throat" | "Head";
 type Vec3 = [number, number, number];
 
 type Stroke = {
@@ -37,10 +37,11 @@ type Stroke = {
 type AreaData = { strokes: Stroke[][] };
 
 /* ================= CONFIG ================= */
-const MODEL_CONFIG: Record<TabKey, { scale: number; camera: Vec3 }> = {
-  Ear: { scale: 2.5, camera: [0, 1.5, 5] },
-  Nose: { scale: 2.2, camera: [0, 1.4, 4.5] },
-  Throat: { scale: 2.0, camera: [0, 1.0, 4.0] },
+const MODEL_CONFIG = {
+  Ear: { scale: 1.2 },
+  Nose: { scale: 1.0 },
+  Throat: { scale: 1.0 },
+  Head: { scale: 1.0 },
 };
 
 const STROKE_WIDTH = 2;
@@ -52,36 +53,255 @@ const templates: Record<TabKey, { name: string; position: Vec3 }[]> = {
     { name: "Tonsils", position: [0, 1.2, 0.8] },
     { name: "Larynx", position: [0, 0.6, 0.5] },
   ],
+  Head: [
+    { name: "Scalp", position: [0, 2.0, 0] },
+    { name: "Face", position: [0, 1.4, 0.8] },
+    { name: "Neck", position: [0, 0.8, 0.3] },
+  ],
 };
 
 /* ================= MODELS ================= */
 const EarModel = () => {
-  const { scene } = useGLTF("/models/ear-anatomy/source/ear.glb");
+  const { scene } = useGLTF("/models/ear-anatomy/source/ear_model/scene.gltf");
   return <primitive object={scene} />;
 };
 
 const NoseModel = () => {
   const { scene } = useGLTF(
-    "/models/ear-anatomy/nose/anatomi_hidung_nose_anatomy/scene.gltf"
+    "/models/ear-anatomy/nose/anatomi_hidung_nose_anatomy/Nose.glb"
   );
-  return <primitive object={scene} />;
-};
-
-const ThroatModel = () => {
-  const { scene } = useGLTF(
-    "/models/ear-anatomy/throat/larynx_model/scene.gltf"
-  );
-  return <primitive object={scene} />;
-};
-
-/* ================= CAMERA RESET ================= */
-const CameraReset = ({ position }: { position: Vec3 }) => {
-  const { camera } = useThree();
+  
+  // Apply materials to meshes - differentiate internal vs external parts
   useEffect(() => {
-    camera.position.set(...position);
-    camera.lookAt(0, 1, 0);
-    camera.updateProjectionMatrix();
-  }, [position, camera]);
+    scene.traverse((child: any) => {
+      if (child.isMesh) {
+        const originalMaterial = child.material;
+        const meshName = child.name.toLowerCase();
+        
+        // Determine if internal or external mesh based on name
+        const isInternal = meshName.includes('cartilage') || 
+                          meshName.includes('bone') || 
+                          meshName.includes('tissue') || 
+                          meshName.includes('membrane') ||
+                          meshName.includes('sinus') ||
+                          meshName.includes('cavity') ||
+                          meshName.includes('septum') ||
+                          meshName.includes('turbinate');
+        
+        const isOuter = meshName.includes('skin') || 
+                       meshName.includes('outer') || 
+                       meshName.includes('surface') ||
+                       meshName.includes('exterior') ||
+                       meshName.includes('shell') ||
+                       meshName.includes('cover');
+        
+        if (isOuter) {
+          // Outer mesh: FrontSide, depthWrite false, renderOrder 2
+          const outerMaterial = new THREE.MeshStandardMaterial({
+            color: originalMaterial.color || 0xffffff,
+            map: originalMaterial.map || null,
+            transparent: true,
+            opacity: 0.3,
+            depthWrite: false,
+            roughness: originalMaterial.roughness || 0.5,
+            metalness: originalMaterial.metalness || 0,
+            side: THREE.FrontSide,
+          });
+          child.material = outerMaterial;
+          (child as any).renderOrder = 2;
+        } else {
+          // Internal mesh: DoubleSide, depthWrite true, renderOrder 1
+          const internalMaterial = new THREE.MeshStandardMaterial({
+            color: originalMaterial.color || 0xffffff,
+            map: originalMaterial.map || null,
+            transparent: true,
+            opacity: 0.9,
+            depthWrite: true,
+            roughness: originalMaterial.roughness || 0.5,
+            metalness: originalMaterial.metalness || 0,
+            side: THREE.DoubleSide,
+          });
+          child.material = internalMaterial;
+          (child as any).renderOrder = 1;
+        }
+      }
+    });
+  }, [scene]);
+  
+  return <primitive object={scene} />;
+};
+
+const ThroatModel = ({ onLoad }: { onLoad?: (scene: THREE.Group) => void }) => {
+  const { scene } = useGLTF(
+    "/models/ear-anatomy/throat/textures/ThroatNew.glb"
+  ); 
+  
+  // Callback when model is loaded to trigger camera adjustment
+  useEffect(() => {
+    if (onLoad) {
+      onLoad(scene);
+    }
+  }, [scene, onLoad]);
+  
+  useEffect(() => {
+    scene.traverse((child: any) => {
+      if (child.isMesh) {
+        const originalMaterial = child.material;
+        const meshName = child.name.toLowerCase();
+        
+        // Determine if internal or external mesh based on name
+        const isInternal = meshName.includes('cartilage') || 
+                          meshName.includes('bone') || 
+                          meshName.includes('tissue') || 
+                          meshName.includes('membrane') ||
+                          meshName.includes('sinus') ||
+                          meshName.includes('cavity') ||
+                          meshName.includes('septum') ||
+                          meshName.includes('turbinate');
+        
+        const isOuter = meshName.includes('skin') || 
+                       meshName.includes('outer') || 
+                       meshName.includes('surface') ||
+                       meshName.includes('exterior') ||
+                       meshName.includes('shell') ||
+                       meshName.includes('cover');
+        
+        if (isOuter) {
+          // Outer mesh: FrontSide, depthWrite false, renderOrder 2
+          const outerMaterial = new THREE.MeshStandardMaterial({
+            color: originalMaterial.color || 0xffffff,
+            map: originalMaterial.map || null,
+            transparent: true,
+            opacity: 0.3,
+            depthWrite: false,
+            roughness: originalMaterial.roughness || 0.5,
+            metalness: originalMaterial.metalness || 0,
+            side: THREE.FrontSide,
+          });
+          child.material = outerMaterial;
+          (child as any).renderOrder = 2;
+        } else {
+          // Internal mesh: DoubleSide, depthWrite true, renderOrder 1
+          const internalMaterial = new THREE.MeshStandardMaterial({
+            color: originalMaterial.color || 0xffffff,
+            map: originalMaterial.map || null,
+            transparent: true,
+            opacity: 0.9,
+            depthWrite: true,
+            roughness: originalMaterial.roughness || 0.5,
+            metalness: originalMaterial.metalness || 0,
+            side: THREE.DoubleSide,
+          });
+          child.material = internalMaterial;
+          (child as any).renderOrder = 1;
+        }
+      }
+    });
+  }, [scene]);
+  
+  return <primitive object={scene} />;
+};
+
+/* ================= MODEL CENTERER COMPONENT ================= */
+// Generic ModelCenterer that works for ALL anatomy tabs (Ear, Nose, Throat, Head)
+const ModelCenterer = ({ 
+  tab, 
+  earRef,
+  noseRef,
+  throatRef,
+  orbitRef 
+}: { 
+  tab: TabKey; 
+  earRef: React.RefObject<THREE.Group | null>;
+  noseRef: React.RefObject<THREE.Group | null>;
+  throatRef: React.RefObject<THREE.Group | null>;
+  orbitRef: React.RefObject<any>;
+}) => {
+  const { camera } = useThree();
+  const isCentered = useRef(false);
+  
+  // Get the appropriate ref based on current tab
+  const getActiveRef = (): THREE.Group | null => {
+    switch (tab) {
+      case "Ear": return earRef.current;
+      case "Nose": return noseRef.current;
+      case "Throat": return throatRef.current;
+      default: return null;
+    }
+  };
+  
+  useEffect(() => {
+    // Skip centering for Head tab (no 3D model)
+    if (tab === "Head") {
+      isCentered.current = false;
+      return;
+    }
+    
+    const activeModelRef = getActiveRef();
+    if (!activeModelRef) {
+      isCentered.current = false;
+      return;
+    }
+    
+    // Wait for model to be loaded
+    const timer = setTimeout(() => {
+      if (!activeModelRef || isCentered.current) return;
+      
+      const model = activeModelRef;
+      
+      // Calculate bounding box of the model using THREE.Box3
+      const box = new THREE.Box3().setFromObject(model);
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      
+      // Center the model
+      model.position.sub(center);
+      
+      // Add slight Y offset for better visual centering (adjust per anatomy)
+      if (tab === "Throat") {
+        model.position.y += 0.5;
+      } else if (tab === "Nose") {
+        model.position.y += 0.3;
+      } else if (tab === "Ear") {
+        model.position.y += 0.2;
+      }
+      
+      // Auto-fit the camera after centering
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      
+      // Set camera distance based on the max dimension
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const perspectiveCamera = camera as THREE.PerspectiveCamera;
+      const fov = perspectiveCamera.fov * (Math.PI / 180);
+      
+      // Calculate camera distance using trigonometry
+      let cameraDistance = Math.abs(maxDim / Math.tan(fov / 2)) * 1.5;
+      
+      // Clamp camera distance to reasonable values
+      cameraDistance = Math.max(2, Math.min(cameraDistance, 20));
+      
+      // Reset camera position based on model size
+      camera.position.set(0, size.y * 0.2, cameraDistance);
+      camera.lookAt(0, 0, 0);
+      
+      // Reset OrbitControls.target to (0,0,0)
+      if (orbitRef.current) {
+        orbitRef.current.target.set(0, 0, 0);
+        orbitRef.current.update();
+      }
+      
+      isCentered.current = true;
+    }, 500); // Delay to ensure model is loaded
+    
+    return () => clearTimeout(timer);
+  }, [tab, camera, earRef, noseRef, throatRef, orbitRef]);
+  
+  // Reset centering flag when tab changes
+  useEffect(() => {
+    isCentered.current = false;
+  }, [tab]);
+  
   return null;
 };
 
@@ -141,18 +361,111 @@ export default function HeadTemplateModal({
   const [isDrawing, setIsDrawing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Clinical Notes State
+  const [clinicalNotes, setClinicalNotes] = useState({
+    findings: "",
+    impression: "",
+    recommendation: "",
+  });
+
+  // Patient Image Preview State - Store up to 3 images (front, left, right)
+  const [patientImages, setPatientImages] = useState<{
+    front: string | null;
+    left: string | null;
+    right: string | null;
+  }>({
+    front: null,
+    left: null,
+    right: null,
+  });
+
+  // Track which view type is currently selected for upload
+  const [uploadType, setUploadType] = useState<"front" | "left" | "right">("front");
+
+  // Collapsible state for Patient Image Capture section
+  const [isPatientImageCollapsed, setIsPatientImageCollapsed] = useState(false);
+
+  // Computed preview image based on current upload type
+  const previewImage = patientImages[uploadType];
+
+  // Loading state for images
+  const [imageLoadingStates, setImageLoadingStates] = useState<{
+    front: boolean;
+    left: boolean;
+    right: boolean;
+  }>({
+    front: false,
+    left: false,
+    right: false,
+  });
+
+  // Handle image loading states
+  const handleImageLoad = (type: "front" | "left" | "right") => {
+    setImageLoadingStates(prev => ({ ...prev, [type]: false }));
+  };
+
+  const handleImageError = (type: "front" | "left" | "right") => {
+    setImageLoadingStates(prev => ({ ...prev, [type]: false }));
+  };
+
+  // Set loading state when image URL changes
+  useEffect(() => {
+    if (patientImages[uploadType]) {
+      setImageLoadingStates(prev => ({ ...prev, [uploadType]: true }));
+    }
+  }, [patientImages, uploadType]);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle image file selection
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Check if image already exists for this type - revoke old URL
+      if (patientImages[uploadType]) {
+        URL.revokeObjectURL(patientImages[uploadType]!);
+      }
+
+      const objectUrl = URL.createObjectURL(file);
+      setPatientImages((prev) => ({
+        ...prev,
+        [uploadType]: objectUrl,
+      }));
+      setImageLoadingStates(prev => ({ ...prev, [uploadType]: false }));
+    }
+    // Reset input to allow selecting same file again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // Remove uploaded image for specific type
+  const handleRemoveImage = (type: "front" | "left" | "right") => {
+    if (patientImages[type]) {
+      URL.revokeObjectURL(patientImages[type]!);
+      setPatientImages((prev) => ({
+        ...prev,
+        [type]: null,
+      }));
+    }
+  };
+
   const overlayRef = useRef<HTMLCanvasElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const webglRef = useRef<HTMLCanvasElement>(null);
   const currentStroke = useRef<Stroke[]>([]);
   const orbitRef = useRef<any>(null);
   const rendererRef = useRef<any>(null);
+  const throatRef = useRef<THREE.Group>(null);
+  const earRef = useRef<THREE.Group>(null);
+  const noseRef = useRef<THREE.Group>(null);
 
   // Persistent strokes for all modes
   const [data, setData] = useState<Record<TabKey, Record<string, AreaData>>>(initialStrokes || {
     Ear: {},
     Nose: {},
     Throat: {},
+    Head: {},
   });
 
   const loadDiagnostic = (savedData: { imageData: string; strokes: Record<TabKey, Record<string, AreaData>> }) => {
@@ -173,6 +486,7 @@ export default function HeadTemplateModal({
     Ear: {},
     Nose: {},
     Throat: {},
+    Head: {},
   });
 
   const soapColor: Record<SOAPType, string> = {
@@ -317,17 +631,13 @@ export default function HeadTemplateModal({
     const ctx = mergedCanvas.getContext('2d');
     if (!ctx) return null;
 
-    // Draw WebGL canvas (3D model and 3D strokes)
     ctx.drawImage(webglCanvas, 0, 0);
-
-    // Draw 2D overlay (2D strokes and notes)
     ctx.drawImage(overlayCanvas, 0, 0);
 
     return mergedCanvas.toDataURL('image/png');
   };
 
   /* ================= EFFECTS ================= */
-  // Redraw all 2D strokes whenever mode/tab/data changes
   useEffect(() => {
     if (!overlayRef.current) return;
     const canvas = overlayRef.current;
@@ -362,247 +672,551 @@ export default function HeadTemplateModal({
   /* ================= RENDER ================= */
   if (!open) return null;
 
+  // Anatomy tabs with icons
+  const anatomyTabs: { key: TabKey; icon: string; label: string }[] = [
+    { key: "Ear", icon: "👂", label: "Ear" },
+    { key: "Nose", icon: "👃", label: "Nose" },
+    { key: "Throat", icon: "🗣", label: "Throat" },
+    { key: "Head", icon: "🧑", label: "Head" },
+  ];
+
+  // SOAP labels
+  const soapLabels: Record<SOAPType, { label: string; color: string }> = {
+    S: { label: "Subjective", color: "bg-blue-500" },
+    O: { label: "Objective", color: "bg-green-500" },
+    A: { label: "Assessment", color: "bg-orange-500" },
+    P: { label: "Plan", color: "bg-purple-500" },
+  };
+
   return (
     <Modal onClose={onClose}>
-      {/* HEADER */}
-      <div className="px-6 py-4 bg-linear-to-r from-blue-600 to-blue-800 text-white shadow-lg">
-        <h2 className="text-xl font-bold">Medical Annotation Tool</h2>
-        <p className="text-sm opacity-90">Interactive 3D Model Documentation</p>
-      </div>
-
-      {/* CONTROLS */}
-      <div className="flex flex-wrap justify-center gap-4 p-4 bg-gray-50 border-b border-gray-200">
-        {/* Tabs */}
-        <div className="flex gap-2">
-          <span className="text-sm font-medium text-gray-700 self-center mr-2">Anatomy:</span>
-          {(["Ear", "Nose", "Throat"] as TabKey[]).map((t) => (
-            <button
-              key={t}
-              onClick={() => { setTab(t); setArea(null); }}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                tab === t
-                  ? "bg-blue-600 text-white shadow-md"
-                  : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              {t}
-            </button>
-          ))}
+      {/* HEADER - Professional Medical Diagnostic Header */}
+      <div className="px-4 md:px-6 py-3 md:py-4 bg-linear-to-r from-slate-800 via-slate-700 to-slate-800 border-b border-slate-600 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+            <span className="text-white text-xl">🏥</span>
+          </div>
+          <div>
+            <h2 className="text-lg md:text-xl font-bold text-white">Centra Clinic Diagnostic System</h2>
+            <p className="text-xs md:text-sm text-slate-400">Interactive 3D Model Documentation</p>
+          </div>
         </div>
-
-        {/* SOAP */}
-        <div className="flex gap-2">
-          <span className="text-sm font-medium text-gray-700 self-center mr-2">SOAP:</span>
-          {(["S", "O", "A", "P"] as SOAPType[]).map((s) => (
-            <button
-              key={s}
-              onClick={() => setSoap(s)}
-              className={`px-4 py-2 rounded-lg font-bold transition-colors ${
-                soap === s
-                  ? "bg-green-600 text-white shadow-md"
-                  : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-
-        {/* Mode */}
-        <div className="flex gap-2">
-          <span className="text-sm font-medium text-gray-700 self-center mr-2">Mode:</span>
-          <button
-            onClick={() => {
-              if (isDrawing && area && currentStroke.current.length > 0) {
-                setData((prev) => ({
-                  ...prev,
-                  [tab]: {
-                    ...prev[tab],
-                    [area]: {
-                      strokes: [...(prev[tab][area]?.strokes || []), [...currentStroke.current]],
-                    },
-                  },
-                }));
-                setTempData((prev) => ({
-                  ...prev,
-                  [tab]: { ...prev[tab], [area]: { strokes: [] } },
-                }));
-                currentStroke.current = [];
-                setIsDrawing(false);
-              }
-              setMode("draw");
-            }}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              mode === "draw"
-                ? "bg-yellow-500 text-black shadow-md"
-                : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-            }`}
-          >
-            ✍ Draw
-          </button>
-          <button
-            onClick={() => {
-              if (isDrawing && area && currentStroke.current.length > 0) {
-                setData((prev) => ({
-                  ...prev,
-                  [tab]: {
-                    ...prev[tab],
-                    [area]: {
-                      strokes: [...(prev[tab][area]?.strokes || []), [...currentStroke.current]],
-                    },
-                  },
-                }));
-                setTempData((prev) => ({
-                  ...prev,
-                  [tab]: { ...prev[tab], [area]: { strokes: [] } },
-                }));
-                currentStroke.current = [];
-                setIsDrawing(false);
-              }
-              setMode("view");
-            }}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              mode === "view"
-                ? "bg-blue-600 text-white shadow-md"
-                : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-            }`}
-          >
-            👁 View
-          </button>
-        </div>
-
-        {/* Undo / Clear / Save */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => {
-              const key = area || "default";
-              setData((prev) => {
-                const strokes = prev[tab][key]?.strokes || [];
-                return { ...prev, [tab]: { ...prev[tab], [key]: { strokes: strokes.slice(0, -1) } } };
-              });
-            }}
-            className="px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition-colors shadow-md"
-          >
-            ↶ Undo
-          </button>
-          <button
-            onClick={() => {
-              const key = area || "default";
-              setData((prev) => ({ ...prev, [tab]: { ...prev[tab], [key]: { strokes: [] } } }));
-            }}
-            className="px-4 py-2 rounded-lg bg-gray-600 text-white font-medium hover:bg-gray-700 transition-colors shadow-md"
-          >
-            🗑 Clear
-          </button>
-          <button
-            onClick={() => {
-              if (onSaveDiagnostic) {
-                const imageData = mergeCanvases();
-                if (imageData) {
-                  onSaveDiagnostic({ imageData, strokes: data });
-                  onClose(); // Close the modal after saving
-                }
-              }
-            }}
-            className="px-4 py-2 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 transition-colors shadow-md"
-          >
-            💾 Save
-          </button>
+        <div className="hidden md:flex items-center gap-2 text-sm text-slate-400">
+          <span>Patient ID:</span>
+          <span className="text-white font-medium">{patientId}</span>
         </div>
       </div>
 
-      {/* 3D CANVAS */}
-      <div className="relative flex-1 bg-black">
-        <Canvas ref={canvasRef} camera={{ fov: 45 }} gl={{ preserveDrawingBuffer: true }}>
-          <WebGLCanvasCapture webglRef={webglRef} />
-          <CameraReset position={MODEL_CONFIG[tab].camera} />
-          <ambientLight intensity={0.7} />
-          <directionalLight position={[5, 5, 5]} />
-          <OrbitControls
-            ref={orbitRef}
-            enableZoom
-            enablePan={mode === "view"}
-            enableRotate={mode === "view"}
-            minDistance={1.2}
-            maxDistance={8}
-            enableDamping
-            dampingFactor={0.1}
-          />
+      {/* MAIN CONTENT - 3 Column Layout */}
+      <div className="flex flex-1 overflow-hidden">
+        
+        {/* LEFT SIDEBAR - Anatomical Navigation */}
+        <div className="w-16 md:w-48 lg:w-56 bg-slate-800 border-r border-slate-700 flex flex-col">
+          <div className="p-3 border-b border-slate-700">
+            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Anatomy</h3>
+          </div>
+          <div className="flex-1 p-2 space-y-1">
+            {anatomyTabs.map((t) => (
+              <button
+                key={t.key}
+                onClick={() => { setTab(t.key); setArea(null); }}
+                className={`w-full flex items-center gap-2 md:gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                  tab === t.key
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30"
+                    : "text-slate-300 hover:bg-slate-700 hover:text-white"
+                }`}
+              >
+                <span className="text-lg">{t.icon}</span>
+                <span className="hidden md:block font-medium">{t.label}</span>
+              </button>
+            ))}
+          </div>
+          
+          {/* SOAP Legend */}
+          <div className="p-3 border-t border-slate-700">
+            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">SOAP Notes</h3>
+            <div className="space-y-1">
+              {(Object.keys(soapLabels) as SOAPType[]).map((s) => (
+                <div key={s} className="flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${soapLabels[s].color}`}></div>
+                  <span className="text-xs text-slate-400">{s}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
-          {/* Models */}
-          <group visible={tab === "Ear"} scale={MODEL_CONFIG.Ear.scale}><EarModel /></group>
-          <group visible={tab === "Nose"} scale={MODEL_CONFIG.Nose.scale}><NoseModel /></group>
-          <group visible={tab === "Throat"} scale={MODEL_CONFIG.Throat.scale}><ThroatModel /></group>
+        {/* CENTER - 3D Viewer Container */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Controls Bar */}
+          <div className="p-2 md:p-3 bg-slate-800/50 border-b border-slate-700 flex flex-wrap gap-2 md:gap-4 items-center justify-between">
+            {/* Left: Anatomy & SOAP */}
+            <div className="flex flex-wrap gap-2 md:gap-4 items-center">
+              {/* SOAP Selection */}
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-slate-400 mr-1 hidden sm:inline">SOAP:</span>
+                {(["S", "O", "A", "P"] as SOAPType[]).map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setSoap(s)}
+                    className={`w-8 h-8 rounded-lg font-bold text-xs transition-all ${
+                      soap === s
+                        ? `${soapLabels[s].color} text-white shadow-md`
+                        : "bg-slate-700 text-slate-400 hover:bg-slate-600"
+                    }`}
+                    title={soapLabels[s].label}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
 
-          {/* Hotspots */}
-          {templates[tab].map((h) => (
-            <mesh
-              key={h.name}
-              position={h.position}
-              onPointerDown={(e: ThreeEvent<PointerEvent>) => { e.stopPropagation(); setArea(h.name); }}
-            >
-              <sphereGeometry args={[0.18, 16, 16]} />
-              <meshStandardMaterial color={area === h.name ? "yellow" : "red"} />
-            </mesh>
-          ))}
+              {/* Mode Toggle */}
+              <div className="flex items-center gap-1 bg-slate-700 rounded-lg p-1">
+                <button
+                  onClick={() => {
+                    if (isDrawing && area && currentStroke.current.length > 0) {
+                      setData((prev) => ({
+                        ...prev,
+                        [tab]: {
+                          ...prev[tab],
+                          [area]: {
+                            strokes: [...(prev[tab][area]?.strokes || []), [...currentStroke.current]],
+                          },
+                        },
+                      }));
+                      setTempData((prev) => ({
+                        ...prev,
+                        [tab]: { ...prev[tab], [area]: { strokes: [] } },
+                      }));
+                      currentStroke.current = [];
+                      setIsDrawing(false);
+                    }
+                    setMode("draw");
+                  }}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    mode === "draw"
+                      ? "bg-yellow-500 text-black"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  ✍ Draw
+                </button>
+                <button
+                  onClick={() => {
+                    if (isDrawing && area && currentStroke.current.length > 0) {
+                      setData((prev) => ({
+                        ...prev,
+                        [tab]: {
+                          ...prev[tab],
+                          [area]: {
+                            strokes: [...(prev[tab][area]?.strokes || []), [...currentStroke.current]],
+                          },
+                        },
+                      }));
+                      setTempData((prev) => ({
+                        ...prev,
+                        [tab]: { ...prev[tab], [area]: { strokes: [] } },
+                      }));
+                      currentStroke.current = [];
+                      setIsDrawing(false);
+                    }
+                    setMode("view");
+                  }}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    mode === "view"
+                      ? "bg-blue-500 text-white"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  👁 View
+                </button>
+              </div>
+            </div>
 
-          {/* Transparent plane for 3D drawing */}
-          {mode === "draw" && (
-            <mesh
-              position={[0, 0.8, 0]}
-              scale={[5, 5, 5]}
-              onPointerDown={start3DStroke}
-              onPointerMove={draw3DStroke}
-              onPointerUp={end3DStroke}
-            >
-              <boxGeometry args={[1, 1, 1]} />
-              <meshBasicMaterial transparent opacity={0} />
-            </mesh>
-          )}
+            {/* Right: Actions */}
+            <div className="flex items-center gap-1 md:gap-2">
+              <button
+                onClick={() => {
+                  const key = area || "default";
+                  setData((prev) => {
+                    const strokes = prev[tab][key]?.strokes || [];
+                    return { ...prev, [tab]: { ...prev[tab], [key]: { strokes: strokes.slice(0, -1) } } };
+                  });
+                }}
+                className="px-2 md:px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 text-xs font-medium transition-colors"
+                title="Undo"
+              >
+                ↶
+              </button>
+              <button
+                onClick={() => {
+                  const key = area || "default";
+                  setData((prev) => ({ ...prev, [tab]: { ...prev[tab], [key]: { strokes: [] } } }));
+                }}
+                className="px-2 md:px-3 py-1.5 rounded-lg bg-slate-700 text-slate-400 hover:bg-slate-600 text-xs font-medium transition-colors"
+                title="Clear"
+              >
+                🗑
+              </button>
+              <button
+                onClick={() => {
+                  if (onSaveDiagnostic) {
+                    const imageData = mergeCanvases();
+                    if (imageData) {
+                      onSaveDiagnostic({ imageData, strokes: data });
+                      onClose();
+                    }
+                  }
+                }}
+                className="px-3 md:px-4 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-xs font-medium transition-colors"
+              >
+                💾 Save
+              </button>
+            </div>
+          </div>
 
-          {/* Persistent 3D strokes (all tabs) */}
-          {Object.entries(data).map(([t, areas]) =>
-            Object.values(areas).map((a, i) =>
-              a.strokes.map((stroke, j) =>
-                stroke[0]?.is3D ? (
-                  <Line
-                    key={`persistent-${t}-${i}-${j}`}
-                    points={smoothPointsRealtime(stroke)}
-                    color={soapColor[stroke[0]?.soap ?? "O"]}
-                    lineWidth={STROKE_WIDTH}
-                    visible={t === tab}
+          {/* 3D Canvas - Diagnostic Imaging Viewport */}
+          <div className="relative flex-1 bg-[#0a1628] overflow-hidden">
+            {/* Grid Overlay */}
+            <div className="absolute inset-0 pointer-events-none opacity-10"
+              style={{
+                backgroundImage: `
+                  linear-gradient(rgba(59, 130, 246, 0.3) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(59, 130, 246, 0.3) 1px, transparent 1px)
+                `,
+                backgroundSize: '50px 50px'
+              }}
+            ></div>
+            
+            {/* Canvas Border Effect */}
+            <div className="absolute inset-2 md:inset-4 border-2 border-blue-500/20 rounded-lg pointer-events-none"></div>
+            
+            <Canvas ref={canvasRef} camera={{ fov: 45 }} gl={{ preserveDrawingBuffer: true }}>
+              <WebGLCanvasCapture webglRef={webglRef} />
+              <ModelCenterer tab={tab} earRef={earRef} noseRef={noseRef} throatRef={throatRef} orbitRef={orbitRef} />
+              <ambientLight intensity={0.7} />
+              <directionalLight position={[5, 5, 5]} />
+              <OrbitControls
+                ref={orbitRef}
+                enableZoom
+                enablePan={mode === "view"}
+                enableRotate={mode === "view"}
+                minDistance={2}
+                maxDistance={100}
+                enableDamping
+                dampingFactor={0.1}
+              />
+
+              {/* Models */}
+              <group ref={earRef} visible={tab === "Ear"} scale={MODEL_CONFIG.Ear.scale}><EarModel /></group>
+              <group ref={noseRef} visible={tab === "Nose"} scale={MODEL_CONFIG.Nose.scale}><NoseModel /></group>
+              <group ref={throatRef} visible={tab === "Throat"} scale={MODEL_CONFIG.Throat.scale}><ThroatModel /></group>
+
+              {/* Hotspots */}
+              {templates[tab].map((h) => (
+                <mesh
+                  key={h.name}
+                  position={h.position}
+                  onPointerDown={(e: ThreeEvent<PointerEvent>) => { e.stopPropagation(); setArea(h.name); }}
+                >
+                  <sphereGeometry args={[0.18, 16, 16]} />
+                  <meshStandardMaterial color={area === h.name ? "yellow" : "red"} />
+                </mesh>
+              ))}
+
+              {/* Transparent plane for 3D drawing - with depthWrite/depthTest disabled to not occlude model */}
+              {mode === "draw" && (
+                <mesh
+                  position={[0, 0.8, 0]}
+                  scale={[5, 5, 5]}
+                  onPointerDown={start3DStroke}
+                  onPointerMove={draw3DStroke}
+                  onPointerUp={end3DStroke}
+                >
+                  <boxGeometry args={[1, 1, 1]} />
+                  <meshBasicMaterial 
+                    transparent 
+                    opacity={0} 
+                    depthWrite={false} 
+                    depthTest={false} 
                   />
-                ) : null
-              )
-            )
-          )}
+                </mesh>
+              )}
 
-          {/* Temporary 3D strokes (current tab only) */}
-          {Object.values(tempData[tab]).map((a, i) =>
-            a.strokes.map((stroke, j) =>
-              stroke[0]?.is3D ? (
-                <Line
-                  key={`temp-${i}-${j}`}
-                  points={smoothPointsRealtime(stroke)}
-                  color={soapColor[stroke[0]?.soap ?? "O"]}
-                  lineWidth={STROKE_WIDTH}
-                />
-              ) : null
-            )
-          )}
-        </Canvas>
+              {/* Persistent 3D strokes */}
+              {Object.entries(data).map(([t, areas]) =>
+                Object.values(areas).map((a, i) =>
+                  a.strokes.map((stroke, j) =>
+                    stroke[0]?.is3D ? (
+                      <Line
+                        key={`persistent-${t}-${i}-${j}`}
+                        points={smoothPointsRealtime(stroke)}
+                        color={soapColor[stroke[0]?.soap ?? "O"]}
+                        lineWidth={STROKE_WIDTH}
+                        visible={t === tab}
+                      />
+                    ) : null
+                  )
+                )
+              )}
 
-        {/* 2D overlay (draw mode only) */}
-        {mode === "draw" && (
-          <canvas
-            ref={overlayRef}
-            className="absolute inset-0 w-full h-full pointer-events-auto"
-            onPointerDown={start2DStroke}
-            onPointerMove={draw2DStroke}
-            onPointerUp={end2DStroke}
-            onPointerLeave={end2DStroke}
-          />
-        )}
+              {/* Temporary 3D strokes */}
+              {Object.values(tempData[tab]).map((a, i) =>
+                a.strokes.map((stroke, j) =>
+                  stroke[0]?.is3D ? (
+                    <Line
+                      key={`temp-${i}-${j}`}
+                      points={smoothPointsRealtime(stroke)}
+                      color={soapColor[stroke[0]?.soap ?? "O"]}
+                      lineWidth={STROKE_WIDTH}
+                    />
+                  ) : null
+                )
+              )}
+            </Canvas>
+
+            {/* 2D overlay */}
+            {mode === "draw" && (
+              <canvas
+                ref={overlayRef}
+                className="absolute inset-0 w-full h-full pointer-events-auto"
+                onPointerDown={start2DStroke}
+                onPointerMove={draw2DStroke}
+                onPointerUp={end2DStroke}
+                onPointerLeave={end2DStroke}
+              />
+            )}
+
+            {/* Viewport Label */}
+            <div className="absolute bottom-4 left-4 bg-slate-900/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-slate-700">
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${tab === "Ear" ? "bg-blue-500" : tab === "Nose" ? "bg-green-500" : tab === "Throat" ? "bg-orange-500" : "bg-purple-500"}`}></div>
+                <span className="text-sm font-medium text-white">{tab} Anatomy</span>
+                {area && (
+                  <>
+                    <span className="text-slate-500">/</span>
+                    <span className="text-sm text-slate-300">{area}</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Mode Indicator */}
+            <div className="absolute top-4 left-4 bg-slate-900/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-slate-700">
+              <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                {mode === "draw" ? "✍ Drawing Mode" : "👁 View Mode"}
+              </span>
+            </div>
+          </div>
+
+          {/* Patient Image Capture Section - Only for Head Tab */}
+          {["Head", "Ear", "Nose", "Throat"].includes(tab) && (
+            <div className="bg-[#0a1628] border-t border-slate-700">
+              {/* Collapsible Header */}
+              <button
+                onClick={() => setIsPatientImageCollapsed(!isPatientImageCollapsed)}
+                className="w-full px-3 py-2 flex items-center justify-between bg-slate-800/50 hover:bg-slate-700/50 transition-colors border-b border-slate-700"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-white flex items-center gap-2">
+                    <span>📷</span>
+                    Patient Image Capture
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {previewImage && (
+                    <span className="text-xs text-green-400 bg-green-500/20 px-2 py-0.5 rounded">
+                      {uploadType}: 1
+                    </span>
+                  )}
+                  <span className={`text-slate-400 transition-transform duration-300 ${isPatientImageCollapsed ? 'rotate-180' : ''}`}>
+                    ▼
+                  </span>
+                </div>
+              </button>
+
+              {/* Collapsible Content */}
+              <div 
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  isPatientImageCollapsed ? 'max-h-0' : 'max-h-40'
+                }`}
+              >
+                <div className="p-2 overflow-y-auto" style={{ maxHeight: '160px' }}>
+                  {/* Hidden file input for upload */}
+                  <input 
+                    ref={fileInputRef}
+                    type="file" 
+                    id="patientImageUpload" 
+                    className="hidden" 
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                  />
+
+                  {/* Conditional Rendering: Image Preview or Upload UI */}
+                  {previewImage ? (
+                    /* Uploaded Image Display - Small 120x120 Card */
+                    <div className="flex items-center gap-3">
+                      <div className="flex-shrink-0 w-28 h-28 bg-slate-900/80 rounded-lg border border-blue-500/40 p-1">
+                        <img 
+                          src={previewImage} 
+                          alt="Patient upload preview" 
+                          className="w-full h-full object-cover rounded-md"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex gap-1">
+                          {(['front', 'left', 'right'] as const).map((type) => (
+                            <button
+                              key={type}
+                              onClick={() => setUploadType(type)}
+                              className={`px-2 py-1 text-xs rounded transition-colors ${
+                                uploadType === type 
+                                  ? 'bg-blue-600 text-white' 
+                                  : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
+                              }`}
+                            >
+                              {type.charAt(0).toUpperCase() + type.slice(1)}
+                            </button>
+                          ))}
+                        </div>
+                        <button
+                          onClick={() => handleRemoveImage(uploadType)}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs rounded transition-colors w-fit"
+                        >
+                          <span>🗑️</span>
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Upload Button and Placeholder Cards (when no image) - Compact */
+                    <div className="flex items-center gap-3">
+                      {/* Upload Button */}
+                      <label
+                        htmlFor="patientImageUpload"
+                        className="flex-shrink-0 flex items-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg cursor-pointer transition-colors"
+                      >
+                        <span>📤</span>
+                        Upload
+                      </label>
+
+                      {/* Placeholder Cards - Small 120x120 */}
+                      <div className="flex gap-2 flex-1">
+                        {/* Front View */}
+                        <div 
+                          className="flex-1 min-w-0 group cursor-pointer"
+                          onClick={() => { setUploadType('front'); document.getElementById('patientImageUpload')?.click(); }}
+                        >
+                          <div className="aspect-square bg-slate-700/30 border-2 border-dashed border-slate-600 rounded-lg flex flex-col items-center justify-center transition-all duration-200 group-hover:border-blue-500 group-hover:bg-slate-700/50 h-20">
+                            <span className="text-xl text-slate-500 group-hover:text-blue-400">👤</span>
+                            <span className="text-xs text-slate-400 group-hover:text-white">Front</span>
+                          </div>
+                        </div>
+
+                        {/* Left Side */}
+                        <div 
+                          className="flex-1 min-w-0 group cursor-pointer"
+                          onClick={() => { setUploadType('left'); document.getElementById('patientImageUpload')?.click(); }}
+                        >
+                          <div className="aspect-square bg-slate-700/30 border-2 border-dashed border-slate-600 rounded-lg flex flex-col items-center justify-center transition-all duration-200 group-hover:border-blue-500 group-hover:bg-slate-700/50 h-20">
+                            <span className="text-xl text-slate-500 group-hover:text-blue-400">👈</span>
+                            <span className="text-xs text-slate-400 group-hover:text-white">Left</span>
+                          </div>
+                        </div>
+
+                        {/* Right Side */}
+                        <div 
+                          className="flex-1 min-w-0 group cursor-pointer"
+                          onClick={() => { setUploadType('right'); document.getElementById('patientImageUpload')?.click(); }}
+                        >
+                          <div className="aspect-square bg-slate-700/30 border-2 border-dashed border-slate-600 rounded-lg flex flex-col items-center justify-center transition-all duration-200 group-hover:border-blue-500 group-hover:bg-slate-700/50 h-20">
+                            <span className="text-xl text-slate-500 group-hover:text-blue-400">👉</span>
+                            <span className="text-xs text-slate-400 group-hover:text-white">Right</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT SIDEBAR - Clinical Notes Panel */}
+        <div className="w-64 md:w-72 lg:w-80 bg-slate-800 border-l border-slate-700 flex flex-col">
+          <div className="p-3 md:p-4 border-b border-slate-700">
+            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+              <span>📋</span>
+              Clinical Notes
+            </h3>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-4">
+            {/* Findings Section */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                Findings
+              </label>
+              <textarea
+                value={clinicalNotes.findings}
+                onChange={(e) => setClinicalNotes(prev => ({ ...prev, findings: e.target.value }))}
+                placeholder="Document clinical findings..."
+                className="w-full h-24 md:h-32 bg-slate-700/50 border border-slate-600 rounded-lg p-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              />
+            </div>
+
+            {/* Impression Section */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                Impression
+              </label>
+              <textarea
+                value={clinicalNotes.impression}
+                onChange={(e) => setClinicalNotes(prev => ({ ...prev, impression: e.target.value }))}
+                placeholder="Clinical impression..."
+                className="w-full h-24 md:h-32 bg-slate-700/50 border border-slate-600 rounded-lg p-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              />
+            </div>
+
+            {/* Recommendation Section */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                Recommendation
+              </label>
+              <textarea
+                value={clinicalNotes.recommendation}
+                onChange={(e) => setClinicalNotes(prev => ({ ...prev, recommendation: e.target.value }))}
+                placeholder="Recommendations..."
+                className="w-full h-24 md:h-32 bg-slate-700/50 border border-slate-600 rounded-lg p-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              />
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="p-3 md:p-4 border-t border-slate-700 space-y-2">
+            <button
+              onClick={() => {
+                if (onSaveFinding) {
+                  const notesText = `Findings: ${clinicalNotes.findings}\n\nImpression: ${clinicalNotes.impression}\n\nRecommendation: ${clinicalNotes.recommendation}`;
+                  onSaveFinding(notesText);
+                }
+              }}
+              className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              Save Notes
+            </button>
+            <button
+              onClick={() => {
+                setClinicalNotes({ findings: "", impression: "", recommendation: "" });
+              }}
+              className="w-full py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 text-sm font-medium rounded-lg transition-colors"
+            >
+              Clear Notes
+            </button>
+          </div>
+        </div>
       </div>
     </Modal>
   );
