@@ -1,0 +1,11 @@
+Model Information:
+* title:	Base Female Head
+* source:	https://sketchfab.com/3d-models/base-female-head-d83ff5134b71441380a52fc6c4f834f3
+* author:	bladesero (https://sketchfab.com/bladesero)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Base Female Head" (https://sketchfab.com/3d-models/base-female-head-d83ff5134b71441380a52fc6c4f834f3) by bladesero (https://sketchfab.com/bladesero) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

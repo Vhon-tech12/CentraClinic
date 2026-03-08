@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect, Suspense } from "react";
-import { Canvas, ThreeEvent, useThree } from "@react-three/fiber";
+import { Canvas, ThreeEvent, useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Line } from "@react-three/drei";
 import * as THREE from "three";
 
@@ -65,6 +65,12 @@ const EarModel = () => {
   const { scene } = useGLTF("/models/ear-anatomy/source/ear_model/scene.gltf");
   return <primitive object={scene} />;
 };
+
+const HeadModal = () => {
+  const { scene } = useGLTF("/models/ear-anatomy/Head/base_female_head/scene.gltf");
+  return <primitive object={scene} />;
+};
+
 
 const NoseModel = () => {
   const { scene } = useGLTF(
@@ -209,12 +215,14 @@ const ModelCenterer = ({
   earRef,
   noseRef,
   throatRef,
+  headRef,
   orbitRef 
 }: { 
   tab: TabKey; 
   earRef: React.RefObject<THREE.Group | null>;
   noseRef: React.RefObject<THREE.Group | null>;
   throatRef: React.RefObject<THREE.Group | null>;
+  headRef: React.RefObject<THREE.Group | null>;
   orbitRef: React.RefObject<any>;
 }) => {
   const { camera } = useThree();
@@ -226,17 +234,14 @@ const ModelCenterer = ({
       case "Ear": return earRef.current;
       case "Nose": return noseRef.current;
       case "Throat": return throatRef.current;
+      case "Head": return headRef.current;
+      
       default: return null;
     }
   };
   
   useEffect(() => {
-    // Skip centering for Head tab (no 3D model)
-    if (tab === "Head") {
-      isCentered.current = false;
-      return;
-    }
-    
+ 
     const activeModelRef = getActiveRef();
     if (!activeModelRef) {
       isCentered.current = false;
@@ -264,6 +269,8 @@ const ModelCenterer = ({
         model.position.y += 0.3;
       } else if (tab === "Ear") {
         model.position.y += 0.2;
+      } else if (tab ==="Head"){
+        model.position.y += 0.4;
       }
       
       // Auto-fit the camera after centering
@@ -295,7 +302,7 @@ const ModelCenterer = ({
     }, 500); // Delay to ensure model is loaded
     
     return () => clearTimeout(timer);
-  }, [tab, camera, earRef, noseRef, throatRef, orbitRef]);
+  }, [tab, camera, earRef, noseRef, throatRef, headRef, orbitRef]);
   
   // Reset centering flag when tab changes
   useEffect(() => {
@@ -313,6 +320,28 @@ const WebGLCanvasCapture = ({ webglRef }: { webglRef: React.RefObject<HTMLCanvas
       webglRef.current = gl.domElement;
     }
   }, [gl.domElement, webglRef]);
+  return null;
+};
+
+/* ================= ROTATION ANIMATOR ================= */
+// Component to smoothly animate the head model rotation based on targetRotation
+const RotationAnimator = ({ 
+  targetRotation, 
+  headRef 
+}: { 
+  targetRotation: number; 
+  headRef: React.RefObject<THREE.Group | null>;
+}) => {
+  useFrame(() => {
+    if (!headRef.current) return;
+    
+    // Smoothly interpolate the rotation.y towards the target
+    // Using lerp with a factor of 0.05 for smooth animation
+    const currentRotation = headRef.current.rotation.y;
+    const newRotation = THREE.MathUtils.lerp(currentRotation, targetRotation, 0.05);
+    headRef.current.rotation.y = newRotation;
+  });
+  
   return null;
 };
 
@@ -381,6 +410,9 @@ export default function HeadTemplateModal({
 
   // Track which view type is currently selected for upload
   const [uploadType, setUploadType] = useState<"front" | "left" | "right">("front");
+
+  // Target rotation for the 3D head model
+  const [targetRotation, setTargetRotation] = useState<number>(0);
 
   // Collapsible state for Patient Image Capture section
   const [isPatientImageCollapsed, setIsPatientImageCollapsed] = useState(false);
@@ -459,8 +491,9 @@ export default function HeadTemplateModal({
   const throatRef = useRef<THREE.Group>(null);
   const earRef = useRef<THREE.Group>(null);
   const noseRef = useRef<THREE.Group>(null);
+  const headRef = useRef<THREE.Group>(null);
 
-  // Persistent strokes for all modes
+  // Persistent strokes
   const [data, setData] = useState<Record<TabKey, Record<string, AreaData>>>(initialStrokes || {
     Ear: {},
     Nose: {},
@@ -894,7 +927,8 @@ export default function HeadTemplateModal({
             
             <Canvas ref={canvasRef} camera={{ fov: 45 }} gl={{ preserveDrawingBuffer: true }}>
               <WebGLCanvasCapture webglRef={webglRef} />
-              <ModelCenterer tab={tab} earRef={earRef} noseRef={noseRef} throatRef={throatRef} orbitRef={orbitRef} />
+              <ModelCenterer tab={tab} earRef={earRef} noseRef={noseRef} throatRef={throatRef} headRef={headRef} orbitRef={orbitRef} />
+              <RotationAnimator targetRotation={targetRotation} headRef={headRef} />
               <ambientLight intensity={0.7} />
               <directionalLight position={[5, 5, 5]} />
               <OrbitControls
@@ -912,6 +946,7 @@ export default function HeadTemplateModal({
               <group ref={earRef} visible={tab === "Ear"} scale={MODEL_CONFIG.Ear.scale}><EarModel /></group>
               <group ref={noseRef} visible={tab === "Nose"} scale={MODEL_CONFIG.Nose.scale}><NoseModel /></group>
               <group ref={throatRef} visible={tab === "Throat"} scale={MODEL_CONFIG.Throat.scale}><ThroatModel /></group>
+              <group ref={headRef} visible={tab === "Head"} scale={MODEL_CONFIG.Head.scale}><HeadModal /></group>
 
               {/* Hotspots */}
               {templates[tab].map((h) => (
@@ -920,7 +955,7 @@ export default function HeadTemplateModal({
                   position={h.position}
                   onPointerDown={(e: ThreeEvent<PointerEvent>) => { e.stopPropagation(); setArea(h.name); }}
                 >
-                  <sphereGeometry args={[0.18, 16, 16]} />
+                  <sphereGeometry args={[0.0, 0, 0]} />
                   <meshStandardMaterial color={area === h.name ? "yellow" : "red"} />
                 </mesh>
               ))}
@@ -1069,7 +1104,13 @@ export default function HeadTemplateModal({
                           {(['front', 'left', 'right'] as const).map((type) => (
                             <button
                               key={type}
-                              onClick={() => setUploadType(type)}
+                              onClick={() => { 
+                                setUploadType(type);
+                                // Set target rotation based on orientation type
+                                if (type === 'front') setTargetRotation(0);
+                                else if (type === 'left') setTargetRotation(Math.PI / 2);
+                                else if (type === 'right') setTargetRotation(-Math.PI / 2);
+                              }}
                               className={`px-2 py-1 text-xs rounded transition-colors ${
                                 uploadType === type 
                                   ? 'bg-blue-600 text-white' 
@@ -1106,7 +1147,7 @@ export default function HeadTemplateModal({
                         {/* Front View */}
                         <div 
                           className="flex-1 min-w-0 group cursor-pointer"
-                          onClick={() => { setUploadType('front'); document.getElementById('patientImageUpload')?.click(); }}
+                          onClick={() => { setUploadType('front'); setTargetRotation(0); document.getElementById('patientImageUpload')?.click(); }}
                         >
                           <div className="aspect-square bg-slate-700/30 border-2 border-dashed border-slate-600 rounded-lg flex flex-col items-center justify-center transition-all duration-200 group-hover:border-blue-500 group-hover:bg-slate-700/50 h-20">
                             <span className="text-xl text-slate-500 group-hover:text-blue-400">👤</span>
@@ -1117,7 +1158,7 @@ export default function HeadTemplateModal({
                         {/* Left Side */}
                         <div 
                           className="flex-1 min-w-0 group cursor-pointer"
-                          onClick={() => { setUploadType('left'); document.getElementById('patientImageUpload')?.click(); }}
+                          onClick={() => { setUploadType('left'); setTargetRotation(Math.PI / 2); document.getElementById('patientImageUpload')?.click(); }}
                         >
                           <div className="aspect-square bg-slate-700/30 border-2 border-dashed border-slate-600 rounded-lg flex flex-col items-center justify-center transition-all duration-200 group-hover:border-blue-500 group-hover:bg-slate-700/50 h-20">
                             <span className="text-xl text-slate-500 group-hover:text-blue-400">👈</span>
@@ -1128,7 +1169,7 @@ export default function HeadTemplateModal({
                         {/* Right Side */}
                         <div 
                           className="flex-1 min-w-0 group cursor-pointer"
-                          onClick={() => { setUploadType('right'); document.getElementById('patientImageUpload')?.click(); }}
+                          onClick={() => { setUploadType('right'); setTargetRotation(-Math.PI / 2); document.getElementById('patientImageUpload')?.click(); }}
                         >
                           <div className="aspect-square bg-slate-700/30 border-2 border-dashed border-slate-600 rounded-lg flex flex-col items-center justify-center transition-all duration-200 group-hover:border-blue-500 group-hover:bg-slate-700/50 h-20">
                             <span className="text-xl text-slate-500 group-hover:text-blue-400">👉</span>
@@ -1221,3 +1262,4 @@ export default function HeadTemplateModal({
     </Modal>
   );
 }
+
