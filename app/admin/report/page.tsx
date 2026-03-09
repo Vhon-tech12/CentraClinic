@@ -8,7 +8,7 @@ const patient = {
   age: 30,
   gender: "Male",
   id: "C12345",
-  doctor: "Dr. Maria Santos",
+  doctor: "Dr. John Ong",
 };
 
 /* ================= Sample Data ================= */

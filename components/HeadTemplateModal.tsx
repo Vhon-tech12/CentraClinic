@@ -25,6 +25,126 @@ type SOAPType = "S" | "O" | "A" | "P";
 type TabKey = "Ear" | "Nose" | "Throat" | "Head";
 type Vec3 = [number, number, number];
 
+type ClinicalTemplate = {
+  name: string;
+  findings: string;
+  impression: string;
+  recommendation: string;
+};
+
+const CLINICAL_TEMPLATES: Record<TabKey, ClinicalTemplate[]> = {
+  Ear: [
+    {
+      name: "Normal Ear Examination",
+      findings: "External ear canal appears normal. No signs of inflammation or infection. Tympanic membrane is intact with proper light reflex. No discharge or debris noted.",
+      impression: "Normal ear examination findings.",
+      recommendation: "No treatment required. Continue routine ear care.",
+    },
+    {
+      name: "Otitis Media",
+      findings: "Redness and inflammation noted in the middle ear. Tympanic membrane appears bulging with reduced mobility. Fluid level visible behind the membrane.",
+      impression: "Findings suggest acute otitis media.",
+      recommendation: "Recommend antibiotic therapy. Follow-up in 7 days. Consider pain management.",
+    },
+    {
+      name: "Impacted Cerumen",
+      findings: "Cerumen impaction observed blocking the external auditory canal. Cerumen is dark, hard, and completely occluding the canal wall.",
+      impression: "Impacted cerumen (ear wax).",
+      recommendation: "Recommend cerumen removal. Use ear drops for softening. Schedule follow-up for irrigation if needed.",
+    },
+    {
+      name: "Ear Infection",
+      findings: "Signs of infection present including redness, swelling, and warmth in the ear canal. Possible discharge noted with foul odor.",
+      impression: "External ear infection (Otitis Externa).",
+      recommendation: "Prescribe antibiotic ear drops. Keep ear dry. Follow-up in 5-7 days.",
+    },
+  ],
+  Nose: [
+    {
+      name: "Normal Nasal Examination",
+      findings: "Nasal passages are clear and symmetrical. No visible inflammation or discharge. Nasal septum is midline. Turbinates appear normal in size and color.",
+      impression: "Normal nasal examination findings.",
+      recommendation: "No treatment required.",
+    },
+    {
+      name: "Deviated Nasal Septum",
+      findings: "Nasal septum is displaced to the left/right, causing narrowing of one nasal passage. Cartilaginous deviation noted.",
+      impression: "Deviated nasal septum.",
+      recommendation: "Consider surgical correction (septoplasty) if symptomatic. Refer to ENT specialist.",
+    },
+    {
+      name: "Nasal Polyps",
+      findings: "Smooth, pale, gelatinous masses observed in the nasal cavity. Polyps are bilateral and originating from the ethmoid region.",
+      impression: "Nasal polyps.",
+      recommendation: "Prescribe nasal corticosteroids. Schedule ENT consultation for further management.",
+    },
+    {
+      name: "Allergic Rhinitis",
+      findings: "Pale, boggy nasal mucosa with clear watery discharge. Swollen turbinates noted. Allergic shiners present.",
+      impression: "Allergic rhinitis.",
+      recommendation: "Prescribe antihistamines and nasal corticosteroids. Identify and avoid allergens. Follow-up in 2 weeks.",
+    },
+  ],
+  Throat: [
+    {
+      name: "Normal Throat",
+      findings: "Pharynx is pink and moist. Tonsils are normal in size without exudate. Uvula is midline. No erythema or swelling noted.",
+      impression: "Normal throat examination findings.",
+      recommendation: "No treatment required.",
+    },
+    {
+      name: "Tonsillitis",
+      findings: "Enlarged and erythematous tonsils with white/yellow exudate. Tender cervical lymph nodes. Patient reports pain on swallowing.",
+      impression: "Acute tonsillitis.",
+      recommendation: "Prescribe antibiotics. Recommend rest and hydration. Soft diet. Follow-up in 1 week.",
+    },
+    {
+      name: "Pharyngitis",
+      findings: "Red and inflamed pharyngeal walls. No exudate on tonsils. Tender anterior cervical lymphadenopathy.",
+      impression: "Acute pharyngitis.",
+      recommendation: "Symptomatic treatment. Analgesics and warm saline gargles. Increase fluid intake.",
+    },
+    {
+      name: "Enlarged Tonsils",
+      findings: "Tonsils are enlarged (grade 2-3) without signs of acute infection. No exudate present. May cause airway obstruction symptoms.",
+      impression: "Tonsillar hypertrophy.",
+      recommendation: "Monitor for obstructive symptoms. Consider tonsillectomy if severe. Refer to ENT if indicated.",
+    },
+  ],
+  Head: [
+    {
+      name: "Normal Facial Examination",
+      findings: "Facial symmetry is preserved. Skin appears healthy with normal color and texture. No lesions, discoloration, or abnormalities noted.",
+      impression: "Normal facial examination findings.",
+      recommendation: "No treatment required. Continue routine skincare.",
+    },
+    {
+      name: "Acne Vulgaris",
+      findings: "Multiple comedones, papules, and pustules noted on face. Inflammation present. Scarring may be starting to form.",
+      impression: "Acne vulgaris - moderate severity.",
+      recommendation: "Prescribe topical retinoids and benzoyl peroxide. Consider oral antibiotics for severe cases. Recommend non-comedogenic products.",
+    },
+    {
+      name: "Facial Asymmetry",
+      findings: "Noticeable asymmetry of facial features. Possible underlying bone structure difference or soft tissue volume loss on one side.",
+      impression: "Facial asymmetry.",
+      recommendation: "Further evaluation needed. Consider imaging if structural cause suspected. Refer to plastic surgery if cosmetic concern.",
+    },
+    {
+      name: "Skin Irritation",
+      findings: "Erythematous patches with mild scaling noted. Skin appears irritated with possible allergic contact dermatitis pattern.",
+      impression: "Skin irritation / contact dermatitis.",
+      recommendation: "Identify and avoid irritant/allergen. Prescribe topical corticosteroid. Recommend gentle skincare products.",
+    },
+    {
+      name: "Post Aesthetic Procedure",
+      findings: "Expected post-procedure findings: mild swelling, pinpoint bruising at injection sites. No signs of infection or vascular compromise.",
+      impression: "Post-aesthetic procedure - expected recovery phase.",
+      recommendation: "Continue post-procedure care instructions. Avoid direct sunlight. Follow-up as scheduled. Contact clinic if unusual symptoms develop.",
+    },
+  ],
+};
+
 type Stroke = {
   x: number;
   y: number;
@@ -396,6 +516,30 @@ export default function HeadTemplateModal({
     impression: "",
     recommendation: "",
   });
+
+  // Selected template state
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+
+  // Get templates for current tab
+  const currentTemplates = CLINICAL_TEMPLATES[tab];
+
+  // Apply template to clinical notes
+  const applyTemplate = (templateName: string) => {
+    const template = currentTemplates.find(t => t.name === templateName);
+    if (template) {
+      setClinicalNotes({
+        findings: template.findings,
+        impression: template.impression,
+        recommendation: template.recommendation,
+      });
+      setSelectedTemplate(templateName);
+    }
+  };
+
+  // Clear template selection
+  const clearTemplateSelection = () => {
+    setSelectedTemplate("");
+  };
 
   // Patient Image Preview State - Store up to 3 images (front, left, right)
   const [patientImages, setPatientImages] = useState<{
@@ -1195,6 +1339,45 @@ export default function HeadTemplateModal({
           </div>
           
           <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-4">
+            {/* Quick Templates Section */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                <span>📝</span>
+                Quick Templates
+              </label>
+              <div className="space-y-2">
+                <select
+                  value={selectedTemplate}
+                  onChange={(e) => {
+                    if (e.target.value === "") {
+                      clearTemplateSelection();
+                    } else {
+                      applyTemplate(e.target.value);
+                    }
+                  }}
+                  className="w-full bg-slate-700/50 border border-slate-600 rounded-lg p-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Select a template...</option>
+                  {currentTemplates.map((template) => (
+                    <option key={template.name} value={template.name}>
+                      {template.name}
+                    </option>
+                  ))}
+                </select>
+                {selectedTemplate && (
+                  <button
+                    onClick={() => clearTemplateSelection()}
+                    className="text-xs text-slate-400 hover:text-slate-300 flex items-center gap-1"
+                  >
+                    ✕ Clear template
+                  </button>
+                )}
+              </div>
+              <p className="text-xs text-slate-500">
+                Select a template to auto-fill clinical notes. You can edit the text after.
+              </p>
+            </div>
+
             {/* Findings Section */}
             <div className="space-y-2">
               <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
