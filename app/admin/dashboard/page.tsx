@@ -97,21 +97,21 @@ export default function DashboardPage() {
 
       <main className="p-6">
         {/* WELCOME BANNER */}
-        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 text-white p-6 rounded-2xl shadow-lg mb-6 relative overflow-hidden">
+        <div className="bg-linear-to-r from-indigo-600 via-purple-600 to-indigo-600 text-white p-6 rounded-2xl shadow-lg mb-6 relative overflow-hidden">
           <div className="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
           <div className="absolute right-20 bottom-0 w-40 h-40 bg-white/5 rounded-full translate-y-1/2" />
           <div className="relative">
-            <h2 className="text-xl font-semibold">Welcome Back Doctor 👋</h2>
+            <h2 className="text-xl font-semibold">Welcome Back Doctor John Ong👋</h2>
             <p className="text-sm opacity-90 mt-1">Here's what's happening with your clinic today.</p>
           </div>
         </div>
 
         {/* STAT CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-          <StatCard title="Revenue" value="₱12,500+" change="+11.01%" positive type="revenue" />
-          <StatCard title="Expenses" value="₱12,500+" change="-0.03%" positive={false} type="expenses" />
-          <StatCard title="Appointments" value="34" change="+3.55%" positive type="appointments" />
-          <StatCard title="Customers" value="721K" change="+6.08%" positive type="customers" />
+          <StatCard title="Report" value="0" change="" positive type="revenue" />
+          <StatCard title="Total Patients" value="100" change="" positive={false} type="patients" />
+          <StatCard title="Appointments" value="34" change="" positive type="appointments" />
+          <StatCard title="Completed Consultations" value="14" change="" positive type="consultations" />
         </div>
 
         {/* CHARTS ROW */}

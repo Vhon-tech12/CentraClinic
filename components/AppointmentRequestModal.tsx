@@ -54,7 +54,7 @@ export default function AppointmentRequestsModal({
           uppercase
           border-b border-gray-200
           bg-gray-50
-          sticky top-[64px]
+          sticky `top-[64px]
           z-10
         ">
           <p className="col-span-5">Patient</p>

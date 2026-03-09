@@ -7,7 +7,7 @@ import * as THREE from "three";
 
 function ThroatModel() {
   const { scene } = useGLTF(
-    "/models/ear-anatomy/throat/textures/ThroatN.glb"
+    "/models/ear-anatomy/throat/textures/ThroatNew.glb"
   );
 
   useEffect(() => {
@@ -27,12 +27,12 @@ function ThroatModel() {
 }
 
 useGLTF.preload(
-  "/models/ear-anatomy/throat/textures/ThroatN.glb"
+  "/models/ear-anatomy/throat/textures/ThroatNew.glb"
 );
 
 export default function ThroatViewer() {
   return (
-    <div className="w-full h-[400px] bg-gray-900 rounded-lg">
+    <div className="w-full `h-100` bg-gray-900 rounded-lg">
       <Canvas camera={{ position: [0, 0, 4], fov: 45 }}>
         <ambientLight intensity={0.7} />
         <directionalLight position={[5, 5, 5]} intensity={1} />

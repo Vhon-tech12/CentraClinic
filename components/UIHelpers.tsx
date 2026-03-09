@@ -11,7 +11,21 @@ export const Placeholder = ({ text }: any) => (
   <p className="opacity-70">{text}</p>
 );
 
-export const FieldBlock = ({ label, placeholder, value, onChange, type = "text" }: { label: string; placeholder?: string; value?: string; onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void; type?: string }) => (
+export const FieldBlock = ({
+  label,
+  placeholder,
+  value,
+  onChange,
+  type = "text",
+  readOnly = false, // new prop
+}: {
+  label: string;
+  placeholder?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  type?: string;
+  readOnly?: boolean;
+}) => (
   <div className="space-y-1.5">
     <p className="text-sm font-medium text-gray-700">{label}</p>
     {type === "textarea" ? (
@@ -20,12 +34,14 @@ export const FieldBlock = ({ label, placeholder, value, onChange, type = "text" 
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className="w-full rounded-lg px-3 py-2.5 text-sm
+        readOnly={readOnly} // apply readOnly
+        className={`w-full rounded-lg px-3 py-2.5 text-sm
                    bg-gray-50 text-gray-900
                    border border-gray-200
                    placeholder-gray-400
                    focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500
-                   resize-none"
+                   resize-none
+                   ${readOnly ? "bg-gray-100 cursor-not-allowed" : ""}`} // style if readonly
       />
     ) : (
       <input
@@ -33,11 +49,13 @@ export const FieldBlock = ({ label, placeholder, value, onChange, type = "text" 
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className="w-full rounded-lg px-3 py-2.5 text-sm
+        readOnly={readOnly} // apply readOnly
+        className={`w-full rounded-lg px-3 py-2.5 text-sm
                    bg-gray-50 text-gray-900
                    border border-gray-200
                    placeholder-gray-400
-                   focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+                   focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500
+                   ${readOnly ? "bg-gray-100 cursor-not-allowed" : ""}`} // style if readonly
       />
     )}
   </div>

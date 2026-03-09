@@ -159,7 +159,7 @@ const PrescriptionModal = ({
       
       <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col max-h-[90vh]">
         {/* HEADER */}
-        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-white to-gray-50/50">
+        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-linear-to-r from-white to-gray-50/50">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
               <svg className="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -301,7 +301,7 @@ const PrescriptionModal = ({
             <button
               onClick={handleSavePrescription}
               disabled={!drug.trim()}
-              className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl hover:from-indigo-700 hover:to-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-all shadow-sm hover:shadow"
+              className="px-5 py-2.5 bg-linear-to-r from-indigo-600 to-violet-600 text-white rounded-xl hover:from-indigo-700 hover:to-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-all shadow-sm hover:shadow"
             >
               {defaultValues ? "Save Changes" : "Add Prescription"}
             </button>
@@ -311,7 +311,7 @@ const PrescriptionModal = ({
         {/* SIDE PANEL - SLIDING DRAWER */}
         {showAddMedication && (
           <div className="absolute top-0 right-0 h-full w-full sm:w-[360px] bg-white border-l border-gray-200 shadow-xl z-50 flex flex-col animate-slide-in-right">
-            <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-white to-gray-50/50">
+            <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-linear-to-r from-white to-gray-50/50">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center">
                   <svg className="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

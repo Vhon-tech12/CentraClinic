@@ -4,5 +4,4 @@ export interface EducationalMaterial {
   category: string;
   thumbnail: string;
   fileUrl: string;
-  description?: string;
 }
