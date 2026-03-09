@@ -174,6 +174,7 @@ export default function PatientsPage() {
         <button
           onClick={() => setShowAddPatient(true)}
           className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition"
+          suppressHydrationWarning
         >
           + Add Patient
         </button>
@@ -201,6 +202,7 @@ export default function PatientsPage() {
               setCurrentPage(1);
             }}
             className="pl-9 pr-4 py-2 w-72 border border-gray-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+            suppressHydrationWarning
           />
         </div>
       </div>
@@ -294,6 +296,7 @@ export default function PatientsPage() {
                             setShowDetails(true);
                           }}
                           className="w-9 h-9 rounded-lg bg-gray-100 hover:bg-indigo-100 transition flex items-center justify-center"
+                          suppressHydrationWarning
                         >
                           👁
                         </button>
@@ -305,6 +308,7 @@ export default function PatientsPage() {
                             setShowSoap(true);
                           }}
                           className="w-9 h-9 rounded-lg bg-gray-100 hover:bg-green-100 transition flex items-center justify-center"
+                          suppressHydrationWarning
                         >
                           ✏️
                         </button>
@@ -313,6 +317,7 @@ export default function PatientsPage() {
                           title="Delete"
                           onClick={() => alert("Delete record")}
                           className="w-9 h-9 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 transition flex items-center justify-center"
+                          suppressHydrationWarning
                         >
                           🗑
                         </button>
@@ -345,6 +350,7 @@ export default function PatientsPage() {
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
               className="px-3 py-1.5 text-sm rounded-lg hover:bg-gray-100 disabled:opacity-40"
+              suppressHydrationWarning
             >
               ←
             </button>
@@ -361,6 +367,7 @@ export default function PatientsPage() {
                       ? "bg-indigo-600 text-white shadow"
                       : "hover:bg-gray-100"
                   }`}
+                  suppressHydrationWarning
                 >
                   {page}
                 </button>
@@ -371,6 +378,7 @@ export default function PatientsPage() {
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
               className="px-3 py-1.5 text-sm rounded-lg hover:bg-gray-100 disabled:opacity-40"
+              suppressHydrationWarning
             >
               →
             </button>

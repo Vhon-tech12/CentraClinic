@@ -238,7 +238,7 @@ const PatientDetailsModal = ({
 
   return (
     <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="w-[1400px] max-h-[95vh] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col">
+      <div className="`w-350` max-h-[95vh] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col">
 
         {/* HEADER - Clinical Style */}
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 bg-linear-to-r from-slate-50 to-white">

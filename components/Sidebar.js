@@ -123,7 +123,10 @@ export default function Sidebar() {
             Settings
           </Link>
 
-          <button className="flex items-center gap-3 text-red-600 hover:text-red-700">
+          <button 
+            className="flex items-center gap-3 text-red-600 hover:text-red-700"
+            suppressHydrationWarning
+          >
             <LogOut size={16} />
             Log out
           </button>
