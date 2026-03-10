@@ -158,10 +158,10 @@ type AreaData = { strokes: Stroke[][] };
 
 /* ================= CONFIG ================= */
 const MODEL_CONFIG = {
-  Ear: { scale: 1.2 },
+  Ear: { scale: 4.0 },
   Nose: { scale: 1.0 },
   Throat: { scale: 1.0 },
-  Head: { scale: 1.0 },
+  Head: { scale: 6.0 },
 };
 
 const STROKE_WIDTH = 2;
@@ -187,7 +187,7 @@ const EarModel = () => {
 };
 
 const HeadModal = () => {
-  const { scene } = useGLTF("/models/ear-anatomy/Head/base_female_head/scene.gltf");
+  const { scene } = useGLTF("/models/ear-anatomy/Head/head/scene.gltf");
   return <primitive object={scene} />;
 };
 

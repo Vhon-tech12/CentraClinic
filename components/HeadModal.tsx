@@ -7,7 +7,7 @@ import * as THREE from "three";
 
 function HeadModal() {
   const { scene } = useGLTF(
-    "/models/ear-anatomy/Head/base_female_head/scene.gltf"
+    "/models/ear-anatomy/Head/head/scene.gltf"
   );
 
   useEffect(() => {
@@ -27,7 +27,7 @@ function HeadModal() {
 }
 
 useGLTF.preload(
-  "/models/ear-anatomy/Head/base_female_head/scene.gltf"
+  "/models/ear-anatomy/Head/head/scene.gltf"
 );
 
 export default function HeadViewer() {

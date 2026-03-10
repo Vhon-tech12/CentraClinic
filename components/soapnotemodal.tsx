@@ -163,21 +163,35 @@ const SoapNoteModal = ({
       </div>
 
       {/* Assessment Section */}
-      <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-        <h4 className="text-xs font-bold tracking-widest text-amber-600 mb-3">ASSESSMENT</h4>
-        <div>
-          <p className="text-xs font-medium text-gray-500 uppercase mb-1">Diagnosis</p>
-          <p className="text-sm text-gray-800 min-h-5">{diagnosis || <span className="text-gray-300 italic">No diagnosis recorded</span>}</p>
-        </div>
-        {diagnostics.length > 0 && (
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            {diagnostics.map((d, i) => (
-              <img key={i} src={d.imageData} alt="Diagnostic" className="rounded-lg border border-gray-200" />
-            ))}
-          </div>
-        )}
-      </div>
+<div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+  <h4 className="text-xs font-bold tracking-widest text-amber-600 mb-3">ASSESSMENT</h4>
 
+  <div>
+    <p className="text-xs font-medium text-gray-500 uppercase mb-1">Diagnosis</p>
+    <p className="text-sm text-gray-800 min-h-5">
+      {diagnosis || (
+        <span className="text-gray-300 italic">No diagnosis recorded</span>
+      )}
+    </p>
+  </div>
+
+  {diagnostics.length > 0 && (
+    <div className="mt-4 space-y-4">
+      {diagnostics.map((d, i) => (
+        <div
+          key={i}
+          className="bg-gray-50 border border-gray-200 rounded-xl p-4 flex justify-center"
+        >
+          <img
+            src={d.imageData}
+            alt="Diagnostic"
+            className="w-full max-h-[420px] object-contain rounded-lg cursor-zoom-in transition hover:scale-105"
+          />
+        </div>
+      ))}
+    </div>
+  )}
+</div>
       {/* Plan Section */}
       <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
         <h4 className="text-xs font-bold tracking-widest text-cyan-600 mb-3">PLAN</h4>
@@ -317,13 +331,13 @@ const SoapNoteModal = ({
                     />
 
                     {diagnostics.length > 0 && (
-                      <div className="mt-4 grid grid-cols-2 gap-3">
+                      <div className="mt-4 space-y-3">
                         {diagnostics.map((d, i) => (
                           <div
                             key={i}
                             className="bg-gray-50 border border-gray-200 p-3 rounded-xl"
                           >
-                            <img src={d.imageData} className="rounded-lg w-full" alt="Diagnostic" />
+                            <img src={d.imageData} className="w-full h-56 object-contain rounded-lg cursor-zoom-in hover:scale-105 transition" alt="Diagnostic" />
                           </div>
                         ))}
                       </div>
@@ -428,22 +442,22 @@ const SoapNoteModal = ({
                 </div>
               </div>
 
-              {/* Right Column - Preview */}
-              <div className="hidden lg:block overflow-y-auto p-6 bg-linear-to-b from-gray-100 to-gray-50 border-l border-gray-200 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                <div className="sticky top-0">
-                  {showPreview ? (
-                    renderPreview()
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-64 text-gray-400">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <p className="text-sm font-medium">Preview will appear here</p>
-                      <p className="text-xs mt-1">after clicking Preview button</p>
-                    </div>
-                  )}
+                {/* Right Column - Preview */}
+                <div className="hidden lg:block overflow-y-auto p-6 bg-linear-to-b from-gray-100 to-gray-50 border-l border-gray-200 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                  <div className="sticky top-0">
+                    {showPreview ? (
+                      renderPreview()
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p className="text-sm font-medium">Preview will appear here</p>
+                        <p className="text-xs mt-1">after clicking Preview button</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
 
               {/* Mobile Preview Toggle - Visible only on small screens */}
               <div className="lg:hidden border-t border-gray-200 bg-gray-50 p-4">
