@@ -1,5 +1,5 @@
 import React from "react";
-import Footer from "../../components/Footer";
+import Footer from "../../../components/Footer";
 
 export default function FAQSection() {
   const faqs = [
@@ -29,7 +29,7 @@ export default function FAQSection() {
         "Yes. Centra Clinic PH uses a secure EMR system to ensure confidentiality and protection of patient data."
     },
     {
-      question: "What are the clinic’s operating hours?",
+      question: "What are the clinic's operating hours?",
       answer:
         "The clinic is open from Monday to Saturday, 8:00 AM to 6:00 PM."
     }
@@ -65,8 +65,8 @@ export default function FAQSection() {
         </div>
       </div>
     </section>
-  );
-  <Footer />
-  </>
+    <Footer />
+    </>
   );
 }
+

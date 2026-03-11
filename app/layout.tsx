@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Providers from "@/components/Providers";
-import ConditionalNavBar from "@/components/ConditionalNavBar";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 
@@ -19,12 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* ✅ Wrap the entire app with Providers (SessionProvider inside) */}
-        <Providers>
-          {/* Navbar will now have access to session */}
-          <ConditionalNavBar />
-          {children}
-        </Providers>
+        {/* Root layout - no navbar here */}
+        {/* Navbar is now in route groups: (public) layout */}
+        {children}
       </body>
     </html>
   );

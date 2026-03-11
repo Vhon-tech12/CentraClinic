@@ -6,8 +6,9 @@ import NavBar from "./NavBar";
 export default function ConditionalNavBar() {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
+  const isSecretary = pathname.startsWith("/secretary");
 
-  if (isAdmin) {
+  if (isAdmin || isSecretary) {
     return null;
   }
 
