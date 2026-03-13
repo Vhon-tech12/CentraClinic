@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 
 // Types
-type PatientStatus = 'Pending' | 'Checked-In' | 'Vitals Recorded' | 'Ready for Doctor' | 'Consultation' | 'Completed';
+type PatientStatus = 'Pending' | 'Checked-In' | 'Vitals Recorded' | 'Ready for Doctor' | 'Consultation' | 'Completed' | 'No Show' | 'Cancelled' | 'Rescheduled';
 
 interface Patient {
   id: number;
@@ -55,6 +55,7 @@ interface Patient {
     complaint: string;
     notes: string;
   };
+  lateArrival?: boolean;
 }
 
 interface VitalsData {
@@ -110,12 +111,12 @@ const getDefaultFollowUpDate = () => {
 // Initial sample data
 const initialPatients: Patient[] = [
   { id: 1, name: "Juan Dela Cruz", birthdate: "1985-03-15", contactNumber: "0912-345-6789", appointmentTime: "9:00 AM", service: "ENT Checkup", status: "Pending" },
-  { id: 2, name: "Maria Santos", birthdate: "1990-07-22", contactNumber: "0918-987-6543", appointmentTime: "9:30 AM", service: "Nose Consultation", status: "Pending" },
+  { id: 2, name: "Maria Santos", birthdate: "1990-07-22", contactNumber: "0918-987-6543", appointmentTime: "9:30 AM", service: "Nose Consultation", status: "No Show" },
   { id: 3, name: "Pedro Reyes", birthdate: "1978-11-08", contactNumber: "0922-111-2222", appointmentTime: "10:00 AM", service: "Throat Exam", status: "Pending" },
-  { id: 4, name: "Ana Garcia", birthdate: "1995-01-30", contactNumber: "0905-333-4444", appointmentTime: "10:30 AM", service: "Ear Cleaning", status: "Pending" },
+  { id: 4, name: "Ana Garcia", birthdate: "1995-01-30", contactNumber: "0905-333-4444", appointmentTime: "10:30 AM", service: "Ear Cleaning", status: "Cancelled" },
   { id: 5, name: "Jose Martinez", birthdate: "1982-09-12", contactNumber: "0917-555-6666", appointmentTime: "11:00 AM", service: "Allergy Test", status: "Pending" },
   { id: 6, name: "Lisa Wong", birthdate: "1988-05-18", contactNumber: "0928-777-8888", appointmentTime: "11:30 AM", service: "Sinus Consultation", status: "Pending" },
-  { id: 7, name: "Carlos Mendoza", birthdate: "1992-12-25", contactNumber: "0919-999-0000", appointmentTime: "12:00 PM", service: "Ear Consultation", status: "Pending" },
+  { id: 7, name: "Carlos Mendoza", birthdate: "1992-12-25", contactNumber: "0919-999-0000", appointmentTime: "12:00 PM", service: "Ear Consultation", status: "Rescheduled" },
   { id: 8, name: "Sofia Reyes", birthdate: "1975-08-05", contactNumber: "0925-121-3434", appointmentTime: "12:30 PM", service: "Throat Treatment", status: "Pending" },
 ];
 
@@ -135,13 +136,14 @@ const commonComplaints = [
 export default function SecretaryDashboard() {
   const [patients, setPatients] = useState<Patient[]>(initialPatients);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [activeModal, setActiveModal] = useState<'identity' | 'vitals' | 'complaint' | 'followUp' | null>(null);
+  const [activeModal, setActiveModal] = useState<'identity' | 'vitals' | 'complaint' | 'followUp' | 'reschedule' | null>(null);
   
-  // Form states
+// Form states
   const [identityForm, setIdentityForm] = useState<IdentityData>({ name: '', birthdate: '', contactNumber: '' });
   const [vitalsForm, setVitalsForm] = useState<VitalsData>({ height: '', weight: '', bloodPressure: '', temperature: '', pulse: '' });
   const [complaintForm, setComplaintForm] = useState<ComplaintData>({ complaint: '', notes: '' });
   const [followUpForm, setFollowUpForm] = useState<FollowUpData>({ appointmentDate: getDefaultFollowUpDate(), appointmentTime: '9:00 AM', treatmentNotes: '' });
+  const [rescheduleForm, setRescheduleForm] = useState<FollowUpData>({ appointmentDate: getDefaultFollowUpDate(), appointmentTime: '9:00 AM', treatmentNotes: '' });
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
@@ -198,11 +200,13 @@ export default function SecretaryDashboard() {
   // Stats
   const stats = {
     totalAppointments: patients.length,
-    pending: patients.filter(p => p.status === 'Pending').length,
+    pending: patients.filter(p => p.status === 'Pending' || p.status === 'Rescheduled').length,
     checkedIn: patients.filter(p => p.status === 'Checked-In').length,
     vitalsRecorded: patients.filter(p => p.status === 'Vitals Recorded').length,
     readyForDoctor: patients.filter(p => p.status === 'Ready for Doctor').length,
     completed: patients.filter(p => p.status === 'Completed').length,
+    noShow: patients.filter(p => p.status === 'No Show').length,
+    cancelled: patients.filter(p => p.status === 'Cancelled').length,
   };
 
   // Get status badge styles
@@ -214,8 +218,11 @@ export default function SecretaryDashboard() {
       'Ready for Doctor': 'bg-purple-100 text-purple-700 border-purple-200',
       'Consultation': 'bg-orange-100 text-orange-700 border-orange-200',
       'Completed': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+      'No Show': 'bg-rose-100 text-rose-700 border-rose-200',
+      'Cancelled': 'bg-orange-100 text-orange-700 border-orange-200',
+      'Rescheduled': 'bg-yellow-100 text-yellow-700 border-yellow-200',
     };
-    return styles[status];
+    return styles[status] || 'bg-gray-100 text-gray-700 border-gray-200';
   };
 
   // Get status icon
@@ -227,11 +234,59 @@ export default function SecretaryDashboard() {
       'Ready for Doctor': <Stethoscope className="w-3.5 h-3.5" />,
       'Consultation': <Activity className="w-3.5 h-3.5" />,
       'Completed': <CheckCircle2 className="w-3.5 h-3.5" />,
+      'No Show': <XCircle className="w-3.5 h-3.5" />,
+      'Cancelled': <XCircle className="w-3.5 h-3.5" />,
+      'Rescheduled': <CalendarPlus className="w-3.5 h-3.5" />,
     };
-    return icons[status];
+    return icons[status] || <Circle className="w-3.5 h-3.5" />;
   };
 
   // Handle action button clicks
+  const handleNoShow = (patient: Patient) => {
+    setPatients(prev => prev.map(p => 
+      p.id === patient.id ? { ...p, status: 'No Show' } : p
+    ));
+    setToastMessage(`${patient.name} marked as No Show`);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
+  const handleCancel = (patient: Patient) => {
+    setPatients(prev => prev.map(p => 
+      p.id === patient.id ? { ...p, status: 'Cancelled' } : p
+    ));
+    setToastMessage(`${patient.name} appointment cancelled`);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
+  const handleReschedule = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setRescheduleForm({
+      appointmentDate: getDefaultFollowUpDate(),
+      appointmentTime: patient.appointmentTime,
+      treatmentNotes: patient.service
+    });
+    setActiveModal('reschedule');
+  };
+
+  const handleRescheduleSubmit = () => {
+    if (!selectedPatient) return;
+    
+    setPatients(prev => prev.map(p => 
+      p.id === selectedPatient.id 
+        ? { ...p, status: 'Rescheduled', appointmentTime: rescheduleForm.appointmentTime }
+        : p
+    ));
+    
+    setToastMessage(`${selectedPatient.name} rescheduled to ${rescheduleForm.appointmentTime}`);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 4000);
+    
+    setActiveModal(null);
+    setSelectedPatient(null);
+  };
+
   const handleCheckIn = (patient: Patient) => {
     setSelectedPatient(patient);
     setIdentityForm({
@@ -297,10 +352,19 @@ export default function SecretaryDashboard() {
     setSelectedPatient(null);
   };
 
-  const handleComplete = (patient: Patient) => {
+const handleComplete = (patient: Patient) => {
     setPatients(prev => prev.map(p => 
       p.id === patient.id ? { ...p, status: 'Completed' } : p
     ));
+  };
+
+  const handleLateCheckIn = (patient: Patient) => {
+    setPatients(prev => prev.map(p => 
+      p.id === patient.id ? { ...p, status: 'Checked-In', lateArrival: true } : p
+    ));
+    setToastMessage(`${patient.name} marked as Late Check-In`);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
   };
 
   // Get patients ready for doctor
@@ -343,7 +407,7 @@ export default function SecretaryDashboard() {
         </div>
 
         {/* STAT CARDS */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-3 sm:gap-4 mb-6">
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
             <div className="flex items-center gap-2 text-gray-500 mb-1">
               <Calendar className="w-4 h-4" />
@@ -385,6 +449,20 @@ export default function SecretaryDashboard() {
               <span className="text-xs font-medium">Completed</span>
             </div>
             <p className="text-2xl font-bold text-emerald-700">{stats.completed}</p>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+            <div className="flex items-center gap-2 text-rose-500 mb-1">
+              <XCircle className="w-4 h-4" />
+              <span className="text-xs font-medium">No Show</span>
+            </div>
+            <p className="text-2xl font-bold text-rose-700">{stats.noShow}</p>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+            <div className="flex items-center gap-2 text-orange-500 mb-1">
+              <XCircle className="w-4 h-4" />
+              <span className="text-xs font-medium">Cancelled</span>
+            </div>
+            <p className="text-2xl font-bold text-orange-700">{stats.cancelled}</p>
           </div>
         </div>
 
@@ -434,12 +512,44 @@ export default function SecretaryDashboard() {
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-1.5">
                           {patient.status === 'Pending' && (
+                            <>
+                              <button
+                                onClick={() => handleCheckIn(patient)}
+                                className="px-2.5 py-1 text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-1"
+                              >
+                                <UserCheck className="w-3 h-3" />
+                                Check-In
+                              </button>
+                              <button
+                                onClick={() => handleNoShow(patient)}
+                                className="px-2.5 py-1 text-xs font-medium bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-lg transition-colors flex items-center gap-1"
+                              >
+                                <XCircle className="w-3 h-3" />
+                                No Show
+                              </button>
+                              <button
+                                onClick={() => handleCancel(patient)}
+                                className="px-2.5 py-1 text-xs font-medium bg-orange-50 text-orange-700 hover:bg-orange-100 rounded-lg transition-colors flex items-center gap-1"
+                              >
+                                <XCircle className="w-3 h-3" />
+                                Cancel
+                              </button>
+                              <button
+                                onClick={() => handleReschedule(patient)}
+                                className="px-2.5 py-1 text-xs font-medium bg-yellow-50 text-yellow-700 hover:bg-yellow-100 rounded-lg transition-colors flex items-center gap-1"
+                              >
+                                <CalendarPlus className="w-3 h-3" />
+                                Reschedule
+                              </button>
+                            </>
+                          )}
+                          {patient.status === 'No Show' && (
                             <button
-                              onClick={() => handleCheckIn(patient)}
-                              className="px-2.5 py-1 text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-1"
+                              onClick={() => handleLateCheckIn(patient)}
+                              className="px-2.5 py-1 text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg transition-colors flex items-center gap-1"
                             >
-                              <UserCheck className="w-3 h-3" />
-                              Check-In
+                              <Clock className="w-3 h-3" />
+                              Late Check-In
                             </button>
                           )}
                           {patient.status === 'Checked-In' && (
@@ -991,6 +1101,95 @@ export default function SecretaryDashboard() {
               >
                 <Check className="w-4 h-4" />
                 Schedule Appointment
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reschedule Modal */}
+      {activeModal === 'reschedule' && selectedPatient && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <CalendarPlus className="w-5 h-5 text-yellow-700" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Reschedule Appointment</h3>
+                  <p className="text-xs text-gray-500">{selectedPatient.name}</p>
+                </div>
+              </div>
+              <button onClick={() => setActiveModal(null)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <CalendarDays className="w-4 h-4 inline mr-1" />
+                  New Date
+                </label>
+                <input
+                  type="date"
+                  value={rescheduleForm.appointmentDate}
+                  onChange={(e) => setRescheduleForm({ ...rescheduleForm, appointmentDate: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 focus:outline-none transition-all"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <Clock className="w-4 h-4 inline mr-1" />
+                  New Time
+                </label>
+                <select
+                  value={rescheduleForm.appointmentTime}
+                  onChange={(e) => setRescheduleForm({ ...rescheduleForm, appointmentTime: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 focus:outline-none transition-all"
+                >
+                  {availableTimeSlots.map((time) => (
+                    <option key={time} value={time}>{time}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <FileText className="w-4 h-4 inline mr-1" />
+                  Service
+                </label>
+                <textarea
+                  value={rescheduleForm.treatmentNotes}
+                  onChange={(e) => setRescheduleForm({ ...rescheduleForm, treatmentNotes: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 focus:outline-none transition-all resize-none"
+                  placeholder="Service type..."
+                />
+              </div>
+
+              <div className="bg-yellow-50 rounded-xl p-4 mt-4">
+                <p className="text-sm text-yellow-700">
+                  <strong>Note:</strong> Original appointment will be marked as Rescheduled.
+                </p>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end">
+              <button
+                onClick={() => setActiveModal(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-xl transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRescheduleSubmit}
+                className="px-4 py-2 text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 rounded-xl transition-colors flex items-center gap-2"
+              >
+                <Check className="w-4 h-4" />
+                Reschedule
               </button>
             </div>
           </div>
