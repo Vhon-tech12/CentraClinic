@@ -30,11 +30,13 @@ import {
   Circle,
   PlayCircle,
   CalendarPlus,
-  Sparkles
+  Sparkles,
+  Monitor
 } from "lucide-react";
 
+
 // Types
-type PatientStatus = 'Pending' | 'Checked-In' | 'Vitals Recorded' | 'Ready for Doctor' | 'Consultation' | 'Completed' | 'No Show' | 'Cancelled' | 'Rescheduled';
+type PatientStatus = 'Pending' | 'Checked-In' | 'Vitals Recorded' | 'Ready for Doctor' | 'Consultation' | 'Completed' | 'Scheduled for Procedure' | 'No Show' | 'Cancelled' | 'Rescheduled';
 
 interface Patient {
   id: number;
@@ -56,6 +58,13 @@ interface Patient {
     notes: string;
   };
   lateArrival?: boolean;
+  visitType?: 'NEW PATIENT' | 'FOLLOW-UP' | 'RETURN VISIT' | 'PROCEDURE';
+  procedureRequired?: boolean;
+  procedureDetails?: {
+    procedureType: string;
+    room: string;
+    scheduledTime: string;
+  };
 }
 
 interface VitalsData {
@@ -82,6 +91,50 @@ interface FollowUpData {
   appointmentTime: string;
   treatmentNotes: string;
 }
+
+interface ProcedureRoom {
+  id: number;
+  name: string;
+  description: string;
+  image: string;
+  available: boolean;
+}
+
+interface ProcedureForm {
+  procedureType: string;
+  date: string;
+  estimatedTime: string;
+  doctor: string;
+  notes: string;
+}
+
+const procedureRooms: ProcedureRoom[] = [
+  {
+    id: 1,
+    name: "Procedure Room 1",
+    description: "For ENT procedures",
+    image: "/ro.jpg",
+    available: true
+  },
+  {
+    id: 2,
+    name: "Procedure Room 2", 
+    description: "Nasal Exam Procedures",
+    image: "/roo.jpg",
+    available: true
+  },
+  {
+    id: 3,
+    name: "Procedure Room 3",
+    description: "Aesthetic procedures",
+    image: "/room.jpg", 
+    available: true
+  }
+];
+
+const procedureTypes = ["Ear Cleaning", "Tonsillectomy", "Nasal Endoscopy", "Biopsy", "Laryngoscopy", "Audiometry", "Other"];
+const doctors = ["Dr. John Ong"];
+
 
 // Sample time slots
 const availableTimeSlots = [
@@ -110,14 +163,15 @@ const getDefaultFollowUpDate = () => {
 
 // Initial sample data
 const initialPatients: Patient[] = [
-  { id: 1, name: "Juan Dela Cruz", birthdate: "1985-03-15", contactNumber: "0912-345-6789", appointmentTime: "9:00 AM", service: "ENT Checkup", status: "Pending" },
-  { id: 2, name: "Maria Santos", birthdate: "1990-07-22", contactNumber: "0918-987-6543", appointmentTime: "9:30 AM", service: "Nose Consultation", status: "No Show" },
-  { id: 3, name: "Pedro Reyes", birthdate: "1978-11-08", contactNumber: "0922-111-2222", appointmentTime: "10:00 AM", service: "Throat Exam", status: "Pending" },
-  { id: 4, name: "Ana Garcia", birthdate: "1995-01-30", contactNumber: "0905-333-4444", appointmentTime: "10:30 AM", service: "Ear Cleaning", status: "Cancelled" },
-  { id: 5, name: "Jose Martinez", birthdate: "1982-09-12", contactNumber: "0917-555-6666", appointmentTime: "11:00 AM", service: "Allergy Test", status: "Pending" },
-  { id: 6, name: "Lisa Wong", birthdate: "1988-05-18", contactNumber: "0928-777-8888", appointmentTime: "11:30 AM", service: "Sinus Consultation", status: "Pending" },
-  { id: 7, name: "Carlos Mendoza", birthdate: "1992-12-25", contactNumber: "0919-999-0000", appointmentTime: "12:00 PM", service: "Ear Consultation", status: "Rescheduled" },
-  { id: 8, name: "Sofia Reyes", birthdate: "1975-08-05", contactNumber: "0925-121-3434", appointmentTime: "12:30 PM", service: "Throat Treatment", status: "Pending" },
+{ id: 1, name: "Juan Dela Cruz", birthdate: "1985-03-15", contactNumber: "0912-345-6789", appointmentTime: "9:00 AM", service: "Ear Cleaning Procedure", status: "Pending", visitType: "PROCEDURE", procedureRequired: true, },
+{ id: 2, name: "Maria Santos", birthdate: "1990-07-22", contactNumber: "0918-987-6543", appointmentTime: "9:30 AM", service: "Nose Consultation", status: "No Show", visitType: "NEW PATIENT" },
+{ id: 3, name: "Pedro Reyes", birthdate: "1978-11-08", contactNumber: "0922-111-2222", appointmentTime: "10:00 AM", service: "Throat Exam", status: "Pending", visitType: "RETURN VISIT" },
+{ id: 4, name: "Ana Garcia", birthdate: "1995-01-30", contactNumber: "0905-333-4444", appointmentTime: "10:30 AM", service: "Ear Cleaning", status: "Completed", visitType: "PROCEDURE", procedureRequired: true },
+{ id: 5, name: "Jose Martinez", birthdate: "1982-09-12", contactNumber: "0917-555-6666", appointmentTime: "11:00 AM", service: "Allergy Test", status: "Pending", visitType: "NEW PATIENT" },
+{ id: 6, name: "Lisa Wong", birthdate: "1988-05-18", contactNumber: "0928-777-8888", appointmentTime: "11:30 AM", service: "Sinus Consultation", status: "Pending", visitType: "FOLLOW-UP" },
+{ id: 7, name: "Carlos Mendoza", birthdate: "1992-12-25", contactNumber: "0919-999-0000", appointmentTime: "12:00 PM", service: "Ear Consultation", status: "Rescheduled", visitType: "RETURN VISIT" },
+{ id: 8, name: "Sofia Reyes", birthdate: "1975-08-05", contactNumber: "0925-121-3434", appointmentTime: "12:30 PM", service: "Throat Treatment", status: "Pending" },
+ 
 ];
 
 const commonComplaints = [
@@ -147,8 +201,20 @@ export default function SecretaryDashboard() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
+  // Procedure scheduling state
+  const [showProcedureModal, setShowProcedureModal] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<ProcedureRoom | null>(null);
+  const [procedureForm, setProcedureForm] = useState<ProcedureForm>({
+    procedureType: '',
+    date: getDefaultFollowUpDate(),
+    estimatedTime: '60 minutes',
+    doctor: '',
+    notes: ''
+  });
+  const [selectedPatientForProcedure, setSelectedPatientForProcedure] = useState<Patient | null>(null);
+
   // Handler to open Schedule Next modal
-  const handleScheduleNext = (patient: Patient) => {
+const handleScheduleNext = (patient: Patient) => {
     setSelectedPatient(patient);
     setFollowUpForm({
       appointmentDate: getDefaultFollowUpDate(),
@@ -156,6 +222,19 @@ export default function SecretaryDashboard() {
       treatmentNotes: ''
     });
     setActiveModal('followUp');
+  };
+
+  const handleScheduleProcedure = (patient: Patient) => {
+    setSelectedPatientForProcedure(patient);
+    setProcedureForm({
+      procedureType: patient.visitType === 'PROCEDURE' ? patient.service : '',
+      date: getDefaultFollowUpDate(),
+      estimatedTime: '60 minutes',
+      doctor: '',
+      notes: `Patient: ${patient.name}. Service: ${patient.service}`
+    });
+    setSelectedRoom(null);
+    setShowProcedureModal(true);
   };
 
   // Handler to submit Schedule Next
@@ -221,6 +300,7 @@ export default function SecretaryDashboard() {
       'No Show': 'bg-rose-100 text-rose-700 border-rose-200',
       'Cancelled': 'bg-orange-100 text-orange-700 border-orange-200',
       'Rescheduled': 'bg-yellow-100 text-yellow-700 border-yellow-200',
+      'Scheduled for Procedure': 'bg-indigo-100 text-indigo-700 border-indigo-200',
     };
     return styles[status] || 'bg-gray-100 text-gray-700 border-gray-200';
   };
@@ -236,7 +316,8 @@ export default function SecretaryDashboard() {
       'Completed': <CheckCircle2 className="w-3.5 h-3.5" />,
       'No Show': <XCircle className="w-3.5 h-3.5" />,
       'Cancelled': <XCircle className="w-3.5 h-3.5" />,
-      'Rescheduled': <CalendarPlus className="w-3.5 h-3.5" />,
+       'Rescheduled': <CalendarPlus className="w-3.5 h-3.5" />,
+      'Scheduled for Procedure': <Monitor className="w-3.5 h-3.5" />,
     };
     return icons[status] || <Circle className="w-3.5 h-3.5" />;
   };
@@ -353,9 +434,50 @@ export default function SecretaryDashboard() {
   };
 
 const handleComplete = (patient: Patient) => {
+    const updatedPatient = { ...patient, status: 'Completed' as PatientStatus };
+    
     setPatients(prev => prev.map(p => 
-      p.id === patient.id ? { ...p, status: 'Completed' } : p
+      p.id === patient.id ? updatedPatient : p
     ));
+    
+    // Auto-trigger procedure scheduling if needed
+    const needsProcedure = patient.visitType === 'PROCEDURE' || 
+      ['Cleaning', 'Surgery', 'Biopsy', 'Endoscopy', 'Tonsillectomy', 'Laryngoscopy'].some(kw => 
+        patient.service.toLowerCase().includes(kw.toLowerCase())
+      );
+    
+    if (needsProcedure) {
+      // Mark as requiring procedure
+      updatedPatient.procedureRequired = true;
+      setPatients(prev => prev.map(p => 
+        p.id === patient.id ? { ...updatedPatient, procedureRequired: true } : p
+      ));
+      
+      // Prepare procedure form
+      setSelectedPatientForProcedure(updatedPatient);
+      setProcedureForm({
+        procedureType: patient.visitType === 'PROCEDURE' ? patient.service : patient.service,
+        date: (() => {
+          const date = new Date();
+          date.setDate(date.getDate() + 7);
+          return date.toISOString().split('T')[0];
+        })(),
+        estimatedTime: '60 minutes',
+        doctor: doctors[0] || 'Dr. John Ong',
+        notes: `Post-consultation procedure scheduling for ${patient.name}\nChief complaint: ${patient.chiefComplaint?.complaint || 'N/A'}\nService: ${patient.service}`
+      });
+      setShowProcedureModal(true);
+      
+      // Success toast
+      setToastMessage(`✅ Consultation completed for ${patient.name}. Schedule procedure now?`);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 6000);
+    } else {
+      // Regular complete without procedure
+      setToastMessage(`✅ Consultation completed for ${patient.name}`);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }
   };
 
   const handleLateCheckIn = (patient: Patient) => {
@@ -369,6 +491,8 @@ const handleComplete = (patient: Patient) => {
 
   // Get patients ready for doctor
   const doctorQueue = patients.filter(p => p.status === 'Ready for Doctor' || p.status === 'Consultation');
+  
+  const procedureQueue = patients.filter(p => p.status === 'Scheduled for Procedure');
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -466,9 +590,9 @@ const handleComplete = (patient: Patient) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {/* TODAY'S APPOINTMENTS TABLE */}
-          <div className="xl:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="lg:col-span-1 xl:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="px-5 sm:px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-gray-900">Today's Appointments</h3>
@@ -511,82 +635,131 @@ const handleComplete = (patient: Patient) => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-1.5">
-                          {patient.status === 'Pending' && (
+{patient.status === 'Pending' && (
                             <>
-                              <button
-                                onClick={() => handleCheckIn(patient)}
-                                className="px-2.5 py-1 text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-1"
-                              >
-                                <UserCheck className="w-3 h-3" />
-                                Check-In
-                              </button>
-                              <button
-                                onClick={() => handleNoShow(patient)}
-                                className="px-2.5 py-1 text-xs font-medium bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-lg transition-colors flex items-center gap-1"
-                              >
-                                <XCircle className="w-3 h-3" />
-                                No Show
-                              </button>
-                              <button
-                                onClick={() => handleCancel(patient)}
-                                className="px-2.5 py-1 text-xs font-medium bg-orange-50 text-orange-700 hover:bg-orange-100 rounded-lg transition-colors flex items-center gap-1"
-                              >
-                                <XCircle className="w-3 h-3" />
-                                Cancel
-                              </button>
-                              <button
-                                onClick={() => handleReschedule(patient)}
-                                className="px-2.5 py-1 text-xs font-medium bg-yellow-50 text-yellow-700 hover:bg-yellow-100 rounded-lg transition-colors flex items-center gap-1"
-                              >
-                                <CalendarPlus className="w-3 h-3" />
-                                Reschedule
-                              </button>
+                              <div className="group relative">
+                                <button
+                                  onClick={() => handleCheckIn(patient)}
+                                  className="w-8 h-8 p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-all hover:scale-110 flex items-center justify-center"
+                                >
+                                  <UserCheck className="w-4 h-4" />
+                                </button>
+                                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 pointer-events-none">
+                                  Check-In
+                                </span>
+                              </div>
+                              <div className="group relative">
+                                <button
+                                  onClick={() => handleNoShow(patient)}
+                                  className="w-8 h-8 p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg transition-all hover:scale-110 flex items-center justify-center"
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                </button>
+                                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 pointer-events-none">
+                                  No Show
+                                </span>
+                              </div>
+                              <div className="group relative">
+                                <button
+                                  onClick={() => handleCancel(patient)}
+                                  className="w-8 h-8 p-1.5 bg-orange-50 hover:bg-orange-100 text-orange-700 rounded-lg transition-all hover:scale-110 flex items-center justify-center"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 pointer-events-none">
+                                  Cancel
+                                </span>
+                              </div>
+                              <div className="group relative">
+                                <button
+                                  onClick={() => handleReschedule(patient)}
+                                  className="w-8 h-8 p-1.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 rounded-lg transition-all hover:scale-110 flex items-center justify-center"
+                                >
+                                  <CalendarPlus className="w-4 h-4" />
+                                </button>
+                                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 pointer-events-none">
+                                  Reschedule
+                                </span>
+                              </div>
                             </>
                           )}
-                          {patient.status === 'No Show' && (
-                            <button
-                              onClick={() => handleLateCheckIn(patient)}
-                              className="px-2.5 py-1 text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg transition-colors flex items-center gap-1"
-                            >
-                              <Clock className="w-3 h-3" />
-                              Late Check-In
-                            </button>
+{patient.status === 'No Show' && (
+                            <div className="group relative">
+                              <button
+                                onClick={() => handleLateCheckIn(patient)}
+                                className="w-8 h-8 p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg transition-all hover:scale-110 flex items-center justify-center"
+                              >
+                                <Clock className="w-4 h-4" />
+                              </button>
+                              <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 pointer-events-none">
+                                Late Check-In
+                              </span>
+                            </div>
                           )}
-                          {patient.status === 'Checked-In' && (
-                            <button
-                              onClick={() => handleRecordVitals(patient)}
-                              className="px-2.5 py-1 text-xs font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg transition-colors flex items-center gap-1"
-                            >
-                              <Heart className="w-3 h-3" />
-                              Vitals
-                            </button>
+{patient.status === 'Checked-In' && (
+                            <div className="group relative">
+                              <button
+                                onClick={() => handleRecordVitals(patient)}
+                                className="w-8 h-8 p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg transition-all hover:scale-110 flex items-center justify-center"
+                              >
+                                <Heart className="w-4 h-4" />
+                              </button>
+                              <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 pointer-events-none">
+                                Record Vitals
+                              </span>
+                            </div>
                           )}
-                          {patient.status === 'Vitals Recorded' && (
-                            <button
-                              onClick={() => handleSendToDoctor(patient)}
-                              className="px-2.5 py-1 text-xs font-medium bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-lg transition-colors flex items-center gap-1"
-                            >
-                              <ArrowRight className="w-3 h-3" />
-                              Send to Doctor
-                            </button>
+{patient.status === 'Vitals Recorded' && (
+                            <div className="group relative">
+                              <button
+                                onClick={() => handleSendToDoctor(patient)}
+                                className="w-8 h-8 p-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg transition-all hover:scale-110 flex items-center justify-center"
+                              >
+                                <ArrowRight className="w-4 h-4" />
+                              </button>
+                              <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 pointer-events-none">
+                                Send to Doctor
+                              </span>
+                            </div>
                           )}
-                          {(patient.status === 'Ready for Doctor' || patient.status === 'Consultation') && (
-                            <button
-                              onClick={() => handleComplete(patient)}
-                              className="px-2.5 py-1 text-xs font-medium bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg transition-colors flex items-center gap-1"
-                            >
-                              <CheckCircle2 className="w-3 h-3" />
-                              Complete
-                            </button>
+{(patient.status === 'Ready for Doctor' || patient.status === 'Consultation') && (
+                            <div className="group relative">
+                              <button
+                                onClick={() => handleComplete(patient)}
+                                className="w-8 h-8 p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg transition-all hover:scale-110 flex items-center justify-center"
+                              >
+                                <CheckCircle2 className="w-4 h-4" />
+                              </button>
+                              <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 pointer-events-none">
+                                Complete
+                              </span>
+                            </div>
                           )}
-                          {patient.status === 'Completed' && (
-                            <button
-                              onClick={() => handleScheduleNext(patient)}
-                              className="px-2.5 py-1 text-xs font-medium bg-teal-50 text-teal-700 hover:bg-teal-100 rounded-lg transition-colors flex items-center gap-1"
-                            >
-                              <CalendarPlus className="w-3 h-3" />
-                              Schedule Next
-                            </button>
+{patient.status === 'Completed' && (
+                            <>
+                              <div className="group relative">
+                                <button
+                                  onClick={() => handleScheduleNext(patient)}
+                                  className="w-8 h-8 p-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg transition-all hover:scale-110 flex items-center justify-center"
+                                >
+                                  <CalendarPlus className="w-4 h-4" />
+                                </button>
+                                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 pointer-events-none">
+                                  Schedule Next
+                                </span>
+                              </div>
+                              <div className="group relative">
+                                <button
+                                  onClick={() => handleScheduleProcedure(patient)}
+                                  className="w-8 h-8 p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg transition-all hover:scale-110 flex items-center justify-center"
+                                >
+                                  <Monitor className="w-4 h-4" />
+                                </button>
+                                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 pointer-events-none">
+                                  Schedule Procedure
+                                </span>
+                              </div>
+                            </>
                           )}
                         </div>
                       </td>
@@ -701,6 +874,250 @@ const handleComplete = (patient: Patient) => {
           </div>
         </div>
       </main>
+
+      {/* Procedure Scheduling Modal */}
+      {showProcedureModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-indigo-100 rounded-xl">
+                  <Monitor className="w-5 h-5 text-indigo-700" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-lg">
+                    {selectedPatientForProcedure 
+                      ? `Schedule Procedure - ${selectedPatientForProcedure.name}` 
+                      : 'Schedule Procedure'
+                    }
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    {selectedPatientForProcedure 
+                      ? `Patient: ${selectedPatientForProcedure.name} (${selectedPatientForProcedure.service})` 
+                      : selectedRoom ? `Room: ${selectedRoom.name}` : 'Select a procedure room'
+                    }
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => {
+                  setShowProcedureModal(false);
+                  setSelectedRoom(null);
+                  setProcedureForm({ procedureType: '', date: getDefaultFollowUpDate(), estimatedTime: '60 minutes', doctor: '', notes: '' });
+                }} 
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {!selectedRoom ? (
+                <>
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-indigo-600" />
+                      Select Procedure Room
+                    </h4>
+                    <p className="text-sm text-gray-600 mb-6">Choose an available room for the procedure.</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {procedureRooms.map((room) => (
+                      <div
+                        key={room.id}
+                        onClick={() => setSelectedRoom(room)}
+                        className={`group cursor-pointer bg-white rounded-xl shadow-sm hover:shadow-md hover:shadow-indigo-200 hover:scale-[1.02] transition-all duration-300 border-2 border-gray-100 hover:border-indigo-300 p-6 flex flex-col items-center text-center h-[320px] overflow-hidden ${
+                          selectedRoom?.id === room.id ? 'ring-4 ring-indigo-200 shadow-indigo-300 scale-[1.02]' : ''
+                        }`}
+                      >
+                        <div className="w-full h-48 rounded-xl overflow-hidden shadow-sm mb-4 group-hover:shadow-md transition-shadow">
+                          <img 
+                            src={room.image} 
+                            alt={room.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        </div>
+                        <h5 className="font-semibold text-gray-900 text-lg mb-2">{room.name}</h5>
+                        <p className="text-sm text-gray-600 mb-4 flex-1">{room.description}</p>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          room.available 
+                            ? 'bg-emerald-100 text-emerald-700' 
+                            : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          {room.available ? 'Available' : 'Occupied'}
+                        </span>
+                        <button className="mt-4 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2 w-full">
+                          <Sparkles className="w-4 h-4" />
+                          Select Room
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-indigo-600" />
+                      Schedule Procedure in {selectedRoom.name}
+                    </h4>
+                    <p className="text-sm text-gray-600">{selectedRoom.description}</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Procedure Type
+                      </label>
+                      <select
+                        value={procedureForm.procedureType}
+                        onChange={(e) => setProcedureForm({ ...procedureForm, procedureType: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none transition-all"
+                      >
+                        <option value="">Select procedure type</option>
+                        {procedureTypes.map((type) => (
+                          <option key={type} value={type}>{type}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Procedure Date
+                      </label>
+                      <input
+                        type="date"
+                        value={procedureForm.date}
+                        onChange={(e) => setProcedureForm({ ...procedureForm, date: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Estimated Duration
+                      </label>
+                      <select
+                        value={procedureForm.estimatedTime}
+                        onChange={(e) => setProcedureForm({ ...procedureForm, estimatedTime: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none transition-all"
+                      >
+                        <option value="30 minutes">30 minutes</option>
+                        <option value="60 minutes">60 minutes</option>
+                        <option value="90 minutes">90 minutes</option>
+                        <option value="120 minutes">120 minutes</option>
+                        <option value="180 minutes">3 hours</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Assigned Doctor
+                      </label>
+                      <select
+                        value={procedureForm.doctor}
+                        onChange={(e) => setProcedureForm({ ...procedureForm, doctor: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none transition-all"
+                      >
+                        <option value="">Select doctor</option>
+                        {doctors.map((doctor) => (
+                          <option key={doctor} value={doctor}>{doctor}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Additional Notes
+                    </label>
+                    <textarea
+                      value={procedureForm.notes}
+                      onChange={(e) => setProcedureForm({ ...procedureForm, notes: e.target.value })}
+                      rows={4}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none transition-all resize-none"
+                      placeholder="Any special instructions, patient preparation, equipment needed..."
+                    />
+                  </div>
+
+                  <div className="bg-indigo-50 rounded-xl p-4 border border-indigo-100">
+                    <p className="text-sm text-indigo-700">
+                      <strong>Selected Room:</strong> <span className="font-semibold">{selectedRoom.name}</span> - {selectedRoom.description}
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex gap-3 justify-end">
+              {!selectedRoom ? (
+                <p className="text-sm text-gray-500 self-center">Please select a room to continue</p>
+              ) : (
+                <>
+                  <button
+                    onClick={() => {
+                      setSelectedRoom(null);
+                      setProcedureForm({ procedureType: '', date: getDefaultFollowUpDate(), estimatedTime: '60 minutes', doctor: '', notes: '' });
+                    }}
+                    className="px-6 py-3 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-all"
+                  >
+                    Change Room
+                  </button>
+                  <button
+                      onClick={() => {
+                        if (!selectedRoom || !procedureForm.procedureType || !procedureForm.doctor) return;
+                        
+                        // Submit procedure - update patient if selected, show toast
+                        const formattedDate = new Date(procedureForm.date).toLocaleDateString('en-US', { 
+                          weekday: 'long', 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        });
+                        
+                        if (selectedPatientForProcedure) {
+                          setPatients(prev => prev.map(p => 
+                            p.id === (selectedPatientForProcedure as Patient).id
+                              ? { 
+                                  ...p, 
+                                  status: 'Scheduled for Procedure' as PatientStatus,
+                                  procedureDetails: {
+                                    procedureType: procedureForm.procedureType,
+                                    room: selectedRoom.name,
+                                    scheduledTime: `${procedureForm.date} ${procedureForm.estimatedTime}`
+                                  }
+                                }
+                              : p
+                          ));
+                        }
+
+                      
+                      setToastMessage(`Procedure "${procedureForm.procedureType}" scheduled in ${selectedRoom.name} on ${formattedDate}${selectedPatientForProcedure ? ` for ${selectedPatientForProcedure.name}` : ''}`);
+                      setShowToast(true);
+                      setTimeout(() => setShowToast(false), 5000);
+                      
+                      // Reset form
+                      setSelectedRoom(null);
+                      setProcedureForm({ procedureType: '', date: getDefaultFollowUpDate(), estimatedTime: '60 minutes', doctor: '', notes: '' });
+                      setSelectedPatientForProcedure(null);
+                      setShowProcedureModal(false);
+                    }}
+
+                    disabled={!procedureForm.procedureType || !procedureForm.doctor}
+                    className="px-8 py-3 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                  >
+                    <Check className="w-4 h-4" />
+                    Confirm Procedure Appointment
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MODALS */}
       
